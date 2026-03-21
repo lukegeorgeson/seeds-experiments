@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seeds — Editorial Cards</title>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: {
+        serif: ['Newsreader', 'Georgia', 'serif'],
+        sans: ['DM Sans', 'system-ui', 'sans-serif'],
+      },
+      colors: {
+        canvas: { bg: '#f5f2ec' },
+        fg: { DEFAULT: '#2d2a24', 2: '#6b6860', 3: '#9a9790', 4: '#c5c2bc' },
+        accent: { DEFAULT: '#eac1f5', text: '#2f2433' },
+        tension: '#c04e86', signal: '#2185bf', direction: '#7a5fb0',
+        idea: '#25956e', provocation: '#bf6a22', guardrail: '#bf3535',
+      }
+    }
+  }
+}
+</script>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { font-family: 'DM Sans', system-ui, sans-serif; background: #f5f2ec; color: #2d2a24; overflow-x: hidden; min-height: 100vh; -webkit-font-smoothing: antialiased; }
+
+  .ed-card {
+    width: 215px; border-radius: 6px; padding: 16px 18px; background: #faf8f4;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    transition: all 0.2s cubic-bezier(0.22,1,0.36,1); cursor: default; position: relative;
+  }
+  .ed-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.07); }
+  .ed-card.selected { background: rgba(234,193,245,0.06); border: 1px solid #eac1f5; }
+  .ed-card.has-note::after { content: ''; position: absolute; top: 8px; right: 10px; width: 6px; height: 6px; border-radius: 50%; background: #d4922e; }
+  .ed-card.editing { box-shadow: 0 0 0 2px #2185bf, 0 4px 16px rgba(33,133,191,0.1); }
+
+  .ed-card-type { font-family: 'DM Sans', sans-serif; font-size: 8px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 8px; }
+  .ed-card-text { font-family: 'Newsreader', Georgia, serif; font-size: 14px; line-height: 1.6; color: #2d2a24; font-weight: 400; letter-spacing: 0.005em; }
+  .ed-card-footer { margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(0,0,0,0.06); display: flex; justify-content: space-between; align-items: center; }
+  .ed-card-tag { font-family: 'DM Sans', sans-serif; font-size: 9px; color: #9a9790; }
+
+  .card-actions-row { display: flex; gap: 2px; opacity: 0; transition: opacity 0.12s; }
+  .ed-card:hover .card-actions-row { opacity: 1; }
+  .card-act { width: 22px; height: 22px; border-radius: 6px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.04); color: #9a9790; font-size: 10px; transition: all 0.1s; }
+  .card-act:hover { background: rgba(0,0,0,0.08); color: #2d2a24; }
+</style>
+</head>
+<body>
+
+<!-- Top Bar -->
+<div class="fixed top-0 left-0 right-0 z-50 h-12 flex items-center justify-between px-6 border-b border-black/[0.06]" style="background:rgba(245,242,236,0.92);backdrop-filter:blur(16px);">
+  <div class="flex items-center gap-3">
+    <span class="text-[11px] font-bold tracking-widest text-fg-3 uppercase font-sans">Seeds</span>
+    <div class="w-px h-4 bg-black/[0.08]"></div>
+    <span class="text-[13px] text-fg-2 font-sans font-medium">Luxury hotel brand reinvention</span>
+  </div>
+  <div class="flex items-center gap-2">
+    <div class="flex items-center gap-1 mr-3 border-b border-transparent">
+      <button class="px-3 py-1 text-[11px] font-semibold text-fg border-b-2 border-direction font-sans">Round 1</button>
+      <button class="px-3 py-1 text-[11px] font-medium text-fg-4 font-sans">Round 2</button>
+    </div>
+    <button class="px-4 py-1.5 rounded-full text-[12px] font-bold bg-accent text-accent-text font-sans">Grow →</button>
+  </div>
+</div>
+
+<!-- Columns -->
+<div class="pt-16 px-8 pb-16 overflow-x-auto">
+  <div class="flex gap-6 min-w-max pt-4">
+
+    <!-- Signals -->
+    <div class="flex flex-col gap-3 w-[215px]">
+      <div class="px-1 mb-1">
+        <span class="font-serif italic text-[15px] text-signal font-medium">Signals</span>
+      </div>
+      <div class="ed-card selected">
+        <div class="ed-card-type" style="color:#2185bf;">SIGNAL</div>
+        <div class="ed-card-text">Luxury hospitality is splitting into two lanes: hyperlocal intimacy and planetary-scale spectacle. The middle is emptying out.</div>
+        <div class="ed-card-footer"><span class="ed-card-tag">#market</span><div class="card-actions-row"><button class="card-act">✓</button><button class="card-act">↻</button><button class="card-act">×</button></div></div>
+      </div>
+      <div class="ed-card">
+        <div class="ed-card-type" style="color:#2185bf;">SIGNAL</div>
+        <div class="ed-card-text">Aman and Nobu proved that restaurant-first hotels work. The anchor experience doesn't have to be the room.</div>
+        <div class="ed-card-footer"><span class="ed-card-tag">#precedent</span><div class="card-actions-row"><button class="card-act">✓</button><button class="card-act">↻</button><button class="card-act">×</button></div></div>
+      </div>
+      <div class="ed-card has-note">
+        <div class="ed-card-type" style="color:#2185bf;">SIGNAL</div>
+        <div class="ed-card-text">Remote work created a new guest archetype: the "productive hedonist" — working mornings, exploring afternoons.</div>
+        <div class="ed-card-footer"><span class="ed-card-tag">#audience</span><div class="card-actions-row"><button class="card-act">✓</button><button class="card-act">↻</button><button class="card-act">×</button></div></div>
+      </div>
+      <div class="ed-card">
+        <div class="ed-card-type" style="color:#2185bf;">SIGNAL</div>
+        <div class="ed-card-text">Instagram killed the lobby surprise. Every corner is pre-photographed. The new luxury is off-grid, unsearchable.</div>
+        <div class="ed-card-footer"><span class="ed-card-tag">#digital</span><div class="card-actions-row"><button class="card-act">✓</button><button class="card-act">↻</button><button class="card-act">×</button></div></div>
+      </div>
+      <div class="ed-card">
+        <div class="ed-card-type" style="color:#2185bf;">SIGNAL</div>
+        <div class="ed-card-text">Climate anxiety is reshaping travel guilt. Fewer trips, longer stays, deeper roots is the emerging pattern.</div>
+        <div class="ed-card-footer"><span class="ed-card-tag">#behavior</span><div class="card-actions-row"><button class="card-act">✓</button><button class="card-act">↻</button><button class="card-act">×</button></div></div>
+      </div>
+    </div>
+
+    <!-- Tensions -->
+    <div class="flex flex-col gap-3 w-[215px]">
+      <div class="px-1 mb-1">
+        <span class="font-serif italic text-[15px] text-tension font-medium">Tensions</span>
+      </div>
+      <div class="ed-card">
+        <div class="ed-card-type" style="color:#c04e86;">TENSION</div>
+        <div class="ed-card-text">Guests want personalization but resent surveillance. The line between attentive and invasive is one data point wide.</div>
+        <div class="ed-card-footer"><span class="ed-card-tag">#privacy</span><div class="card-actions-row"><button class="card-act">✓</button><button class="card-act">↻</button><button class="card-act">×</button></div></div>
+      </div>
+      <div class="ed-card selected">
+        <div class="ed-card-type" style="color:#c04e86;">TENSION</div>
+        <div class="ed-card-text">"Heritage" positioning locks you into nostalgia. "Contemporary" positioning makes you forgettable. Neither alone works.</div>
+        <div class="ed-card-footer"><span class="ed-card-tag">#brand</span><div class="card-actions-row"><button class="card-act">✓</button><button class="card-act">↻</button><button class="card-act">×</button></div></div>
+      </div>
+      <div class="ed-card">
+        <div class="ed-card-type" style="color:#c04e86;">TENSION</div>
+        <div class="ed-card-text">Local authenticity at scale is a paradox. The 50th "locally sourced breakfast" starts to feel like a franchise move.</div>
+        <div class="ed-card-footer"><span class="ed-card-tag">#scale</span><div class="card-actions-row"><button class="card-act">✓</button><button class="card-act">↻</button><button class="card-act">×</button></div></div>
+      </div>
+      <div class="ed-card has-note">
+        <div class="ed-card-type" style="color:#c04e86;">TENSION</div>
+        <div class="ed-card-text">The brand needs to attract new-money tech travelers without alienating old-money loyalists who value discretion.</div>
+        <div class="ed-card-footer"><span class="ed-card-tag">#audience</span><div class="card-actions-row"><button class="card-act">✓</button><button class="card-act">↻</button><button class="card-act">×</button></div></div>
+      </div>
+      <div class="ed-card">
+        <div class="ed-card-type" style="color:#c04e86;">TENSION</div>
+        <div class="ed-card-text">Sustainability in luxury hospitality means spending more to look like you're doing less. It's an invisible investment.</div>
+        <div class="ed-card-footer"><span class="ed-card-tag">#sustainability</span><div class="card-actions-row"><button class="card-act">✓</button><button class="card-act">↻</button><button class="card-act">×</button></div></div>
+      </div>
+    </div>
+
+    <!-- Directions -->
+    <div class="flex flex-col gap-3 w-[215px]">
+      <div class="px-1 mb-1">
+        <span class="font-serif italic text-[15px] text-direction font-medium">Directions</span>
+      </div>
+      <div class="ed-card selected" style="border:1px solid #eac1f5;background:rgba(234,193,245,0.06);">
+        <div class="ed-card-type" style="color:#7a5fb0;">DIRECTION</div>
+        <div class="ed-card-text" style="font-weight:500;">"The hotel as neighborhood." Don't contain guests — connect them. The property is a gateway, not a destination.</div>
+        <div class="ed-card-footer"><span class="ed-card-tag">#core</span><div class="card-actions-row"><button class="card-act">✓</button><button class="card-act">🔒</button><button class="card-act">↻</button></div></div>
+      </div>
+      <div class="ed-card">
+        <div class="ed-card-type" style="color:#7a5fb0;">DIRECTION</div>
+        <div class="ed-card-text">Redefine "rooms" as studios. Each one has tools — a turntable, a library, a drawing desk. Make staying productive.</div>
+        <div class="ed-card-footer"><span class="ed-card-tag">#product</span><div class="card-actions-row"><button class="card-act">✓</button><button class="card-act">↻</button><button class="card-act">×</button></div></div>
+      </div>
+      <div class="ed-card">
+        <div class="ed-card-type" style="color:#7a5fb0;">DIRECTION</div>
+        <div class="ed-card-text">Membership over booking. Treat return guests like club members, not customers. Recurring revenue, deeper loyalty.</div>
+        <div class="ed-card-footer"><span class="ed-card-tag">#model</span><div class="card-actions-row"><button class="card-act">✓</button><button class="card-act">↻</button><button class="card-act">×</button></div></div>
+      </div>
+      <!-- Editing card -->
+      <div class="ed-card editing">
+        <div class="ed-card-type" style="color:#7a5fb0;">DIRECTION</div>
+        <div class="ed-card-text" contenteditable="true" style="outline:none;caret-color:#2185bf;">No minibar. A pantry. Stock it with local producers, let guests cook. Blur the line between hosting and living.|</div>
+        <div class="ed-card-footer"><span class="ed-card-tag">#experience</span></div>
+      </div>
+    </div>
+
+    <!-- Ideas -->
+    <div class="flex flex-col gap-3 w-[215px]">
+      <div class="px-1 mb-1">
+        <span class="font-serif italic text-[15px] text-idea font-medium">Ideas</span>
+      </div>
+      <div class="ed-card">
+        <div class="ed-card-type" style="color:#25956e;">IDEA</div>
+        <div class="ed-card-text">A "concierge letter" before arrival — handwritten, mailed physically. First impression before you walk in.</div>
+        <div class="ed-card-footer"><span class="ed-card-tag">#touchpoint</span><div class="card-actions-row"><button class="card-act">✓</button><button class="card-act">↻</button><button class="card-act">×</button></div></div>
+      </div>
+      <div class="ed-card selected">
+        <div class="ed-card-type" style="color:#25956e;">IDEA</div>
+        <div class="ed-card-text">Partner with one local artist per property. They get a residency; guests get to watch creation happen in real time.</div>
+        <div class="ed-card-footer"><span class="ed-card-tag">#program</span><div class="card-actions-row"><button class="card-act">✓</button><button class="card-act">↻</button><button class="card-act">×</button></div></div>
+      </div>
+      <div class="ed-card">
+        <div class="ed-card-type" style="color:#25956e;">IDEA</div>
+        <div class="ed-card-text">Seasonal menus for the room itself — different textiles, scents, art rotations. The room is never the same twice.</div>
+        <div class="ed-card-footer"><span class="ed-card-tag">#product</span><div class="card-actions-row"><button class="card-act">✓</button><button class="card-act">↻</button><button class="card-act">×</button></div></div>
+      </div>
+      <div class="ed-card">
+        <div class="ed-card-type" style="color:#25956e;">IDEA</div>
+        <div class="ed-card-text">A "quiet hour" at the restaurant — no phones allowed, just conversation. Market it as a luxury feature.</div>
+        <div class="ed-card-footer"><span class="ed-card-tag">#experience</span><div class="card-actions-row"><button class="card-act">✓</button><button class="card-act">↻</button><button class="card-act">×</button></div></div>
+      </div>
+      <div class="ed-card">
+        <div class="ed-card-type" style="color:#25956e;">IDEA</div>
+        <div class="ed-card-text">Check-out gift: a small publication about the neighborhood, made in-house. Something worth keeping, not a branded tote.</div>
+        <div class="ed-card-footer"><span class="ed-card-tag">#touchpoint</span><div class="card-actions-row"><button class="card-act">✓</button><button class="card-act">↻</button><button class="card-act">×</button></div></div>
+      </div>
+    </div>
+
+    <!-- Modifiers -->
+    <div class="flex flex-col gap-3 w-[215px]">
+      <div class="px-1 mb-1">
+        <span class="font-serif italic text-[15px] text-provocation font-medium">Modifiers</span>
+      </div>
+      <div class="ed-card">
+        <div class="ed-card-type" style="color:#bf6a22;">PROVOCATION</div>
+        <div class="ed-card-text">What if you removed star ratings entirely? Let the stay speak for itself. No self-assigned status.</div>
+        <div class="ed-card-footer"><span class="ed-card-tag">#challenge</span><div class="card-actions-row"><button class="card-act">✓</button><button class="card-act">↻</button><button class="card-act">×</button></div></div>
+      </div>
+      <div class="ed-card">
+        <div class="ed-card-type" style="color:#bf6a22;">PROVOCATION</div>
+        <div class="ed-card-text">What if rooms had no TVs? If the view and the silence are the entertainment, why compete with a screen?</div>
+        <div class="ed-card-footer"><span class="ed-card-tag">#bold</span><div class="card-actions-row"><button class="card-act">✓</button><button class="card-act">↻</button><button class="card-act">×</button></div></div>
+      </div>
+      <div class="ed-card">
+        <div class="ed-card-type" style="color:#bf3535;">GUARD RAIL</div>
+        <div class="ed-card-text">Never use the word "curated." It means nothing. Describe what was actually chosen and why.</div>
+        <div class="ed-card-footer"><span class="ed-card-tag">#language</span></div>
+      </div>
+      <div class="ed-card">
+        <div class="ed-card-type" style="color:#bf3535;">GUARD RAIL</div>
+        <div class="ed-card-text">Avoid aspirational imagery of empty spaces. Show real guests, real use, real mess. Luxury is lived-in.</div>
+        <div class="ed-card-footer"><span class="ed-card-tag">#visual</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

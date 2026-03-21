@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seeds — Minimal Cards</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: { sans: ['Space Grotesk', 'system-ui', 'sans-serif'] },
+      colors: {
+        canvas: { bg: '#0c0c0e' },
+        fg: { DEFAULT: '#d4d0cb', 2: 'rgba(212,208,203,0.5)', 3: 'rgba(212,208,203,0.25)', 4: 'rgba(212,208,203,0.12)' },
+        accent: { DEFAULT: '#eac1f5' },
+        tension: '#f472b6', signal: '#38bdf8', direction: '#a78bfa',
+        idea: '#34d399', provocation: '#fb923c', guardrail: '#ef4444',
+      }
+    }
+  }
+}
+</script>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { font-family: 'Space Grotesk', system-ui, sans-serif; background: #0c0c0e; color: #d4d0cb; overflow: hidden; height: 100vh; width: 100vw; -webkit-font-smoothing: antialiased; }
+
+  .canvas-world { position: absolute; inset: 0; overflow: hidden; cursor: grab;
+    background: radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 24px 24px; }
+  .canvas-world:active { cursor: grabbing; }
+  .canvas-inner { position: absolute; width: 4000px; height: 3000px; transform-origin: 0 0; }
+
+  .card {
+    position: absolute; border-radius: 8px; padding: 14px 16px;
+    cursor: grab; user-select: none; -webkit-user-select: none;
+    background: rgba(255,255,255,0.03); border: 1px solid transparent;
+    transition: all 0.15s; z-index: 10;
+  }
+  .card:hover { background: rgba(255,255,255,0.06); z-index: 50; }
+  .card:active { cursor: grabbing; }
+  .card.dragging { z-index: 100; transform: scale(1.02) !important; background: rgba(255,255,255,0.08); }
+  .card.selected { border-color: rgba(234,193,245,0.4); }
+
+  .card-dot { width: 4px; height: 4px; border-radius: 50%; margin-bottom: 10px; }
+  .card-text { font-size: 13.5px; line-height: 1.55; color: #d4d0cb; font-weight: 400; }
+
+  /* Floating action bar */
+  .card-fab {
+    position: absolute; left: 50%; transform: translateX(-50%);
+    top: -36px; display: flex; gap: 2px; padding: 4px;
+    border-radius: 999px; background: rgba(18,18,22,0.95);
+    border: 1px solid rgba(255,255,255,0.06);
+    opacity: 0; pointer-events: none; transition: opacity 0.12s;
+    backdrop-filter: blur(8px);
+  }
+  .card:hover .card-fab { opacity: 1; pointer-events: auto; }
+  .fab-btn { width: 24px; height: 24px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; background: transparent; color: rgba(212,208,203,0.4); font-size: 10px; transition: all 0.1s; }
+  .fab-btn:hover { background: rgba(255,255,255,0.08); color: #d4d0cb; }
+</style>
+</head>
+<body>
+
+<!-- Minimal Top Bar -->
+<div class="fixed top-0 left-0 right-0 z-[200] h-10 flex items-center px-4" style="background:rgba(12,12,14,0.7);backdrop-filter:blur(12px);">
+  <span class="text-[10px] font-semibold tracking-widest text-fg-3 uppercase">Seeds</span>
+  <div class="w-px h-3 bg-white/[0.06] mx-3"></div>
+  <span class="text-[11px] text-fg-3 font-normal">Sustainable fashion brand positioning</span>
+</div>
+
+<!-- Canvas -->
+<div class="canvas-world" id="canvas-world">
+  <div class="canvas-inner" id="canvas-inner">
+
+    <!-- Cards scattered freeform with varied widths -->
+    <div class="card" style="left:140px;top:120px;width:220px;transform:rotate(-0.8deg);">
+      <div class="card-fab"><button class="fab-btn">✓</button><button class="fab-btn">↻</button><button class="fab-btn">✎</button><button class="fab-btn">💬</button><button class="fab-btn">×</button></div>
+      <div class="card-dot" style="background:#f472b6;"></div>
+      <div class="card-text">Fast fashion's real competitor isn't slow fashion — it's thrifting apps that make secondhand feel first-choice.</div>
+    </div>
+
+    <div class="card" style="left:380px;top:100px;width:200px;transform:rotate(0.5deg);">
+      <div class="card-fab"><button class="fab-btn">✓</button><button class="fab-btn">↻</button><button class="fab-btn">✎</button><button class="fab-btn">💬</button><button class="fab-btn">×</button></div>
+      <div class="card-dot" style="background:#f472b6;"></div>
+      <div class="card-text">"Sustainability" is a dead word. People hear it and tune out. Find a new frame.</div>
+    </div>
+
+    <div class="card selected" style="left:600px;top:90px;width:240px;transform:rotate(-0.3deg);">
+      <div class="card-fab"><button class="fab-btn">✓</button><button class="fab-btn">↻</button><button class="fab-btn">✎</button><button class="fab-btn">💬</button><button class="fab-btn">×</button></div>
+      <div class="card-dot" style="background:#38bdf8;"></div>
+      <div class="card-text">Repair cafes are booming in Berlin, Copenhagen, Tokyo. People want to maintain things, not just buy new ones. Durability as lifestyle.</div>
+    </div>
+
+    <div class="card" style="left:860px;top:110px;width:190px;transform:rotate(0.7deg);">
+      <div class="card-fab"><button class="fab-btn">✓</button><button class="fab-btn">↻</button><button class="fab-btn">✎</button><button class="fab-btn">💬</button><button class="fab-btn">×</button></div>
+      <div class="card-dot" style="background:#38bdf8;"></div>
+      <div class="card-text">Patagonia's "Don't Buy This Jacket" ad ran 13 years ago. What's the next evolution of that honesty?</div>
+    </div>
+
+    <div class="card" style="left:160px;top:290px;width:210px;transform:rotate(1deg);">
+      <div class="card-fab"><button class="fab-btn">✓</button><button class="fab-btn">↻</button><button class="fab-btn">✎</button><button class="fab-btn">💬</button><button class="fab-btn">×</button></div>
+      <div class="card-dot" style="background:#f472b6;"></div>
+      <div class="card-text">The carbon footprint label is the new nutrition label. But nobody knows how to read it yet.</div>
+    </div>
+
+    <div class="card" style="left:400px;top:270px;width:180px;transform:rotate(-1.2deg);">
+      <div class="card-fab"><button class="fab-btn">✓</button><button class="fab-btn">↻</button><button class="fab-btn">✎</button><button class="fab-btn">💬</button><button class="fab-btn">×</button></div>
+      <div class="card-dot" style="background:#38bdf8;"></div>
+      <div class="card-text">Rental fashion grew 10× in 3 years. Ownership is optional for under-30s.</div>
+    </div>
+
+    <div class="card selected" style="left:610px;top:260px;width:260px;transform:rotate(0.4deg);">
+      <div class="card-fab"><button class="fab-btn">✓</button><button class="fab-btn">↻</button><button class="fab-btn">✎</button><button class="fab-btn">💬</button><button class="fab-btn">×</button></div>
+      <div class="card-dot" style="background:#a78bfa;"></div>
+      <div class="card-text">Position as "clothes that get better." Not anti-new, not anti-fashion. Pro-aging. The opposite of planned obsolescence.</div>
+    </div>
+
+    <div class="card" style="left:900px;top:280px;width:200px;transform:rotate(-0.6deg);">
+      <div class="card-fab"><button class="fab-btn">✓</button><button class="fab-btn">↻</button><button class="fab-btn">✎</button><button class="fab-btn">💬</button><button class="fab-btn">×</button></div>
+      <div class="card-dot" style="background:#a78bfa;"></div>
+      <div class="card-text">Brand voice: matter-of-fact, no guilt. Show the supply chain like a recipe, not a confession.</div>
+    </div>
+
+    <!-- Stacked/overlapping cluster -->
+    <div class="card" style="left:180px;top:450px;width:220px;transform:rotate(0.3deg);z-index:12;">
+      <div class="card-fab"><button class="fab-btn">✓</button><button class="fab-btn">↻</button><button class="fab-btn">✎</button><button class="fab-btn">💬</button><button class="fab-btn">×</button></div>
+      <div class="card-dot" style="background:#a78bfa;"></div>
+      <div class="card-text">Every garment ships with a QR code linking to its production diary. Make the journey visible.</div>
+    </div>
+    <div class="card" style="left:210px;top:475px;width:220px;transform:rotate(-1deg);z-index:11;">
+      <div class="card-fab"><button class="fab-btn">✓</button><button class="fab-btn">↻</button><button class="fab-btn">✎</button><button class="fab-btn">💬</button><button class="fab-btn">×</button></div>
+      <div class="card-dot" style="background:#a78bfa;"></div>
+      <div class="card-text">"Design for disassembly" — make every component separable and recyclable at end of life.</div>
+    </div>
+
+    <div class="card" style="left:480px;top:440px;width:190px;transform:rotate(0.8deg);">
+      <div class="card-fab"><button class="fab-btn">✓</button><button class="fab-btn">↻</button><button class="fab-btn">✎</button><button class="fab-btn">💬</button><button class="fab-btn">×</button></div>
+      <div class="card-dot" style="background:#34d399;"></div>
+      <div class="card-text">A "wear test" program — 100 people wear each piece for 6 months before it launches. Real data, not claims.</div>
+    </div>
+
+    <div class="card" style="left:700px;top:420px;width:250px;transform:rotate(-0.5deg);">
+      <div class="card-fab"><button class="fab-btn">✓</button><button class="fab-btn">↻</button><button class="fab-btn">✎</button><button class="fab-btn">💬</button><button class="fab-btn">×</button></div>
+      <div class="card-dot" style="background:#34d399;"></div>
+      <div class="card-text">Partnership with local tailors in every city you sell in. Buy the garment, get lifetime alterations. The after-sale IS the product.</div>
+    </div>
+
+    <div class="card selected" style="left:970px;top:440px;width:210px;transform:rotate(0.6deg);">
+      <div class="card-fab"><button class="fab-btn">✓</button><button class="fab-btn">↻</button><button class="fab-btn">✎</button><button class="fab-btn">💬</button><button class="fab-btn">×</button></div>
+      <div class="card-dot" style="background:#34d399;"></div>
+      <div class="card-text">A "materials library" in-store. Customers touch, compare, learn. The shop is an education space.</div>
+    </div>
+
+    <div class="card" style="left:300px;top:620px;width:220px;transform:rotate(-0.4deg);">
+      <div class="card-fab"><button class="fab-btn">✓</button><button class="fab-btn">↻</button><button class="fab-btn">✎</button><button class="fab-btn">💬</button><button class="fab-btn">×</button></div>
+      <div class="card-dot" style="background:#fb923c;"></div>
+      <div class="card-text">What if you published the exact pollution cost of each garment and let customers offset it — or not?</div>
+    </div>
+
+    <div class="card" style="left:550px;top:600px;width:200px;transform:rotate(1.2deg);">
+      <div class="card-fab"><button class="fab-btn">✓</button><button class="fab-btn">↻</button><button class="fab-btn">✎</button><button class="fab-btn">💬</button><button class="fab-btn">×</button></div>
+      <div class="card-dot" style="background:#fb923c;"></div>
+      <div class="card-text">Make returns painful on purpose. If you have to write why you're returning it, people think harder before buying.</div>
+    </div>
+
+    <div class="card" style="left:780px;top:610px;width:230px;transform:rotate(-0.7deg);">
+      <div class="card-fab"><button class="fab-btn">✓</button><button class="fab-btn">↻</button><button class="fab-btn">✎</button><button class="fab-btn">💬</button><button class="fab-btn">×</button></div>
+      <div class="card-dot" style="background:#fb923c;"></div>
+      <div class="card-text">Only release 4 pieces per year. Scarcity through restraint, not artificial drops. Anti-collection collection.</div>
+    </div>
+
+    <!-- Guard rails -->
+    <div class="card" style="left:140px;top:760px;width:210px;transform:rotate(0.2deg);">
+      <div class="card-fab"><button class="fab-btn">✓</button><button class="fab-btn">↻</button><button class="fab-btn">✎</button><button class="fab-btn">💬</button><button class="fab-btn">×</button></div>
+      <div class="card-dot" style="background:#ef4444;"></div>
+      <div class="card-text">Never use the word "eco." It's greenwashing shorthand. Say exactly what you mean.</div>
+    </div>
+
+    <div class="card" style="left:380px;top:750px;width:220px;transform:rotate(-0.8deg);">
+      <div class="card-fab"><button class="fab-btn">✓</button><button class="fab-btn">↻</button><button class="fab-btn">✎</button><button class="fab-btn">💬</button><button class="fab-btn">×</button></div>
+      <div class="card-dot" style="background:#ef4444;"></div>
+      <div class="card-text">Don't position against fast fashion. Position for something. Negative framing attracts the wrong audience.</div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const world = document.getElementById('canvas-world');
+const inner = document.getElementById('canvas-inner');
+let panX = -60, panY = -40, zoom = 1, isPanning = false, startX, startY, startPanX, startPanY;
+
+function applyTransform() { inner.style.transform = `translate(${panX}px,${panY}px) scale(${zoom})`; }
+
+world.addEventListener('mousedown', e => {
+  if (e.target.closest('.card')) return;
+  isPanning = true; startX = e.clientX; startY = e.clientY; startPanX = panX; startPanY = panY;
+});
+window.addEventListener('mousemove', e => { if (!isPanning) return; panX = startPanX + (e.clientX - startX); panY = startPanY + (e.clientY - startY); applyTransform(); });
+window.addEventListener('mouseup', () => { isPanning = false; });
+world.addEventListener('wheel', e => { e.preventDefault(); zoom = Math.max(0.25, Math.min(2.5, zoom * (e.deltaY > 0 ? 0.92 : 1.08))); applyTransform(); }, { passive: false });
+
+document.querySelectorAll('.card').forEach(card => {
+  let dx, dy, dragging = false;
+  card.addEventListener('mousedown', e => {
+    e.stopPropagation(); dragging = true; card.classList.add('dragging');
+    const rect = card.getBoundingClientRect(); dx = e.clientX - rect.left; dy = e.clientY - rect.top;
+    const onMove = ev => { if (!dragging) return; const wr = inner.getBoundingClientRect(); card.style.left = (ev.clientX - wr.left - dx * zoom) / zoom + 'px'; card.style.top = (ev.clientY - wr.top - dy * zoom) / zoom + 'px'; card.style.transform = 'rotate(0deg)'; };
+    const onUp = () => { dragging = false; card.classList.remove('dragging'); window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); };
+    window.addEventListener('mousemove', onMove); window.addEventListener('mouseup', onUp);
+  });
+});
+
+applyTransform();
+</script>
+</body>
+</html>

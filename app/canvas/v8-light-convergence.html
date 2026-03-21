@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seeds — Round 3 Convergence</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+      colors: {
+        canvas: { bg: '#f0eeea' },
+        fg: { DEFAULT: '#1a1a18', 2: '#5a5a56', 3: '#8a8a86', 4: '#b5b5b2' },
+        accent: { DEFAULT: '#eac1f5', text: '#2f2433' },
+        tension: '#c04e86', signal: '#2185bf', direction: '#7a5fb0',
+        idea: '#25956e', provocation: '#bf6a22', guardrail: '#bf3535',
+      }
+    }
+  }
+}
+</script>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { font-family: 'Inter', system-ui, sans-serif; background: #f0eeea; color: #1a1a18; overflow-x: hidden; min-height: 100vh; -webkit-font-smoothing: antialiased; }
+
+  .conv-card {
+    width: 220px; border-radius: 12px; padding: 16px 18px; background: #ffffff; position: relative;
+    border: 1px solid rgba(0,0,0,0.06);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    transition: all 0.18s cubic-bezier(0.22,1,0.36,1);
+  }
+  .conv-card:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
+  .conv-card.selected { box-shadow: 0 0 0 2px #eac1f5, 0 0 12px rgba(234,193,245,0.18); }
+  .conv-card.locked { box-shadow: 0 0 0 2.5px #eac1f5, 0 0 16px rgba(234,193,245,0.22); }
+  .conv-card.locked::after { content: '🔒'; position: absolute; top: 10px; right: 12px; font-size: 10px; }
+  .conv-card.core { width: 280px; background: rgba(234,193,245,0.04); border: 1.5px solid rgba(234,193,245,0.25); }
+  .conv-card.sparring { border: 1.5px dashed rgba(239,68,68,0.15); background: rgba(239,68,68,0.02); }
+
+  .card-type { display: inline-flex; align-items: center; gap: 5px; font-size: 9px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 8px; }
+  .card-dot { width: 5px; height: 5px; border-radius: 50%; }
+  .card-text { font-size: 14px; line-height: 1.6; color: #1a1a18; font-weight: 400; }
+  .card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(0,0,0,0.05); }
+  .card-tag { font-size: 9px; color: #b5b5b2; }
+  .card-actions { display: flex; gap: 2px; opacity: 0; transition: opacity 0.12s; }
+  .conv-card:hover .card-actions { opacity: 1; }
+  .card-act { width: 22px; height: 22px; border-radius: 6px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.04); color: #8a8a86; font-size: 10px; transition: all 0.1s; }
+  .card-act:hover { background: rgba(0,0,0,0.08); color: #1a1a18; }
+</style>
+</head>
+<body>
+
+<!-- Top Bar -->
+<div class="fixed top-0 left-0 right-0 z-50 h-12 flex items-center justify-between px-6 border-b border-black/[0.06]" style="background:rgba(240,238,234,0.92);backdrop-filter:blur(16px);">
+  <div class="flex items-center gap-3">
+    <span class="text-[11px] font-bold tracking-widest text-fg-3 uppercase">Seeds</span>
+    <div class="w-px h-4 bg-black/[0.08]"></div>
+    <span class="text-[13px] text-fg-2 font-medium">DTC coffee brand launch</span>
+  </div>
+  <div class="flex items-center gap-2">
+    <div class="flex items-center gap-0.5 mr-3">
+      <button class="px-3 py-1 rounded-full text-[11px] font-medium text-fg-4">R1</button>
+      <button class="px-3 py-1 rounded-full text-[11px] font-medium text-fg-4">R2</button>
+      <button class="px-3 py-1 rounded-full text-[11px] font-semibold text-fg border-b-2 border-accent bg-accent/10">Round 3</button>
+    </div>
+    <button class="px-4 py-1.5 rounded-full text-[12px] font-bold bg-accent text-accent-text shadow-sm hover:shadow-md transition-all">Grow Round 4 →</button>
+  </div>
+</div>
+
+<!-- Round indicators (collapsed) -->
+<div class="fixed left-4 top-16 z-40 flex flex-col gap-2 pt-3">
+  <div class="px-3 py-2 rounded-lg bg-white/80 border border-black/[0.04] text-[9px] text-fg-4 font-medium shadow-sm">
+    <div class="text-fg-3 font-semibold mb-0.5">Start</div>
+    "DTC coffee brand…"
+  </div>
+  <div class="px-3 py-1.5 rounded-lg bg-white/60 border border-black/[0.04] text-[9px] text-fg-4">R1 · 28 cards</div>
+  <div class="px-3 py-1.5 rounded-lg bg-white/60 border border-black/[0.04] text-[9px] text-fg-4">R2 · 18 cards</div>
+</div>
+
+<!-- Columns -->
+<div class="pt-16 px-8 pb-20 overflow-x-auto">
+  <div class="flex gap-7 min-w-max pl-[140px] pt-4">
+
+    <!-- Core Direction -->
+    <div class="flex flex-col gap-3 w-[280px]">
+      <div class="flex items-center gap-2 mb-1 px-1">
+        <div class="card-dot" style="background:#7a5fb0;"></div>
+        <span class="text-[10px] font-semibold text-direction uppercase tracking-[0.08em]">Core Direction</span>
+      </div>
+      <div class="conv-card core locked">
+        <div class="card-type"><span style="color:#7a5fb0">Direction</span></div>
+        <div class="card-text" style="font-weight:500;font-size:15px;">"Neighborhood coffee, not coffee brand." Position as the local roaster that ships — not a DTC brand pretending to be local. Every bag names the roaster, city, and the café that inspired the blend.</div>
+        <div class="card-footer"><span class="card-tag">#core · locked</span></div>
+      </div>
+    </div>
+
+    <!-- Reasons to Believe -->
+    <div class="flex flex-col gap-3 w-[220px]">
+      <div class="flex items-center gap-2 mb-1 px-1">
+        <div class="card-dot" style="background:#2185bf;"></div>
+        <span class="text-[10px] font-semibold text-signal uppercase tracking-[0.08em]">Reasons to Believe</span>
+      </div>
+      <div class="conv-card selected">
+        <div class="card-text">Third-wave coffee already proved people will pay for provenance. This extends provenance to the roaster's story, not just the bean's origin.</div>
+        <div class="card-footer"><span class="card-tag">#precedent</span><div class="card-actions"><button class="card-act">✓</button><button class="card-act">↻</button></div></div>
+      </div>
+      <div class="conv-card">
+        <div class="card-text">Subscription fatigue is real — but people don't cancel the subscriptions that feel personal. A named roaster creates that bond.</div>
+        <div class="card-footer"><span class="card-tag">#retention</span><div class="card-actions"><button class="card-act">✓</button><button class="card-act">↻</button></div></div>
+      </div>
+      <div class="conv-card selected">
+        <div class="card-text">Logistics already support it — micro-roasters are overproducing. This gives them a distribution channel, not competition.</div>
+        <div class="card-footer"><span class="card-tag">#supply</span><div class="card-actions"><button class="card-act">✓</button><button class="card-act">↻</button></div></div>
+      </div>
+    </div>
+
+    <!-- Risks -->
+    <div class="flex flex-col gap-3 w-[220px]">
+      <div class="flex items-center gap-2 mb-1 px-1">
+        <div class="card-dot" style="background:#bf3535;"></div>
+        <span class="text-[10px] font-semibold text-guardrail uppercase tracking-[0.08em]">Risks</span>
+      </div>
+      <div class="conv-card" style="border-left:3px solid rgba(191,53,53,0.2);">
+        <div class="card-text">Quality inconsistency between roasters could undermine the brand. Need a curation bar, not just a marketplace.</div>
+        <div class="card-footer"><span class="card-tag">#quality</span><div class="card-actions"><button class="card-act">✓</button><button class="card-act">↻</button></div></div>
+      </div>
+      <div class="conv-card locked" style="border-left:3px solid rgba(191,53,53,0.2);">
+        <div class="card-text">If you scale too fast, "neighborhood" becomes performative. Growth rate needs to match the narrative.</div>
+        <div class="card-footer"><span class="card-tag">#scale</span></div>
+      </div>
+    </div>
+
+    <!-- Execution Plays -->
+    <div class="flex flex-col gap-3 w-[220px]">
+      <div class="flex items-center gap-2 mb-1 px-1">
+        <div class="card-dot" style="background:#25956e;"></div>
+        <span class="text-[10px] font-semibold text-idea uppercase tracking-[0.08em]">Execution Plays</span>
+      </div>
+      <div class="conv-card">
+        <div class="card-text">Launch in 3 cities only. One roaster per city. Name the subscription after the city, not the brand.</div>
+        <div class="card-footer"><span class="card-tag">#launch</span><div class="card-actions"><button class="card-act">✓</button><button class="card-act">↻</button></div></div>
+      </div>
+      <div class="conv-card selected">
+        <div class="card-text">Each bag includes a postcard from the roaster — handwritten note about this particular batch. Analog in a digital channel.</div>
+        <div class="card-footer"><span class="card-tag">#touchpoint</span><div class="card-actions"><button class="card-act">✓</button><button class="card-act">↻</button></div></div>
+      </div>
+      <div class="conv-card">
+        <div class="card-text">Instagram strategy: feature the roasters, not the product. The people ARE the brand. No lifestyle shots of mugs.</div>
+        <div class="card-footer"><span class="card-tag">#content</span><div class="card-actions"><button class="card-act">✓</button><button class="card-act">↻</button></div></div>
+      </div>
+      <div class="conv-card">
+        <div class="card-text">Pricing: transparent breakdown on every bag. "Roaster gets X, shipping costs Y, we keep Z." Trust through math.</div>
+        <div class="card-footer"><span class="card-tag">#pricing</span><div class="card-actions"><button class="card-act">✓</button><button class="card-act">↻</button></div></div>
+      </div>
+    </div>
+
+    <!-- What Would Break This? (sparring) -->
+    <div class="flex flex-col gap-3 w-[220px]">
+      <div class="flex items-center gap-2 mb-1 px-1">
+        <span class="text-[12px]">⚡</span>
+        <span class="text-[10px] font-semibold text-guardrail uppercase tracking-[0.08em]">What Would Break This?</span>
+      </div>
+      <div class="conv-card sparring">
+        <div class="card-type"><span class="text-[10px]">⚡</span> <span style="color:#bf3535">Challenge</span></div>
+        <div class="card-text">If Blue Bottle or Stumptown copies the model with better logistics, what's your moat? Distribution isn't defensible.</div>
+        <div class="card-footer"><span class="card-tag">#competition</span><div class="card-actions"><button class="card-act">✓</button><button class="card-act">↻</button></div></div>
+      </div>
+      <div class="conv-card sparring">
+        <div class="card-type"><span class="text-[10px]">⚡</span> <span style="color:#bf3535">Challenge</span></div>
+        <div class="card-text">"Neighborhood" implies small. What happens when you're in 50 cities? The metaphor breaks. Do you rebrand or cap growth?</div>
+        <div class="card-footer"><span class="card-tag">#scale</span><div class="card-actions"><button class="card-act">✓</button><button class="card-act">↻</button></div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Bottom Grow Bar -->
+<div class="fixed bottom-0 left-0 right-0 z-50 h-12 flex items-center justify-between px-6 border-t border-black/[0.06]" style="background:rgba(240,238,234,0.95);backdrop-filter:blur(12px);">
+  <div class="text-[12px] text-fg-3 font-medium">
+    <span class="text-fg-2 font-semibold">2</span> locked · <span class="text-fg-2 font-semibold">3</span> selected — Ready to sharpen further
+  </div>
+  <button class="px-5 py-1.5 rounded-full text-[12px] font-bold bg-accent text-accent-text shadow-sm hover:shadow-md transition-all">Grow Round 4 →</button>
+</div>
+
+</body>
+</html>

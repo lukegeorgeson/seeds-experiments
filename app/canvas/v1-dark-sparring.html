@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seeds — Dark Sparring Canvas</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: { sans: ['DM Sans', 'system-ui', 'sans-serif'] },
+      colors: {
+        canvas: { bg: '#0a0a0c', surface: '#161619', chrome: 'rgba(10,10,12,0.88)' },
+        fg: { DEFAULT: '#e0ddd8', 2: 'rgba(224,221,216,0.5)', 3: 'rgba(224,221,216,0.25)', 4: 'rgba(224,221,216,0.12)' },
+        accent: { DEFAULT: '#eac1f5', hover: '#ddb0eb', text: '#f0e0f8' },
+        tension: '#f472b6', signal: '#38bdf8', direction: '#a78bfa',
+        idea: '#34d399', provocation: '#fb923c', guardrail: '#ef4444',
+        keep: '#34d399', riff: '#fbbf24',
+      }
+    }
+  }
+}
+</script>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { font-family: 'DM Sans', system-ui, sans-serif; background: #0a0a0c; color: #e0ddd8; overflow: hidden; height: 100vh; width: 100vw; -webkit-font-smoothing: antialiased; }
+
+  .canvas-world { position: absolute; inset: 0; overflow: hidden; cursor: grab;
+    background: radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px);
+    background-size: 24px 24px; }
+  .canvas-world:active { cursor: grabbing; }
+  .canvas-inner { position: absolute; width: 4000px; height: 3000px; transform-origin: 0 0; }
+
+  .connections { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
+  .connections line { stroke: rgba(255,255,255,0.03); stroke-width: 1; stroke-dasharray: 4 4; }
+  .connections line.flow { stroke: rgba(167,139,250,0.1); stroke-width: 1.5; stroke-dasharray: none; }
+  .connections line.riff-line { stroke: rgba(251,191,36,0.1); stroke-width: 1.5; stroke-dasharray: 6 3; }
+
+  .card {
+    position: absolute; width: 220px; border-radius: 10px; padding: 14px 16px;
+    cursor: grab; user-select: none; -webkit-user-select: none;
+    transition: box-shadow 0.15s, transform 0.15s; z-index: 10;
+    border: 1px solid rgba(255,255,255,0.06); background: #161619;
+  }
+  .card:hover { z-index: 50; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
+  .card:active { cursor: grabbing; }
+  .card.dragging { z-index: 100; box-shadow: 0 12px 48px rgba(0,0,0,0.55); transform: scale(1.02) !important; }
+
+  .card-warm { background: linear-gradient(145deg, #1c1917, #292524); border-color: rgba(251,191,36,0.06); }
+  .card-cool { background: linear-gradient(145deg, #0c1222, #1e293b); border-color: rgba(56,189,248,0.06); }
+  .card-deep { background: linear-gradient(145deg, #1a0a2e, #2d1b4e); border-color: rgba(167,139,250,0.06); }
+  .card-forest { background: linear-gradient(145deg, #052e16, #14532d); border-color: rgba(52,211,153,0.06); }
+  .card-ember { background: linear-gradient(145deg, #2a0a0a, #4a1212); border-color: rgba(239,68,68,0.06); }
+
+  .card-type { display: inline-flex; align-items: center; gap: 5px; font-size: 9px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 7px; }
+  .card-type-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+  .card-text { font-size: 13px; line-height: 1.55; color: #e0ddd8; font-weight: 400; letter-spacing: -0.005em; }
+  .card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 9px; padding-top: 7px; border-top: 1px solid rgba(255,255,255,0.04); }
+  .card-tag { font-size: 9px; color: rgba(224,221,216,0.2); font-weight: 500; }
+  .card-actions { display: flex; gap: 2px; opacity: 0; transition: opacity 0.12s; }
+  .card:hover .card-actions { opacity: 1; }
+  .card-action { width: 22px; height: 22px; border-radius: 5px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.06); color: rgba(224,221,216,0.4); font-size: 10px; transition: all 0.1s; }
+  .card-action:hover { background: rgba(255,255,255,0.12); color: #e0ddd8; }
+
+  .zone { position: absolute; border-radius: 16px; pointer-events: none; z-index: 2; }
+  .zone-freeform { border: 1px dashed rgba(255,255,255,0.06); background: rgba(255,255,255,0.008); }
+  .zone-focused { border: 1px solid rgba(167,139,250,0.12); background: rgba(167,139,250,0.012); }
+  .zone-hot { border: 1px solid rgba(251,191,36,0.12); background: rgba(251,191,36,0.012); }
+  .zone-label { position: absolute; top: -9px; left: 14px; padding: 2px 9px; border-radius: 4px; font-size: 10px; font-weight: 500; letter-spacing: 0.04em; }
+  .zone-freeform .zone-label { background: rgba(255,255,255,0.04); color: rgba(224,221,216,0.3); }
+  .zone-focused .zone-label { background: rgba(167,139,250,0.1); color: #a78bfa; }
+  .zone-hot .zone-label { background: rgba(251,191,36,0.1); color: #fbbf24; }
+
+  .fountain { position: absolute; z-index: 15; width: 190px; padding: 12px; border-radius: 12px; background: rgba(167,139,250,0.04); border: 1px solid rgba(167,139,250,0.12); backdrop-filter: blur(8px); }
+  .fountain-btn { width: 100%; padding: 7px 10px; border-radius: 7px; border: 1px dashed rgba(167,139,250,0.15); background: transparent; color: rgba(224,221,216,0.35); font-family: 'DM Sans', sans-serif; font-size: 10px; cursor: pointer; transition: all 0.12s; margin-bottom: 4px; text-align: left; }
+  .fountain-btn:hover { background: rgba(167,139,250,0.06); color: #e0ddd8; border-color: rgba(167,139,250,0.25); }
+
+  .quick-add { position: absolute; z-index: 15; display: flex; gap: 3px; padding: 5px; border-radius: 8px; background: rgba(18,18,22,0.95); border: 1px solid rgba(255,255,255,0.06); }
+  .qa-btn { padding: 4px 9px; border-radius: 5px; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 9px; font-weight: 500; background: rgba(255,255,255,0.04); color: rgba(224,221,216,0.3); display: flex; align-items: center; gap: 4px; transition: all 0.1s; }
+  .qa-btn:hover { background: rgba(255,255,255,0.08); color: #e0ddd8; }
+  .qa-dot { width: 4px; height: 4px; border-radius: 50%; }
+
+  .card-ghost { position: absolute; width: 220px; min-height: 80px; border-radius: 10px; border: 1px dashed rgba(167,139,250,0.15); background: rgba(167,139,250,0.02); display: flex; align-items: center; justify-content: center; gap: 6px; z-index: 10; }
+  .card-ghost-label { font-size: 10px; color: rgba(224,221,216,0.2); animation: pulse-text 2s ease-in-out infinite; }
+  @keyframes pulse-text { 0%,100%{opacity:0.2} 50%{opacity:0.6} }
+
+  .minimap-dot { position: absolute; width: 3px; height: 3px; border-radius: 1px; }
+</style>
+</head>
+<body>
+
+<!-- Top Bar -->
+<div class="fixed top-0 left-0 right-0 z-[200] h-11 flex items-center justify-between px-3.5" style="background:rgba(10,10,12,0.88);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,0.06);">
+  <div class="flex items-center gap-3">
+    <span class="text-[11px] font-semibold tracking-wide text-fg-3 uppercase">Seeds</span>
+    <div class="w-px h-4 bg-white/[0.06]"></div>
+    <div class="flex items-center gap-1.5 text-[12px] text-fg-2 font-normal">
+      <div class="w-1.5 h-1.5 rounded-full bg-keep"></div>
+      Skincare launch — ingredient-forward positioning
+    </div>
+  </div>
+  <div class="flex items-center gap-1.5">
+    <button class="px-2.5 py-1 rounded-md text-[11px] font-medium text-fg-3 hover:bg-white/[0.06] hover:text-fg-2 transition-all">24 cards</button>
+    <button class="px-2.5 py-1 rounded-md text-[11px] font-medium text-fg-3 hover:bg-white/[0.06] hover:text-fg-2 transition-all">3 zones</button>
+    <button class="px-2.5 py-1 rounded-md text-[11px] font-medium text-fg-3 hover:bg-white/[0.06] hover:text-fg-2 transition-all">History</button>
+    <button class="px-2.5 py-1.5 rounded-md text-[11px] font-bold bg-fg text-canvas-bg hover:bg-white transition-all">Share</button>
+  </div>
+</div>
+
+<!-- Left Toolbar -->
+<div class="fixed left-2.5 top-1/2 -translate-y-1/2 z-[200] flex flex-col gap-px p-1.5 rounded-xl border border-white/[0.06]" style="background:rgba(18,18,22,0.95);backdrop-filter:blur(12px);">
+  <button class="w-[30px] h-[30px] rounded-lg flex items-center justify-center text-[13px] bg-white/[0.08] text-fg" title="Select">↖</button>
+  <button class="w-[30px] h-[30px] rounded-lg flex items-center justify-center text-[13px] text-fg-3 hover:bg-white/[0.06] hover:text-fg transition-all" title="Pan">✋</button>
+  <div class="w-[18px] h-px bg-white/[0.06] mx-auto my-1"></div>
+  <button class="w-[30px] h-[30px] rounded-lg flex items-center justify-center text-[13px] text-fg-3 hover:bg-white/[0.06] hover:text-fg transition-all" title="Zone">▢</button>
+  <button class="w-[30px] h-[30px] rounded-lg flex items-center justify-center text-[13px] text-fg-3 hover:bg-white/[0.06] hover:text-fg transition-all" title="Connect">⤳</button>
+  <button class="w-[30px] h-[30px] rounded-lg flex items-center justify-center text-[13px] text-fg-3 hover:bg-white/[0.06] hover:text-fg transition-all" title="Sticky">▤</button>
+  <div class="w-[18px] h-px bg-white/[0.06] mx-auto my-1"></div>
+  <button class="w-[30px] h-[30px] rounded-lg flex items-center justify-center text-[13px] text-direction hover:bg-white/[0.06] transition-all" title="Generate">✦</button>
+  <button class="w-[30px] h-[30px] rounded-lg flex items-center justify-center text-[13px] text-riff hover:bg-white/[0.06] transition-all" title="Riff">↻</button>
+</div>
+
+<!-- Minimap -->
+<div class="fixed bottom-20 left-3 z-[200] w-[120px] h-[80px] rounded-md overflow-hidden border border-white/[0.06]" style="background:rgba(18,18,22,0.95);">
+  <div class="absolute border border-fg/15 rounded-sm" style="left:8px;top:10px;width:35px;height:25px;background:rgba(224,221,216,0.03);"></div>
+  <div class="minimap-dot" style="left:18px;top:18px;background:#f472b6;"></div>
+  <div class="minimap-dot" style="left:25px;top:22px;background:#f472b6;"></div>
+  <div class="minimap-dot" style="left:38px;top:16px;background:#38bdf8;"></div>
+  <div class="minimap-dot" style="left:42px;top:24px;background:#38bdf8;"></div>
+  <div class="minimap-dot" style="left:58px;top:19px;background:#a78bfa;"></div>
+  <div class="minimap-dot" style="left:62px;top:28px;background:#a78bfa;"></div>
+  <div class="minimap-dot" style="left:75px;top:32px;background:#34d399;"></div>
+  <div class="minimap-dot" style="left:80px;top:38px;background:#34d399;"></div>
+  <div class="minimap-dot" style="left:48px;top:42px;background:#fb923c;"></div>
+  <div class="minimap-dot" style="left:92px;top:22px;background:#a78bfa;"></div>
+  <div class="minimap-dot" style="left:95px;top:48px;background:#fbbf24;"></div>
+  <div class="minimap-dot" style="left:24px;top:54px;background:#ef4444;"></div>
+</div>
+
+<!-- Zoom -->
+<div class="fixed bottom-20 right-3 z-[200] flex items-center gap-px p-1 rounded-lg border border-white/[0.06]" style="background:rgba(18,18,22,0.95);backdrop-filter:blur(12px);">
+  <button id="zoom-out" class="w-[26px] h-[26px] rounded-md flex items-center justify-center text-[13px] text-fg-3 hover:bg-white/[0.08] hover:text-fg">−</button>
+  <span id="zoom-level" class="text-[10px] text-fg-4 px-1.5 min-w-[32px] text-center tabular-nums">100%</span>
+  <button id="zoom-in" class="w-[26px] h-[26px] rounded-md flex items-center justify-center text-[13px] text-fg-3 hover:bg-white/[0.08] hover:text-fg">+</button>
+</div>
+
+<!-- Canvas -->
+<div class="canvas-world" id="canvas-world">
+  <div class="canvas-inner" id="canvas-inner">
+
+    <svg class="connections" width="4000" height="3000">
+      <line x1="310" y1="220" x2="520" y2="190" />
+      <line x1="310" y1="355" x2="520" y2="265" />
+      <line x1="730" y1="200" x2="935" y2="230" class="flow" />
+      <line x1="730" y1="345" x2="935" y2="325" />
+      <line x1="1155" y1="260" x2="1355" y2="290" class="flow" />
+      <line x1="565" y1="560" x2="730" y2="345" class="riff-line" />
+      <line x1="945" y1="445" x2="1155" y2="260" class="flow" />
+      <line x1="1365" y1="385" x2="1365" y2="525" />
+      <line x1="385" y1="705" x2="605" y2="645" />
+    </svg>
+
+    <!-- Zone: exploring audience -->
+    <div class="zone zone-freeform" style="left:120px;top:100px;width:450px;height:330px;">
+      <div class="zone-label">exploring audience</div>
+    </div>
+
+    <div class="card card-ember" style="left:160px;top:155px;transform:rotate(-1deg);">
+      <div class="card-type"><div class="card-type-dot" style="background:#f472b6"></div><span style="color:#f472b6">Tension</span></div>
+      <div class="card-text">Gen Z craves authenticity but engages most with highly produced content. Brands that win make production feel effortless.</div>
+      <div class="card-footer"><span class="card-tag">#audience</span><div class="card-actions"><button class="card-action">✓</button><button class="card-action">↻</button><button class="card-action">×</button></div></div>
+    </div>
+
+    <div class="card" style="left:390px;top:145px;transform:rotate(0.5deg);">
+      <div class="card-type"><div class="card-type-dot" style="background:#f472b6"></div><span style="color:#f472b6">Tension</span></div>
+      <div class="card-text">Ingredient transparency creates decision fatigue. People want to feel smart without doing the homework.</div>
+      <div class="card-footer"><span class="card-tag">#ux</span><div class="card-actions"><button class="card-action">✓</button><button class="card-action">↻</button><button class="card-action">×</button></div></div>
+    </div>
+
+    <div class="card card-ember" style="left:160px;top:305px;transform:rotate(0.8deg);">
+      <div class="card-type"><div class="card-type-dot" style="background:#f472b6"></div><span style="color:#f472b6">Tension</span></div>
+      <div class="card-text">"Clean beauty" peaked — the next wave claims literacy, not purity. But literacy is harder to market than a green leaf.</div>
+      <div class="card-footer"><span class="card-tag">#positioning</span><div class="card-actions"><button class="card-action">✓</button><button class="card-action">↻</button><button class="card-action">×</button></div></div>
+    </div>
+
+    <div class="card" style="left:390px;top:295px;transform:rotate(-0.4deg);">
+      <div class="card-type"><div class="card-type-dot" style="background:#38bdf8"></div><span style="color:#38bdf8">Signal</span></div>
+      <div class="card-text">De-influencing isn't anti-consumption — it's a demand for specificity. People want why this, not just what.</div>
+      <div class="card-footer"><span class="card-tag">#culture</span><div class="card-actions"><button class="card-action">✓</button><button class="card-action">↻</button><button class="card-action">×</button></div></div>
+    </div>
+
+    <!-- Zone: building the position -->
+    <div class="zone zone-focused" style="left:630px;top:100px;width:450px;height:410px;">
+      <div class="zone-label">building the position</div>
+    </div>
+
+    <div class="card card-cool" style="left:670px;top:155px;transform:rotate(-0.6deg);">
+      <div class="card-type"><div class="card-type-dot" style="background:#38bdf8"></div><span style="color:#38bdf8">Signal</span></div>
+      <div class="card-text">Reddit skincare: 4M+ members dissecting INCI lists. The audience for ingredient depth already exists — they just lack a brand.</div>
+      <div class="card-footer"><span class="card-tag">#market</span><div class="card-actions"><button class="card-action">✓</button><button class="card-action">↻</button><button class="card-action">×</button></div></div>
+    </div>
+
+    <div class="card card-cool" style="left:880px;top:145px;transform:rotate(0.3deg);">
+      <div class="card-type"><div class="card-type-dot" style="background:#38bdf8"></div><span style="color:#38bdf8">Signal</span></div>
+      <div class="card-text">The Ordinary proved commodity positioning can be premium if framing is sharp enough. Price ≠ perception.</div>
+      <div class="card-footer"><span class="card-tag">#precedent</span><div class="card-actions"><button class="card-action">✓</button><button class="card-action">↻</button><button class="card-action">×</button></div></div>
+    </div>
+
+    <div class="card card-deep" style="left:670px;top:305px;transform:rotate(1deg);">
+      <div class="card-type"><div class="card-type-dot" style="background:#a78bfa"></div><span style="color:#a78bfa">Direction</span></div>
+      <div class="card-text">Position as "ingredient-literate" beauty. Not clean, not clinical, just honest. Let the formula be the personality.</div>
+      <div class="card-footer"><span class="card-tag">#brand · #core</span><div class="card-actions"><button class="card-action">✓</button><button class="card-action">↻</button><button class="card-action">×</button></div></div>
+    </div>
+
+    <div class="card" style="left:880px;top:285px;transform:rotate(-0.7deg);">
+      <div class="card-type"><div class="card-type-dot" style="background:#a78bfa"></div><span style="color:#a78bfa">Direction</span></div>
+      <div class="card-text">"Boring" as brand attitude. No hype. No miracle claims. The anti-marketing position is the marketing.</div>
+      <div class="card-footer"><span class="card-tag">#tone</span><div class="card-actions"><button class="card-action">✓</button><button class="card-action">↻</button><button class="card-action">×</button></div></div>
+    </div>
+
+    <div class="card card-deep" style="left:880px;top:425px;transform:rotate(0.4deg);">
+      <div class="card-type"><div class="card-type-dot" style="background:#a78bfa"></div><span style="color:#a78bfa">Direction</span></div>
+      <div class="card-text">Lead with "why this concentration." Each product page is a micro-essay on formulation choices.</div>
+      <div class="card-footer"><span class="card-tag">#content</span><div class="card-actions"><button class="card-action">✓</button><button class="card-action">↻</button><button class="card-action">×</button></div></div>
+    </div>
+
+    <!-- Zone: hot ideas -->
+    <div class="zone zone-hot" style="left:1110px;top:145px;width:400px;height:320px;">
+      <div class="zone-label">hot ideas</div>
+    </div>
+
+    <div class="card card-forest" style="left:1150px;top:185px;transform:rotate(-0.5deg);">
+      <div class="card-type"><div class="card-type-dot" style="background:#34d399"></div><span style="color:#34d399">Idea</span></div>
+      <div class="card-text">Formula card shipped with every product — ingredient breakdown designed to be photographed and shared.</div>
+      <div class="card-footer"><span class="card-tag">#packaging</span><div class="card-actions"><button class="card-action">✓</button><button class="card-action">↻</button><button class="card-action">×</button></div></div>
+    </div>
+
+    <div class="card" style="left:1350px;top:175px;transform:rotate(0.8deg);">
+      <div class="card-type"><div class="card-type-dot" style="background:#34d399"></div><span style="color:#34d399">Idea</span></div>
+      <div class="card-text">"Why we didn't include" page. List trending ingredients you left out and explain why. Anti-marketing content.</div>
+      <div class="card-footer"><span class="card-tag">#content</span><div class="card-actions"><button class="card-action">✓</button><button class="card-action">↻</button><button class="card-action">×</button></div></div>
+    </div>
+
+    <div class="card card-forest" style="left:1170px;top:345px;transform:rotate(0.3deg);">
+      <div class="card-type"><div class="card-type-dot" style="background:#34d399"></div><span style="color:#34d399">Idea</span></div>
+      <div class="card-text">Notion-style "routine builder." Users drag ingredients into slots. Makes the complexity into a game.</div>
+      <div class="card-footer"><span class="card-tag">#product</span><div class="card-actions"><button class="card-action">✓</button><button class="card-action">↻</button><button class="card-action">×</button></div></div>
+    </div>
+
+    <!-- Ghost card -->
+    <div class="card-ghost" style="left:1360px;top:345px;">
+      <span class="card-ghost-label">Generating more ideas…</span>
+    </div>
+
+    <!-- Free-floating cards -->
+    <div class="card card-warm" style="left:410px;top:525px;transform:rotate(1.5deg);">
+      <div class="card-type"><div class="card-type-dot" style="background:#fb923c"></div><span style="color:#fb923c">Provocation</span></div>
+      <div class="card-text">What if the packaging had no product name — only the INCI list? Force the conversation about what's inside.</div>
+      <div class="card-footer"><span class="card-tag">#branding</span><div class="card-actions"><button class="card-action">✓</button><button class="card-action">↻</button><button class="card-action">×</button></div></div>
+    </div>
+
+    <div class="card card-warm" style="left:650px;top:565px;transform:rotate(-0.9deg);">
+      <div class="card-type"><div class="card-type-dot" style="background:#fb923c"></div><span style="color:#fb923c">Provocation</span></div>
+      <div class="card-text">Publish the full cost breakdown. "Here's what the niacinamide costs. Here's our margin." Radical transparency.</div>
+      <div class="card-footer"><span class="card-tag">#pricing</span><div class="card-actions"><button class="card-action">✓</button><button class="card-action">↻</button><button class="card-action">×</button></div></div>
+    </div>
+
+    <!-- Guard rails -->
+    <div class="card" style="left:210px;top:685px;transform:rotate(0.3deg);border-color:rgba(239,68,68,0.08);">
+      <div class="card-type"><div class="card-type-dot" style="background:#ef4444"></div><span style="color:#ef4444">Guard Rail</span></div>
+      <div class="card-text">Never claim "clean" or "natural." Transparency should feel like generosity, not virtue signaling.</div>
+      <div class="card-footer"><span class="card-tag">#voice</span></div>
+    </div>
+
+    <div class="card" style="left:450px;top:705px;transform:rotate(-0.6deg);border-color:rgba(239,68,68,0.08);">
+      <div class="card-type"><div class="card-type-dot" style="background:#ef4444"></div><span style="color:#ef4444">Guard Rail</span></div>
+      <div class="card-text">Never lead with results. Results are subjective. Lead with process, ingredients, and reasoning.</div>
+      <div class="card-footer"><span class="card-tag">#legal</span></div>
+    </div>
+
+    <!-- Fountain -->
+    <div class="fountain" style="left:1370px;top:525px;">
+      <div class="flex items-center gap-1.5 mb-2">
+        <div class="w-5 h-5 rounded-[5px] bg-direction/10 text-direction flex items-center justify-center text-[10px]">✦</div>
+        <div class="text-[10px] font-medium text-direction tracking-wide">Generate</div>
+      </div>
+      <button class="fountain-btn">+ More ideas from this zone</button>
+      <button class="fountain-btn">+ Tensions I'm missing</button>
+      <button class="fountain-btn">+ Challenge my direction</button>
+      <button class="fountain-btn" style="margin-bottom:0">+ Surprise me</button>
+    </div>
+
+    <!-- Quick-add strip -->
+    <div class="quick-add" style="left:630px;top:515px;">
+      <button class="qa-btn"><div class="qa-dot" style="background:#f472b6"></div> Tension</button>
+      <button class="qa-btn"><div class="qa-dot" style="background:#38bdf8"></div> Signal</button>
+      <button class="qa-btn"><div class="qa-dot" style="background:#a78bfa"></div> Direction</button>
+      <button class="qa-btn"><div class="qa-dot" style="background:#34d399"></div> Idea</button>
+      <button class="qa-btn"><div class="qa-dot" style="background:#fb923c"></div> Provocation</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- Prompt hints -->
+<div class="fixed bottom-[52px] left-1/2 -translate-x-1/2 z-[200] flex gap-1">
+  <span class="px-2 py-0.5 rounded text-[9px] text-fg-4 border border-white/[0.06]" style="background:rgba(18,18,22,0.9);">⌘G generate</span>
+  <span class="px-2 py-0.5 rounded text-[9px] text-fg-4 border border-white/[0.06]" style="background:rgba(18,18,22,0.9);">⌘R riff</span>
+  <span class="px-2 py-0.5 rounded text-[9px] text-fg-4 border border-white/[0.06]" style="background:rgba(18,18,22,0.9);">⌘Z zone</span>
+  <span class="px-2 py-0.5 rounded text-[9px] text-fg-4 border border-white/[0.06]" style="background:rgba(18,18,22,0.9);">⌘N sticky</span>
+</div>
+
+<!-- Prompt Bar -->
+<div class="fixed bottom-0 left-0 right-0 z-[200] px-5 pb-3 pt-2 border-t border-white/[0.06]" style="background:rgba(10,10,12,0.92);backdrop-filter:blur(16px);">
+  <div class="max-w-[580px] mx-auto flex items-center gap-1.5">
+    <input type="text" class="flex-1 px-3 py-2 rounded-lg border border-white/[0.06] bg-canvas-surface text-fg text-[12px] font-normal outline-none placeholder:text-fg-4 focus:border-white/10" placeholder="Ask anything… 'generate 5 tensions about pricing' or 'challenge this direction'" />
+    <button class="w-8 h-8 rounded-lg bg-fg text-canvas-bg flex items-center justify-center text-sm font-medium shrink-0">→</button>
+  </div>
+</div>
+
+<script>
+const world = document.getElementById('canvas-world');
+const inner = document.getElementById('canvas-inner');
+let panX = -80, panY = -30, zoom = 1, isPanning = false, startX, startY, startPanX, startPanY;
+
+function applyTransform() {
+  inner.style.transform = `translate(${panX}px,${panY}px) scale(${zoom})`;
+  document.getElementById('zoom-level').textContent = Math.round(zoom * 100) + '%';
+}
+
+world.addEventListener('mousedown', e => {
+  if (e.target.closest('.card') || e.target.closest('.fountain') || e.target.closest('.quick-add')) return;
+  isPanning = true; startX = e.clientX; startY = e.clientY; startPanX = panX; startPanY = panY;
+});
+window.addEventListener('mousemove', e => { if (!isPanning) return; panX = startPanX + (e.clientX - startX); panY = startPanY + (e.clientY - startY); applyTransform(); });
+window.addEventListener('mouseup', () => { isPanning = false; });
+world.addEventListener('wheel', e => { e.preventDefault(); zoom = Math.max(0.25, Math.min(2.5, zoom * (e.deltaY > 0 ? 0.92 : 1.08))); applyTransform(); }, { passive: false });
+document.getElementById('zoom-in').onclick = () => { zoom = Math.min(2.5, zoom * 1.15); applyTransform(); };
+document.getElementById('zoom-out').onclick = () => { zoom = Math.max(0.25, zoom * 0.85); applyTransform(); };
+
+document.querySelectorAll('.card').forEach(card => {
+  let dx, dy, dragging = false;
+  card.addEventListener('mousedown', e => {
+    e.stopPropagation(); dragging = true; card.classList.add('dragging');
+    const rect = card.getBoundingClientRect(); dx = e.clientX - rect.left; dy = e.clientY - rect.top;
+    const onMove = ev => { if (!dragging) return; const wr = inner.getBoundingClientRect(); card.style.left = (ev.clientX - wr.left - dx * zoom) / zoom + 'px'; card.style.top = (ev.clientY - wr.top - dy * zoom) / zoom + 'px'; card.style.transform = 'rotate(0deg)'; };
+    const onUp = () => { dragging = false; card.classList.remove('dragging'); window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); };
+    window.addEventListener('mousemove', onMove); window.addEventListener('mouseup', onUp);
+  });
+});
+
+applyTransform();
+</script>
+</body>
+</html>
