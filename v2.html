@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seeds — Creative sparring for sharper directions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #f0f0f0;
+  --fg: #191919;
+  --fg-2: #525252;
+  --fg-3: #737373;
+  --border: #d4d4d4;
+  --cream: #e8e4de;
+  --dark: #0a0a0a;
+  --font: 'Inter', -apple-system, system-ui, 'Segoe UI', Roboto, sans-serif;
+}
+
+html {
+  font-family: var(--font);
+  color: var(--fg);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  scroll-behavior: smooth;
+}
+
+body { overflow-x: hidden; }
+
+/* ── Typography ── */
+h1 {
+  font-size: clamp(2.5rem, 5.5vw, 3.625rem);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  text-align: center;
+  text-wrap: balance;
+}
+
+h2 {
+  font-size: clamp(2rem, 4.5vw, 3.25rem);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  text-align: center;
+  text-wrap: balance;
+}
+
+h3 {
+  font-size: clamp(1.125rem, 2vw, 1.375rem);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+
+.sub {
+  font-size: clamp(1.063rem, 1.8vw, 1.375rem);
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--fg-2);
+  text-align: center;
+  max-width: 540px;
+  margin: 0 auto;
+  text-wrap: pretty;
+}
+
+.container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+section { padding: 100px 0; }
+@media (max-width: 640px) { section { padding: 64px 0; } }
+
+/* ── Nav ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 16px 24px;
+  display: flex; align-items: center; justify-content: space-between;
+  transition: background 0.3s, backdrop-filter 0.3s;
+}
+nav.scrolled {
+  background: rgba(240,240,240,0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.nav-wordmark { height: 20px; width: auto; image-rendering: pixelated; opacity: 0.85; }
+
+/* ── Glassmorphic Button ── */
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 28px; border-radius: 9999px; border: none; cursor: pointer;
+  font-family: var(--font); font-size: 15px; font-weight: 400;
+  color: var(--fg);
+  background: rgba(240,240,240,0.7);
+  backdrop-filter: blur(4px);
+  box-shadow:
+    inset 0 2px 2px rgba(0,0,0,0.05),
+    inset 0 -2px 2px rgba(255,255,255,0.5),
+    0 4px 2px -2px rgba(0,0,0,0.2),
+    0 1px 4px rgba(0,0,0,0.08);
+  transition: transform 0.3s cubic-bezier(0.25,1,0.5,1);
+  text-decoration: none; position: relative; overflow: hidden;
+}
+.btn::before {
+  content: ''; position: absolute; inset: 0; border-radius: inherit;
+  background: linear-gradient(-75deg, rgba(255,255,255,0.05), rgba(255,255,255,0.2), rgba(255,255,255,0.05));
+  pointer-events: none;
+}
+.btn:hover { transform: scale(1.04); }
+.btn:active { transform: scale(0.97); }
+
+.btn-dark {
+  background: var(--fg); color: #f0f0f0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+.btn-dark::before {
+  background: linear-gradient(-75deg, rgba(255,255,255,0.02), rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+}
+
+/* ── Hero ── */
+.hero { padding-top: 140px; padding-bottom: 0; text-align: center; }
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 16px; border-radius: 9999px;
+  background: rgba(240,240,240,0.7); backdrop-filter: blur(4px);
+  font-size: 13px; color: var(--fg-2); margin-bottom: 24px;
+  box-shadow: inset 0 1px 1px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.06);
+}
+.hero-badge .dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #34d399; animation: pulse-dot 2s ease-in-out infinite;
+}
+@keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:0.4} }
+.hero h1 { margin-bottom: 20px; }
+.hero .sub { margin-bottom: 36px; }
+.hero-cta { display: flex; gap: 12px; justify-content: center; }
+@media (max-width: 640px) {
+  .hero { padding-top: 110px; }
+  .hero-cta { flex-direction: column; align-items: center; }
+}
+
+/* ── Animated pixel logo ── */
+.pixel-logo-wrap {
+  display: flex; justify-content: center; margin-bottom: 32px;
+}
+#pixel-logo {
+  image-rendering: pixelated;
+  width: 366px; height: 86px;
+}
+@media (max-width: 640px) {
+  #pixel-logo { width: 260px; height: 61px; }
+}
+
+/* ── Gallery ── */
+.gallery-section { padding-top: 72px; padding-bottom: 48px; }
+.gallery-container {
+  position: relative; max-width: 1000px;
+  height: clamp(380px, 44vw, 540px);
+  margin: 0 auto; cursor: grab; touch-action: pan-y;
+  user-select: none; -webkit-user-select: none;
+  transform-style: preserve-3d;
+}
+.gallery-container:active { cursor: grabbing; }
+
+.gallery-card {
+  position: absolute; top: 50%; left: 50%;
+  transform-origin: center bottom;
+  width: clamp(300px, 36vw, 440px);
+  aspect-ratio: 3 / 4;
+  border-radius: clamp(16px, 1.8vw, 24px);
+  overflow: hidden; will-change: transform;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.15), 0 2px 8px rgba(0,0,0,0.1);
+}
+.gallery-card::after {
+  content: ''; position: absolute; inset: 0; z-index: 2;
+  border-radius: inherit; pointer-events: none;
+  box-shadow: inset -2px -2px 3px rgba(0,0,0,0.15), inset 2px 2px 3px rgba(255,255,255,0.08);
+}
+@media (max-width: 640px) {
+  .gallery-container { height: 440px; }
+  .gallery-card { width: 280px; }
+}
+
+.gallery-dots {
+  display: flex; justify-content: center; gap: 8px;
+  margin-top: 28px; position: relative; z-index: 10;
+}
+.gallery-dots button {
+  width: 8px; height: 8px; border-radius: 9999px; border: none; padding: 0;
+  cursor: pointer; background: var(--border);
+  transition: background 0.3s, transform 0.3s;
+}
+.gallery-dots button.active { background: var(--fg); transform: scale(1.25); }
+
+/* ── Idea Cards (inside gallery) ── */
+.idea-card {
+  width: 100%; height: 100%; padding: 32px 28px; display: flex;
+  flex-direction: column; justify-content: space-between;
+  position: relative; z-index: 1;
+}
+
+.idea-card .idea-type {
+  font-size: 10px; font-weight: 500; letter-spacing: 0.1em;
+  text-transform: uppercase; margin-bottom: 12px; opacity: 0.5;
+}
+
+.idea-card .idea-text {
+  font-size: clamp(16px, 2vw, 22px); font-weight: 400;
+  line-height: 1.4; letter-spacing: -0.01em;
+  flex: 1; display: flex; align-items: center;
+}
+
+.idea-card .idea-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.08);
+  font-size: 11px; opacity: 0.35;
+}
+
+/* Card color themes */
+.card-dark {
+  background: #141414; color: var(--cream);
+}
+.card-warm {
+  background: linear-gradient(145deg, #1c1917, #292524);
+  color: #fef3c7;
+}
+.card-cool {
+  background: linear-gradient(145deg, #0c1222, #1e293b);
+  color: #e0f2fe;
+}
+.card-deep {
+  background: linear-gradient(145deg, #1a0a2e, #2d1b4e);
+  color: #ede9fe;
+}
+.card-forest {
+  background: linear-gradient(145deg, #052e16, #14532d);
+  color: #dcfce7;
+}
+.card-ember {
+  background: linear-gradient(145deg, #2a0a0a, #4a1212);
+  color: #fecaca;
+}
+
+/* Pin/rotation indicators on idea cards */
+.idea-pin {
+  position: absolute; top: 20px; right: 20px;
+  width: 8px; height: 8px; border-radius: 50%;
+  opacity: 0.3;
+}
+
+/* ── "How" dark section ── */
+.how-section {
+  background: var(--dark); color: var(--cream);
+  border-radius: 32px; margin: 0 16px; padding: 100px 24px;
+  position: relative; overflow: hidden;
+}
+.how-section h2 { color: #fff; margin-bottom: 16px; }
+.how-section .sub { color: rgba(255,255,255,0.4); margin-bottom: 64px; }
+
+/* ── Bento Grid ── */
+.bento {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: auto auto;
+  gap: 12px;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.bento-card {
+  border-radius: 16px;
+  padding: 28px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  position: relative;
+  overflow: hidden;
+}
+
+.bento-card h3 { color: #fff; margin-bottom: 8px; }
+.bento-card p { color: rgba(255,255,255,0.4); font-size: 14px; line-height: 1.5; }
+
+/* Bento layout */
+.bento-1 { grid-column: 1 / 4; }
+.bento-2 { grid-column: 4 / 7; }
+.bento-3 { grid-column: 1 / 3; }
+.bento-4 { grid-column: 3 / 5; }
+.bento-5 { grid-column: 5 / 7; }
+
+@media (max-width: 800px) {
+  .bento { grid-template-columns: 1fr; }
+  .bento-1, .bento-2, .bento-3, .bento-4, .bento-5 { grid-column: 1 / -1; }
+}
+
+/* Bento accents — small canvas animations */
+.bento-canvas-wrap {
+  margin-bottom: 16px;
+}
+.bento-canvas-wrap canvas {
+  image-rendering: pixelated;
+  opacity: 0.6;
+}
+
+/* ── Marquee for bento-1 ── */
+.bento-1 { position: relative; min-height: 180px; }
+.bento-marquee {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 44px; overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent, black 10%, black 90%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, black 10%, black 90%, transparent);
+}
+.bento-marquee-track {
+  display: flex; gap: 12px; white-space: nowrap;
+  animation: marquee 20s linear infinite;
+}
+.bento-marquee-track span {
+  display: inline-block; padding: 6px 14px;
+  border-radius: 8px; font-size: 12px;
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.3);
+  border: 1px solid rgba(255,255,255,0.05);
+  flex-shrink: 0;
+}
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ── Round counter in bento-2 ── */
+.round-counter {
+  display: flex; gap: 6px; margin-bottom: 16px;
+}
+.round-pip {
+  width: 32px; height: 4px; border-radius: 2px;
+  background: rgba(255,255,255,0.08);
+}
+.round-pip.filled { background: rgba(255,255,255,0.35); }
+.round-pip.active {
+  background: var(--cream);
+  animation: pip-fill 1.5s ease-in-out infinite alternate;
+}
+@keyframes pip-fill { 0%{opacity:0.5} 100%{opacity:1} }
+
+/* ── Principles ── */
+.principles-section { text-align: center; }
+.principles-section h2 { margin-bottom: 16px; }
+.principles-section .sub { margin-bottom: 64px; }
+
+.principles-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: 12px; max-width: 800px; margin: 0 auto;
+}
+@media (max-width: 640px) { .principles-grid { grid-template-columns: 1fr; } }
+
+.p-card {
+  padding: 28px; border-radius: 16px; text-align: left;
+  background: rgba(255,255,255,0.45);
+  border: 1px solid rgba(0,0,0,0.04);
+  position: relative; overflow: hidden;
+  transition: transform 0.3s cubic-bezier(0.25,1,0.5,1);
+}
+.p-card:hover { transform: translateY(-2px); }
+.p-card h3 { margin-bottom: 6px; }
+.p-card p { font-size: 14px; line-height: 1.5; color: var(--fg-3); }
+
+/* Accent line on p-cards */
+.p-card::before {
+  content: ''; position: absolute; top: 0; left: 28px; right: 28px;
+  height: 1px;
+}
+.p-card:nth-child(1)::before { background: linear-gradient(90deg, transparent, rgba(167,139,250,0.4), transparent); }
+.p-card:nth-child(2)::before { background: linear-gradient(90deg, transparent, rgba(52,211,153,0.4), transparent); }
+.p-card:nth-child(3)::before { background: linear-gradient(90deg, transparent, rgba(56,189,248,0.4), transparent); }
+.p-card:nth-child(4)::before { background: linear-gradient(90deg, transparent, rgba(251,191,36,0.4), transparent); }
+
+/* ── Audience ── */
+.audience-section { text-align: center; }
+.audience-section h2 { margin-bottom: 16px; }
+.audience-section .sub { margin-bottom: 48px; }
+.audience-tags {
+  display: flex; flex-wrap: wrap; gap: 10px;
+  justify-content: center; max-width: 600px; margin: 0 auto 40px;
+}
+.audience-tag {
+  padding: 8px 20px; border-radius: 9999px; font-size: 14px;
+  color: var(--fg-2); background: rgba(255,255,255,0.45);
+  border: 1px solid rgba(0,0,0,0.05);
+}
+.audience-quote {
+  max-width: 520px; margin: 0 auto;
+  font-size: clamp(1.063rem, 1.8vw, 1.25rem);
+  font-style: italic; line-height: 1.5; color: var(--fg-3);
+}
+
+/* ── CTA ── */
+.cta-section { text-align: center; padding-bottom: 120px; }
+.cta-section h2 { margin-bottom: 16px; }
+.cta-section .sub { margin-bottom: 36px; }
+
+/* ── Footer ── */
+footer {
+  padding: 28px 24px; display: flex; align-items: center;
+  justify-content: space-between; font-size: 13px; color: var(--fg-3);
+}
+footer a { color: var(--fg-3); text-decoration: none; transition: color 0.2s; }
+footer a:hover { color: var(--fg); }
+.footer-links { display: flex; gap: 24px; }
+@media (max-width: 640px) { footer { flex-direction: column; gap: 16px; } }
+
+/* ── Fade-in ── */
+.fi {
+  opacity: 0; filter: blur(5px); transform: translateY(12px);
+  transition: opacity 0.7s ease, filter 0.7s ease, transform 0.7s ease;
+}
+.fi.vis { opacity: 1; filter: blur(0); transform: translateY(0); }
+.fi.d1 { transition-delay: 0.1s; }
+.fi.d2 { transition-delay: 0.2s; }
+.fi.d3 { transition-delay: 0.3s; }
+.fi.d4 { transition-delay: 0.4s; }
+.fi.d5 { transition-delay: 0.5s; }
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <canvas id="nav-logo" class="nav-wordmark" width="1464" height="344"></canvas>
+  <a href="#" class="btn">Get early access</a>
+</nav>
+
+<section class="hero">
+  <div class="container">
+    <div class="fi d1"><div class="hero-badge"><span class="dot"></span>Now in private beta</div></div>
+    <div class="pixel-logo-wrap fi d2"><canvas id="pixel-logo" width="1464" height="344"></canvas></div>
+    <p class="sub fi d3">A creative sparring tool that turns a rough brief into a board of ideas you can shape, combine, and evolve.</p>
+    <div class="hero-cta fi d4">
+      <a href="#" class="btn btn-dark">Get early access</a>
+      <a href="#how" class="btn">See how it works</a>
+    </div>
+  </div>
+</section>
+
+<section class="gallery-section">
+  <div class="gallery-container" id="gallery">
+
+    <div class="gallery-card">
+      <div class="idea-card card-dark">
+        <div><div class="idea-type">Tension</div></div>
+        <div class="idea-text">Gen Z craves authenticity but engages most with highly produced content. The brands that win will make production feel effortless.</div>
+        <div class="idea-footer"><span>Skincare launch brief</span><span>Round 1</span></div>
+        <div class="idea-pin" style="background:#f472b6"></div>
+      </div>
+    </div>
+
+    <div class="gallery-card">
+      <div class="idea-card card-warm">
+        <div><div class="idea-type">Direction</div></div>
+        <div class="idea-text">Position as "ingredient-literate" beauty — not clean, not clinical, just honest. Let the formula be the personality.</div>
+        <div class="idea-footer"><span>Skincare launch brief</span><span>Round 2</span></div>
+        <div class="idea-pin" style="background:#a78bfa"></div>
+      </div>
+    </div>
+
+    <div class="gallery-card">
+      <div class="idea-card card-cool">
+        <div><div class="idea-type">Provocation</div></div>
+        <div class="idea-text">What if we never hired enterprise sales reps and stayed fully product-led? The product is the pitch.</div>
+        <div class="idea-footer"><span>B2B fintech rebrand</span><span>Round 1</span></div>
+        <div class="idea-pin" style="background:#fb923c"></div>
+      </div>
+    </div>
+
+    <div class="gallery-card">
+      <div class="idea-card card-deep">
+        <div><div class="idea-type">Signal</div></div>
+        <div class="idea-text">De-influencing isn't anti-consumption — it's a demand for specificity. People want to know why this, not just what.</div>
+        <div class="idea-footer"><span>Content strategy</span><span>Round 1</span></div>
+        <div class="idea-pin" style="background:#38bdf8"></div>
+      </div>
+    </div>
+
+    <div class="gallery-card">
+      <div class="idea-card card-forest">
+        <div><div class="idea-type">Idea</div></div>
+        <div class="idea-text">A "formula card" shipped with every product — ingredient breakdown designed to be photographed and shared, not filed away.</div>
+        <div class="idea-footer"><span>Skincare launch brief</span><span>Round 3</span></div>
+        <div class="idea-pin" style="background:#fbbf24"></div>
+      </div>
+    </div>
+
+    <div class="gallery-card">
+      <div class="idea-card card-ember">
+        <div><div class="idea-type">Guard Rail</div></div>
+        <div class="idea-text">Never claim "clean" or "natural" — those are the words of brands with something to hide. Transparency should feel like generosity.</div>
+        <div class="idea-footer"><span>Skincare launch brief</span><span>Round 3</span></div>
+        <div class="idea-pin" style="background:#ef4444"></div>
+      </div>
+    </div>
+
+  </div>
+  <div class="gallery-dots" id="gallery-dots">
+    <button class="active" data-idx="0"></button>
+    <button data-idx="1"></button>
+    <button data-idx="2"></button>
+    <button data-idx="3"></button>
+    <button data-idx="4"></button>
+    <button data-idx="5"></button>
+  </div>
+</section>
+
+<section class="how-section" id="how">
+  <div class="container">
+    <h2 class="fi">From blank page to sharp direction</h2>
+    <p class="sub fi d1">Seeds works in rounds. Each one responds to your judgement, so the work gets sharper as you go.</p>
+    <div class="bento">
+
+      <div class="bento-card bento-1 fi d1">
+        <div class="bento-canvas-wrap"><canvas id="bento-spinner" width="248" height="248"></canvas></div>
+        <h3>Canvas, not chat</h3>
+        <p>Ideas live as small, movable cards on a spatial board. Not buried in paragraphs of prose you'll never re-read.</p>
+        <div class="bento-marquee">
+          <div class="bento-marquee-track">
+            <span>Tensions</span><span>Signals</span><span>Directions</span><span>Ideas</span><span>Provocations</span><span>Guard rails</span>
+            <span>Tensions</span><span>Signals</span><span>Directions</span><span>Ideas</span><span>Provocations</span><span>Guard rails</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="bento-card bento-2 fi d2">
+        <div class="round-counter">
+          <div class="round-pip filled"></div>
+          <div class="round-pip filled"></div>
+          <div class="round-pip active"></div>
+          <div class="round-pip"></div>
+          <div class="round-pip"></div>
+        </div>
+        <h3>Works in rounds</h3>
+        <p>Each generation responds to your selections. The system learns what you care about and pushes further. Keep, riff, reject — your taste shapes the output.</p>
+      </div>
+
+      <div class="bento-card bento-3 fi d2">
+        <div class="bento-canvas-wrap"><canvas id="bento-dots" width="310" height="186"></canvas></div>
+        <h3>Widens, then narrows</h3>
+        <p>AI explores before it converges. Breadth first, coherence after.</p>
+      </div>
+
+      <div class="bento-card bento-4 fi d3">
+        <h3>You keep authorship</h3>
+        <p>Taste is revealed through selection. The best ideas come from your judgement shaping the machine's output. You decide what lives.</p>
+      </div>
+
+      <div class="bento-card bento-5 fi d4">
+        <div class="bento-canvas-wrap"><canvas id="bento-pulse" width="372" height="310"></canvas></div>
+        <h3>Export when ready</h3>
+        <p>Clean markdown brief. A structured artifact, not a chat log.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section class="principles-section">
+  <div class="container">
+    <h2 class="fi">Not another AI text generator</h2>
+    <p class="sub fi d1">Most AI tools give you a wall of text or jump to a polished answer. That skips the part where good work actually gets made.</p>
+    <div class="principles-grid">
+      <div class="p-card fi d1">
+        <h3>Explore multiple directions</h3>
+        <p>Good strategy comes from seeing the full landscape before choosing a path. Seeds generates breadth so you can find the direction you'd never have started with.</p>
+      </div>
+      <div class="p-card fi d2">
+        <h3>Ideas stay small and movable</h3>
+        <p>Every idea is an atomic card you can keep, riff on, reject, or combine. No long prose. No scrolling past paragraphs to find the one useful sentence.</p>
+      </div>
+      <div class="p-card fi d3">
+        <h3>Riff without regenerating</h3>
+        <p>Push on any single card to explore a thread deeper. The rest of the board stays put. Follow a hunch without losing the bigger picture.</p>
+      </div>
+      <div class="p-card fi d4">
+        <h3>End with a structured artifact</h3>
+        <p>When the direction is strong enough, export a clean markdown handoff. Not an ephemeral conversation — a real document you can share and build from.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="audience-section">
+  <div class="container">
+    <h2 class="fi">For people whose work starts in ambiguity</h2>
+    <p class="sub fi d1">When you need more than inspiration, but less than a finished deck.</p>
+    <div class="audience-tags fi d2">
+      <span class="audience-tag">Strategists</span>
+      <span class="audience-tag">Creative Directors</span>
+      <span class="audience-tag">Designers</span>
+      <span class="audience-tag">Founders</span>
+      <span class="audience-tag">Brand Leads</span>
+      <span class="audience-tag">Product Managers</span>
+    </div>
+    <p class="audience-quote fi d3">"Make AI feel less like a vending machine for answers and more like a sharp creative partner."</p>
+  </div>
+</section>
+
+<section class="cta-section">
+  <div class="container">
+    <h2 class="fi">Start with a seed, arrive at a direction</h2>
+    <p class="sub fi d1">Seeds is in private beta. Join the waitlist to get early access.</p>
+    <div class="fi d2"><a href="#" class="btn btn-dark">Get early access</a></div>
+  </div>
+</section>
+
+<footer>
+  <canvas id="footer-logo" class="nav-wordmark" width="1464" height="344"></canvas>
+  <span>&copy; 2026 Seeds</span>
+  <div class="footer-links"><a href="#">Twitter</a><a href="#">Discord</a></div>
+</footer>
+
+<script>
+// ═══ SEEDS pixel wordmark SVG path ═══
+const SVG_PATH = "M120.68 0C123.275 0 124.573 1.29829 124.573 3.89355V26.9912C124.573 29.8459 123.275 31.1436 120.68 31.1436H38.6689C33.7382 31.1437 31.1436 33.7393 31.1436 38.9297V62.2871C31.1437 67.4773 33.7383 70.0721 38.6689 70.0723H97.3223C99.9174 70.0723 101.216 71.3701 101.216 74.2246V85.6445C101.216 90.8348 103.811 93.4296 109.001 93.4297H120.68C123.275 93.4297 124.573 94.7275 124.573 97.582V143.778C124.573 146.633 123.275 147.931 120.68 147.931H109.001C103.811 147.931 101.216 150.526 101.216 155.457V167.396C101.216 169.991 99.9174 171.288 97.3223 171.288H3.89258C1.29753 171.288 0.000108743 169.991 0 167.396V144.297C0.0001236 141.442 1.29755 140.145 3.89258 140.145H85.9033C90.8342 140.145 93.4296 137.55 93.4297 132.359V109.002C93.4297 103.811 90.8343 101.216 85.9033 101.216H27.25C24.6549 101.216 23.3575 99.9181 23.3574 97.0635V85.6445C23.3574 80.454 20.7618 77.8584 15.5713 77.8584H3.89258C1.29746 77.8583 3.18864e-05 76.5607 0 73.7061V27.5098C0.000117108 24.6553 1.29754 23.3575 3.89258 23.3574H15.5713C20.7618 23.3574 23.3574 20.7621 23.3574 15.8311V3.89355C23.3574 1.29835 24.6548 6.00221e-05 27.25 0H120.68ZM272.584 0C275.179 0 276.478 1.29829 276.478 3.89355V27.251C276.477 29.846 275.179 31.1436 272.584 31.1436H190.833C185.643 31.1436 183.048 33.739 183.048 38.6699V62.5459C183.048 67.4768 185.643 70.0722 190.833 70.0723H249.227C251.822 70.0723 253.12 71.3706 253.12 73.9658V97.3232C253.12 99.9183 251.822 101.216 249.227 101.216H190.833C185.643 101.216 183.048 103.811 183.048 108.742V132.618C183.048 137.549 185.643 140.144 190.833 140.145H272.584C275.179 140.145 276.478 141.443 276.478 144.038V167.396C276.477 169.991 275.179 171.288 272.584 171.288H155.797C153.202 171.288 151.904 169.99 151.904 167.396V3.89355C151.904 1.29837 153.202 8.08707e-05 155.797 0H272.584ZM424.397 0C426.993 2.76769e-05 428.29 1.29832 428.29 3.89355V27.251C428.29 29.846 426.993 31.1435 424.397 31.1436H342.646C337.456 31.1436 334.86 33.7389 334.86 38.6699V62.5459C334.86 67.4769 337.456 70.0723 342.646 70.0723H401.04C403.635 70.0723 404.933 71.3706 404.933 73.9658V97.3232C404.933 99.9183 403.635 101.216 401.04 101.216H342.646C337.456 101.216 334.86 103.811 334.86 108.742V132.618C334.86 137.549 337.456 140.145 342.646 140.145H424.397C426.993 140.145 428.29 141.443 428.29 144.038V167.396C428.29 169.991 426.993 171.288 424.397 171.288H307.61C305.015 171.288 303.718 169.991 303.718 167.396V3.89355C303.718 1.29829 305.015 0 307.61 0H424.397ZM552.854 0C555.448 0.000151161 556.746 1.29798 556.746 4.15234V15.5723C556.746 20.7626 559.342 23.3574 564.272 23.3574H576.211C578.806 23.3576 580.103 24.6554 580.104 27.5098V144.038C580.103 146.633 578.806 147.931 576.211 147.931H564.272C559.341 147.931 556.746 150.526 556.746 155.717V167.396C556.746 169.99 555.448 171.288 552.854 171.288H459.424C456.829 171.288 455.53 169.991 455.53 167.396V3.89355C455.53 1.29829 456.829 0 459.424 0H552.854ZM727.933 0C730.528 8.42668e-05 731.825 1.29837 731.825 3.89355V26.9912C731.825 29.8458 730.528 31.1435 727.933 31.1436H645.922C640.991 31.1436 638.396 33.7392 638.396 38.9297V62.2871C638.396 67.4774 640.991 70.0723 645.922 70.0723H704.575C707.17 70.0724 708.468 71.3702 708.468 74.2246V85.6445C708.468 90.8348 711.063 93.4297 716.254 93.4297H727.933C730.528 93.4298 731.825 94.7276 731.825 97.582V143.778C731.825 146.633 730.528 147.931 727.933 147.931H716.254C711.063 147.931 708.468 150.526 708.468 155.457V167.396C708.468 169.99 707.17 171.288 704.575 171.288H611.146C608.55 171.288 607.252 169.991 607.252 167.396V144.297C607.252 141.442 608.55 140.145 611.146 140.145H693.155C698.086 140.145 700.682 137.55 700.682 132.359V109.002C700.682 103.811 698.086 101.216 693.155 101.216H634.503C631.908 101.216 630.609 99.9182 630.609 97.0635V85.6445C630.609 80.4541 628.015 77.8585 622.824 77.8584H611.146C608.55 77.8584 607.252 76.5608 607.252 73.7061V27.5098C607.252 24.6552 608.55 23.3574 611.146 23.3574H622.824C628.015 23.3573 630.609 20.762 630.609 15.8311V3.89355C630.609 1.29829 631.908 0 634.503 0H727.933ZM494.46 31.1436C489.269 31.1436 486.674 33.7389 486.674 38.6699V132.618C486.674 137.549 489.269 140.145 494.46 140.145H541.175C546.365 140.144 548.96 137.549 548.96 132.618V38.6699C548.96 33.7391 546.365 31.1437 541.175 31.1436H494.46Z";
+const BK = 31, SVG_W = 732, SVG_H = 172;
+const GC = Math.ceil(SVG_W/BK), GR = Math.ceil(SVG_H/BK);
+
+function mulberry32(s){return function(){let t=s+=0x6d2b79f5;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296}}
+
+function getCells(){
+  const c=document.createElement('canvas');c.width=SVG_W;c.height=SVG_H;
+  const x=c.getContext('2d');x.fillStyle='white';x.fill(new Path2D(SVG_PATH));
+  const d=x.getImageData(0,0,SVG_W,SVG_H),f=[];
+  for(let r=0;r<GR;r++)for(let c=0;c<GC;c++){
+    const cx=c*BK+BK/2,cy=r*BK+BK/2;
+    if(cx<SVG_W&&cy<SVG_H){const i=(Math.floor(cy)*SVG_W+Math.floor(cx))*4;if(d.data[i+3]>128)f.push({col:c,row:r})}
+  }
+  return f;
+}
+
+// ═══ Animated pixel logo (scramble → resolve loop) ═══
+function initPixelLogo(canvasId, fillColor, scale) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const cells = getCells();
+  const rng = mulberry32(42);
+  const blocks = cells.map(p => ({
+    col: p.col, row: p.row,
+    sCol: Math.floor(rng()*GC), sRow: Math.floor(rng()*GR),
+    eCol: Math.floor(rng()*GC), eRow: Math.floor(rng()*GR),
+    delay: (p.col/GC)*0.7 + rng()*0.3
+  }));
+  const px = BK * scale;
+  const loopFrames = 90;
+  const phases = [10, 50, 60, 80];
+  let frame = 0, lastT = 0;
+
+  function tick(t) {
+    const dt = lastT ? (t-lastT)/1000 : 1/30;
+    lastT = t;
+    frame = (frame + dt * 30) % loopFrames;
+    const f = frame;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const rP = Math.max(0, Math.min(1, (f-phases[0])/(phases[1]-phases[0])));
+    const sP = Math.max(0, Math.min(1, (f-phases[2])/(phases[3]-phases[2])));
+    ctx.fillStyle = fillColor;
+    for (const b of blocks) {
+      const rs = b.delay * 0.6;
+      const br = Math.max(0, Math.min(1, (rP-rs)/(0.41)));
+      const ss = (1-b.delay) * 0.6;
+      const bs = Math.max(0, Math.min(1, (sP-ss)/(0.41)));
+      const eI = 1-(1-br)**3, eO = bs**2;
+      const rc = b.sCol+(b.col-b.sCol)*eI;
+      const rr = b.sRow+(b.row-b.sRow)*eI;
+      const fc = rc+(b.eCol-rc)*eO;
+      const fr = rr+(b.eRow-rr)*eO;
+      const settled = br*(1-bs);
+      const j = mulberry32(b.col*17+b.row*31+Math.floor(f));
+      const jR = Math.floor((1-settled)*2);
+      const jc = jR>0?Math.round((j()-0.5)*jR):0;
+      const jr = jR>0?Math.round((j()-0.5)*jR):0;
+      ctx.fillRect(
+        Math.max(0,Math.min(GC-1,Math.round(fc+jc)))*px,
+        Math.max(0,Math.min(GR-1,Math.round(fr+jr)))*px,
+        px, px
+      );
+    }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+// ═══ Mini spinner (for bento cards) ═══
+function initSpinner(canvasId) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const sz = 4, px = BK*2;
+  const ring = [];
+  for(let r=0;r<sz;r++)for(let c=0;c<sz;c++)
+    if(r===0||r===sz-1||c===0||c===sz-1) ring.push({col:c,row:r});
+  const cen = (sz-1)/2;
+  ring.sort((a,b)=>Math.atan2(a.row-cen,a.col-cen)-Math.atan2(b.row-cen,b.col-cen));
+  let frame=0,lastT=0;
+  function tick(t){
+    const dt=lastT?(t-lastT)/1000:1/30; lastT=t; frame+=dt*30;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    const total=ring.length, pos=(frame/4)%total;
+    ctx.fillStyle='#e8e4de';
+    for(let i=0;i<total;i++){
+      const dist=((i-pos+total)%total);
+      if(dist<3) ctx.fillRect(ring[i].col*px,ring[i].row*px,px,px);
+    }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+// ═══ Mini thinking dots ═══
+function initDots(canvasId) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const px = BK*2;
+  let frame=0,lastT=0;
+  function tick(t){
+    const dt=lastT?(t-lastT)/1000:1/30; lastT=t; frame+=dt*30;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle='#e8e4de';
+    for(let d=0;d<3;d++){
+      const col=d*3;
+      const phase=(frame-d*6)/36;
+      const bounce=Math.sin(phase*Math.PI*2);
+      const yOff=bounce>0?-Math.round(bounce):0;
+      ctx.fillRect(col*px,(1+yOff)*px,px,px);
+    }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+// ═══ Mini EKG pulse ═══
+function initPulse(canvasId) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const COLS=6,ROWS=5,MID=2,px=BK*2;
+  const ekg=[0,0,-1,-3,2,-1,0,0,0,0,0,0];
+  let frame=0,lastT=0;
+  function tick(t){
+    const dt=lastT?(t-lastT)/1000:1/30; lastT=t; frame+=dt*30;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle='#e8e4de';
+    const cursor=Math.floor((frame/48)*COLS)%COLS;
+    for(let c=0;c<COLS;c++){
+      const pi=((c-cursor+COLS)%COLS);
+      const db=(cursor-c+COLS)%COLS;
+      if(db>0&&db<=COLS){
+        const off=ekg[pi]||0;
+        const row=Math.max(0,Math.min(ROWS-1,MID+off));
+        ctx.fillRect(c*px,row*px,px,px);
+      }
+    }
+    if(Math.floor(frame)%6<4) ctx.fillRect(cursor*px,MID*px,px,px);
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+// ═══ Static nav/footer wordmark ═══
+function drawStaticLogo(canvasId, color) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const cells = getCells();
+  const px = BK * 2;
+  ctx.fillStyle = color;
+  for (const c of cells) ctx.fillRect(c.col*px, c.row*px, px, px);
+}
+
+// ═══ Init all pixel canvases ═══
+window.addEventListener('DOMContentLoaded', () => {
+  // Hero animated logo
+  initPixelLogo('pixel-logo', '#191919', 2);
+  // Nav & footer static
+  drawStaticLogo('nav-logo', '#191919');
+  drawStaticLogo('footer-logo', '#191919');
+  // Bento mini animations
+  initSpinner('bento-spinner');
+  initDots('bento-dots');
+  initPulse('bento-pulse');
+});
+
+// ═══ Spring physics ═══
+function spring(p,tgt,v,w,z,dt){
+  const t=Math.min(dt,0.064),d=p-tgt;
+  if(Math.abs(d)<0.01&&Math.abs(v)<0.1)return{position:tgt,velocity:0};
+  const wd=w*Math.sqrt(1-z*z),decay=Math.exp(-z*w*t),
+    cos=Math.cos(wd*t),sin=Math.sin(wd*t),
+    m=(v+z*w*d)/wd;
+  return{position:tgt+decay*(d*cos+m*sin),velocity:decay*((m*wd-z*w*d)*cos-(d*wd+z*w*m)*sin)}
+}
+const SP={layout:{w:2*Math.PI/0.45,z:0.85},snap:{w:2*Math.PI/0.4,z:0.7},over:{w:Math.sqrt(250),z:12/(2*Math.sqrt(90))}};
+
+// ═══ Card Gallery ═══
+(function(){
+  const ctr=document.getElementById('gallery');
+  const cards=Array.from(ctr.querySelectorAll('.gallery-card'));
+  const dots=Array.from(document.querySelectorAll('#gallery-dots button'));
+  const cnt=cards.length;
+
+  function layout(i){
+    if(i===0)return{x:0,y:0,rot:0,scale:1};
+    const m=window.innerWidth<641,e=i%2===0;
+    return{x:e?(m?10:24):(m?-10:-24),y:e?(m?10:16):(m?4:6),rot:e?(m?3:4.5):(m?-3:-4.5),scale:Math.max(0.82,1-0.058*i)};
+  }
+
+  let order=[0,1,2,3,4,5].filter(i=>i<cnt),transitioning=false;
+  const st=new Map();
+  cards.forEach((_,i)=>st.set(i,{
+    x:{position:0,velocity:0,target:0},y:{position:30,velocity:0,target:30},
+    rot:{position:0,velocity:0,target:0},scale:{position:0.95,velocity:0,target:0.95},
+    opacity:{position:0,velocity:0,target:0}
+  }));
+  const cRot={position:0,velocity:0,target:0};
+  let drag=false,dX=0,dY=0,sX=0,sY=0,dir=null,swiped=false;
+
+  function updateDots(){const f=order[0];dots.forEach((d,i)=>d.classList.toggle('active',i===f))}
+  function setTargets(){
+    order.forEach((ci,si)=>{
+      const s=st.get(ci);if(!s)return;const l=layout(si);
+      s.x.target=l.x;s.y.target=l.y;s.rot.target=l.rot;s.scale.target=l.scale;
+      // ALL cards solid opacity
+      s.opacity.target=1;
+    });
+  }
+
+  function transition(){
+    if(transitioning)return;transitioning=true;
+    const fi=order[0],fs=st.get(fi);if(!fs)return;
+    const bl=layout(cnt-1);
+    fs.x.velocity+=3*dX;fs.y.velocity+=3*dY;
+    fs.x.target=bl.x;fs.y.target=bl.y;fs.rot.target=bl.rot;fs.scale.target=bl.scale;
+    setTimeout(()=>{cRot.target=0},80);
+    setTimeout(()=>{const r=order.shift();if(r!==undefined)order.push(r);transitioning=false;updateDots();setTargets()},180);
+  }
+
+  function onD(cx,cy){if(transitioning)return;drag=true;swiped=false;dir=null;sX=cx;sY=cy;dX=0;dY=0}
+  function onM(cx,cy){
+    if(!drag||dir==='v')return;dX=cx-sX;dY=cy-sY;
+    const d=Math.hypot(dX,dY);
+    if(dir===null&&d>10){if(Math.abs(dY)>1.2*Math.abs(dX)){dir='v';drag=false;dX=0;dY=0;return}dir='h'}
+    const w=ctr.offsetWidth||600;cRot.target=Math.max(-25,Math.min(25,dX/(w/2)*25));
+  }
+  function onU(){
+    if(!drag){dir=null;return}drag=false;dir=null;
+    const fi=order[0],s=st.get(fi);
+    if(s){s.x.position=dX;s.y.position=dY;s.rot.position=dX/20;
+      if(Math.abs(dX)>60){swiped=true;transition()}
+      else{s.x.target=0;s.y.target=0;s.rot.target=0;s.scale.target=1;cRot.target=0}}
+    dX=0;dY=0;
+  }
+  ctr.addEventListener('mousedown',e=>{onD(e.clientX,e.clientY);e.preventDefault()});
+  window.addEventListener('mousemove',e=>onM(e.clientX,e.clientY));
+  window.addEventListener('mouseup',onU);
+  ctr.addEventListener('touchstart',e=>{const t=e.touches[0];if(t)onD(t.clientX,t.clientY)},{passive:true});
+  ctr.addEventListener('touchmove',e=>{const t=e.touches[0];if(t){onM(t.clientX,t.clientY);if(dir==='h')e.preventDefault()}},{passive:false});
+  ctr.addEventListener('touchend',onU);
+  cards.forEach((c,i)=>c.addEventListener('click',()=>{if(swiped||transitioning)return;if(order.indexOf(i)>0)transition()}));
+  dots.forEach(d=>d.addEventListener('click',()=>{if(transitioning)return;const t=Number(d.dataset.idx??0);if(order[0]!==t)transition()}));
+
+  let lt=0;
+  function tick(t){
+    const dt=lt?(t-lt)/1000:1/60;lt=t;
+    const cr=spring(cRot.position,cRot.target,cRot.velocity,SP.layout.w,SP.layout.z,dt);
+    cRot.position=cr.position;cRot.velocity=cr.velocity;
+    ctr.style.transform=`perspective(1200px) rotateY(${cRot.position}deg)`;
+    order.forEach((ci,si)=>{
+      const card=cards[ci],s=st.get(ci);if(!card||!s)return;
+      const front=si===0;
+      const sp=transitioning&&ci===order[0]?SP.over:front&&!drag?SP.snap:SP.layout;
+      ['x','y','rot','scale','opacity'].forEach(k=>{
+        const p=s[k],r=spring(p.position,p.target,p.velocity,sp.w,sp.z,dt);
+        p.position=r.position;p.velocity=r.velocity;
+      });
+      const dx=front&&drag?dX:s.x.position,dy=front&&drag?dY:s.y.position;
+      const dr=front&&drag?dX/20:s.rot.position,ds=front&&drag?1:s.scale.position;
+      card.style.transform=`translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px)) rotate(${dr}deg) scale(${ds})`;
+      card.style.zIndex=String(cnt-si);
+      card.style.opacity=String(s.opacity.position);
+    });
+    requestAnimationFrame(tick);
+  }
+
+  setTimeout(()=>{setTargets();updateDots()},500);
+  requestAnimationFrame(tick);
+
+  let auto=setInterval(()=>{if(!drag&&!transitioning)transition()},4500);
+  ctr.addEventListener('mousedown',()=>clearInterval(auto));
+  ctr.addEventListener('touchstart',()=>clearInterval(auto));
+})();
+
+// ═══ Scroll fade-in ═══
+const obs=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('vis')}),{threshold:0.1,rootMargin:'0px 0px -30px 0px'});
+document.querySelectorAll('.fi').forEach(el=>obs.observe(el));
+
+// ═══ Nav scroll ═══
+window.addEventListener('scroll',()=>document.getElementById('nav').classList.toggle('scrolled',window.scrollY>20),{passive:true});
+</script>
+</body>
+</html>

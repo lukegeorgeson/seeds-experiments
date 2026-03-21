@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seeds — Creative sparring for sharper directions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ─── Reset & Base ─── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #f0f0f0;
+  --fg: #191919;
+  --fg-secondary: #525252;
+  --fg-tertiary: #737373;
+  --border: #d4d4d4;
+  --card-bg: #1a1a1a;
+  --card-fg: #e5e5e5;
+  --accent-violet: #a78bfa;
+  --accent-rose: #f472b6;
+  --accent-amber: #fbbf24;
+  --accent-emerald: #34d399;
+  --accent-sky: #38bdf8;
+  --font: 'Inter', -apple-system, 'system-ui', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+html {
+  font-family: var(--font);
+  color: var(--fg);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+body { overflow-x: hidden; }
+
+/* ─── Typography ─── */
+h1 {
+  font-size: clamp(2.5rem, 5.5vw, 3.625rem);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  text-align: center;
+  color: var(--fg);
+}
+
+h2 {
+  font-size: clamp(2rem, 4.5vw, 3.625rem);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  text-align: center;
+  color: var(--fg);
+}
+
+h3 {
+  font-size: clamp(1.125rem, 2vw, 1.375rem);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+  color: var(--fg);
+}
+
+p, .body-text {
+  font-size: clamp(1rem, 1.5vw, 1.25rem);
+  font-weight: 400;
+  line-height: 1.55;
+  color: var(--fg-secondary);
+}
+
+.subhead {
+  font-size: clamp(1.125rem, 2vw, 1.5625rem);
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--fg-secondary);
+  text-align: center;
+  max-width: 580px;
+  margin: 0 auto;
+}
+
+/* ─── Layout ─── */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+section {
+  padding: 100px 0;
+}
+
+@media (max-width: 640px) {
+  section { padding: 64px 0; }
+}
+
+/* ─── Nav ─── */
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background 0.3s ease, backdrop-filter 0.3s ease;
+}
+
+nav.scrolled {
+  background: rgba(240, 240, 240, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.nav-logo {
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg);
+  text-decoration: none;
+}
+
+.nav-logo span {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  background: var(--accent-violet);
+  border-radius: 50%;
+  margin-left: 2px;
+  vertical-align: middle;
+  position: relative;
+  top: -1px;
+}
+
+/* ─── Glassmorphic Button ─── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 28px;
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font);
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--fg);
+  background: rgba(240, 240, 240, 0.7);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  box-shadow:
+    inset 0 2px 2px rgba(0,0,0,0.05),
+    inset 0 -2px 2px rgba(255,255,255,0.5),
+    0 4px 2px -2px rgba(0,0,0,0.2),
+    0 1px 4px rgba(0,0,0,0.08);
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), filter 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(-75deg, rgba(255,255,255,0.05), rgba(255,255,255,0.2), rgba(255,255,255,0.05));
+  pointer-events: none;
+}
+
+.btn:hover { transform: scale(1.04); }
+.btn:active { transform: scale(0.97); }
+
+.btn-dark {
+  background: var(--fg);
+  color: #f0f0f0;
+  box-shadow:
+    0 4px 12px rgba(0,0,0,0.3),
+    inset 0 1px 0 rgba(255,255,255,0.1);
+}
+
+.btn-dark::before {
+  background: linear-gradient(-75deg, rgba(255,255,255,0.02), rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+}
+
+/* ─── Hero ─── */
+.hero {
+  padding-top: 140px;
+  padding-bottom: 0;
+  text-align: center;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  border-radius: 9999px;
+  background: rgba(240, 240, 240, 0.7);
+  backdrop-filter: blur(4px);
+  font-size: 13px;
+  color: var(--fg-secondary);
+  margin-bottom: 24px;
+  box-shadow:
+    inset 0 1px 1px rgba(0,0,0,0.04),
+    0 1px 3px rgba(0,0,0,0.06);
+}
+
+.hero-badge .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-emerald);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.hero h1 { margin-bottom: 20px; }
+
+.hero .subhead { margin-bottom: 36px; }
+
+.hero-cta {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 0;
+}
+
+@media (max-width: 640px) {
+  .hero { padding-top: 110px; }
+  .hero-cta { flex-direction: column; align-items: center; }
+}
+
+/* ─── Card Gallery (3D Swipe) ─── */
+.gallery-section {
+  padding-top: 88px;
+  padding-bottom: 60px;
+}
+
+.gallery-container {
+  position: relative;
+  max-width: 1000px;
+  height: clamp(400px, 50vw, 620px);
+  margin: 0 auto;
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  transform-style: preserve-3d;
+}
+
+.gallery-container:active { cursor: grabbing; }
+
+.gallery-card {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform-origin: center bottom;
+  width: clamp(340px, 46vw, 580px);
+  aspect-ratio: 4 / 5;
+  border-radius: clamp(18px, 2vw, 28px);
+  overflow: hidden;
+  will-change: transform;
+  background: linear-gradient(90deg, #232323 25%, #2a2a2a 50%, #232323 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+.gallery-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow:
+    inset -2px -2px 2px rgba(0,0,0,0.2),
+    inset 2px 2px 2px rgba(0,0,0,0.03);
+}
+
+.gallery-card img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@media (max-width: 640px) {
+  .gallery-container { height: 460px; }
+  .gallery-card { width: 300px; }
+}
+
+.gallery-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 24px;
+  position: relative;
+  z-index: 10;
+}
+
+.gallery-dots button {
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  background: var(--border);
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.gallery-dots button.active {
+  background: var(--fg);
+  transform: scale(1.25);
+}
+
+/* ─── How It Works ─── */
+.how-section {
+  background: var(--fg);
+  color: var(--card-fg);
+  border-radius: 32px;
+  margin: 0 16px;
+  padding: 100px 24px;
+}
+
+.how-section h2 { color: #fff; margin-bottom: 16px; }
+.how-section .subhead { color: rgba(255,255,255,0.5); margin-bottom: 72px; }
+
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+@media (max-width: 800px) {
+  .steps-grid { grid-template-columns: 1fr; max-width: 480px; }
+}
+
+.step-card {
+  padding: 32px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.step-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.08);
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 20px;
+}
+
+.step-card h3 { color: #fff; margin-bottom: 10px; }
+.step-card p { color: rgba(255,255,255,0.45); font-size: 15px; line-height: 1.5; }
+
+/* ─── Principles ─── */
+.principles-section { text-align: center; }
+.principles-section h2 { margin-bottom: 16px; }
+.principles-section .subhead { margin-bottom: 72px; }
+
+.principles-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+@media (max-width: 640px) {
+  .principles-grid { grid-template-columns: 1fr; }
+}
+
+.principle-card {
+  padding: 32px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.5);
+  border: 1px solid rgba(0,0,0,0.04);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  text-align: left;
+}
+
+.principle-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  font-size: 18px;
+}
+
+.principle-card h3 { margin-bottom: 8px; }
+.principle-card p { font-size: 15px; line-height: 1.5; color: var(--fg-tertiary); }
+
+/* ─── For Who ─── */
+.audience-section { text-align: center; }
+.audience-section h2 { margin-bottom: 16px; }
+.audience-section .subhead { margin-bottom: 56px; }
+
+.audience-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  max-width: 640px;
+  margin: 0 auto 48px;
+}
+
+.audience-tag {
+  padding: 10px 24px;
+  border-radius: 9999px;
+  font-size: 15px;
+  color: var(--fg-secondary);
+  background: rgba(255,255,255,0.5);
+  border: 1px solid rgba(0,0,0,0.06);
+}
+
+.audience-quote {
+  max-width: 560px;
+  margin: 0 auto;
+  font-size: clamp(1.125rem, 2vw, 1.375rem);
+  font-weight: 400;
+  font-style: italic;
+  line-height: 1.5;
+  color: var(--fg-tertiary);
+  letter-spacing: -0.01em;
+}
+
+/* ─── CTA ─── */
+.cta-section {
+  text-align: center;
+  padding-bottom: 120px;
+}
+
+.cta-section h2 { margin-bottom: 16px; }
+.cta-section .subhead { margin-bottom: 40px; }
+
+/* ─── Footer ─── */
+footer {
+  padding: 32px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--fg-tertiary);
+}
+
+footer a {
+  color: var(--fg-tertiary);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+footer a:hover { color: var(--fg); }
+
+.footer-links { display: flex; gap: 24px; }
+
+@media (max-width: 640px) {
+  footer { flex-direction: column; gap: 16px; }
+}
+
+/* ─── Fade-in Animation ─── */
+.fade-in {
+  opacity: 0;
+  filter: blur(6px);
+  transform: translateY(16px);
+  transition: opacity 0.8s ease, filter 0.8s ease, transform 0.8s ease;
+}
+
+.fade-in.visible {
+  opacity: 1;
+  filter: blur(0);
+  transform: translateY(0);
+}
+
+/* stagger children */
+.fade-in.d1 { transition-delay: 0.1s; }
+.fade-in.d2 { transition-delay: 0.2s; }
+.fade-in.d3 { transition-delay: 0.3s; }
+.fade-in.d4 { transition-delay: 0.4s; }
+.fade-in.d5 { transition-delay: 0.5s; }
+.fade-in.d6 { transition-delay: 0.6s; }
+
+/* ─── Synthetic Card Images ─── */
+.synth-card {
+  width: 100%;
+  height: 100%;
+  background: #1a1a1a;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.synth-header {
+  padding: 20px 24px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.synth-logo {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.9);
+}
+
+.synth-logo span {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  background: var(--accent-violet);
+  border-radius: 50%;
+  margin-left: 1px;
+  vertical-align: middle;
+  position: relative;
+  top: -1px;
+}
+
+.synth-round {
+  padding: 3px 10px;
+  border-radius: 9999px;
+  background: rgba(255,255,255,0.08);
+  font-size: 11px;
+  color: rgba(255,255,255,0.4);
+}
+
+.synth-prompt {
+  padding: 8px 24px 16px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.25);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.synth-columns {
+  flex: 1;
+  display: grid;
+  gap: 8px;
+  padding: 16px 16px;
+  overflow: hidden;
+}
+
+.synth-columns.cols-5 { grid-template-columns: repeat(5, 1fr); }
+.synth-columns.cols-4 { grid-template-columns: repeat(4, 1fr); }
+.synth-columns.cols-3 { grid-template-columns: repeat(3, 1fr); }
+
+.synth-col {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.synth-col-header {
+  font-size: 7px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(255,255,255,0.3);
+  padding: 0 4px 4px;
+}
+
+.synth-tile {
+  border-radius: 8px;
+  padding: 8px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+.synth-tile-text {
+  font-size: 6.5px;
+  line-height: 1.4;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 6px;
+}
+
+.synth-tag {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 5.5px;
+  font-weight: 500;
+}
+
+.tag-keep { background: rgba(52, 211, 153, 0.15); color: #34d399; }
+.tag-riff { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+.tag-tension { background: rgba(244, 114, 182, 0.15); color: #f472b6; }
+.tag-direction { background: rgba(167, 139, 250, 0.15); color: #a78bfa; }
+.tag-signal { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+.tag-provocation { background: rgba(251, 146, 60, 0.15); color: #fb923c; }
+
+/* Card shadows */
+.gallery-card {
+  box-shadow:
+    0 8px 40px rgba(0,0,0,0.12),
+    0 2px 8px rgba(0,0,0,0.08);
+}
+</style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav id="nav">
+  <a href="#" class="nav-logo">Seeds<span></span></a>
+  <a href="#" class="btn">Get early access</a>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="container">
+    <div class="fade-in d1">
+      <div class="hero-badge">
+        <span class="dot"></span>
+        Now in private beta
+      </div>
+    </div>
+    <h1 class="fade-in d2">Explore more directions,<br>arrive somewhere stronger</h1>
+    <p class="subhead fade-in d3">Seeds is a creative sparring tool that turns a rough brief into a board of ideas you can shape, combine, and evolve.</p>
+    <div class="hero-cta fade-in d4">
+      <a href="#" class="btn btn-dark">Get early access</a>
+      <a href="#how" class="btn">See how it works</a>
+    </div>
+  </div>
+</section>
+
+<!-- Card Gallery -->
+<section class="gallery-section">
+  <div class="gallery-container" id="gallery">
+
+    <!-- Card 0: Round 1 board with many ideas -->
+    <div class="gallery-card">
+      <div class="synth-card">
+        <div class="synth-header">
+          <div class="synth-logo">Seeds<span></span></div>
+          <div class="synth-round">Round 1</div>
+        </div>
+        <div class="synth-prompt">Launch strategy for a direct-to-consumer skincare brand targeting Gen Z...</div>
+        <div class="synth-columns cols-5">
+          <div class="synth-col">
+            <div class="synth-col-header">Tensions</div>
+            <div class="synth-tile"><div class="synth-tile-text">Gen Z craves authenticity but engages most with highly produced content</div><span class="synth-tag tag-keep">Keep</span></div>
+            <div class="synth-tile"><div class="synth-tile-text">Clean beauty claims feel mandatory yet increasingly meaningless</div><span class="synth-tag tag-riff">Riff</span></div>
+            <div class="synth-tile"><div class="synth-tile-text">Want community but distrust brands that try too hard to build it</div><span class="synth-tag tag-tension">Tension</span></div>
+          </div>
+          <div class="synth-col">
+            <div class="synth-col-header">Signals</div>
+            <div class="synth-tile"><div class="synth-tile-text">De-influencing trend shows fatigue with traditional product pushing</div><span class="synth-tag tag-signal">Signal</span></div>
+            <div class="synth-tile"><div class="synth-tile-text">Ingredient-first shopping behavior rising on TikTok</div><span class="synth-tag tag-keep">Keep</span></div>
+            <div class="synth-tile"><div class="synth-tile-text">Micro-communities outperform mass reach for conversion</div><span class="synth-tag tag-signal">Signal</span></div>
+          </div>
+          <div class="synth-col">
+            <div class="synth-col-header">Directions</div>
+            <div class="synth-tile"><div class="synth-tile-text">Lead with radical ingredient transparency as the brand's personality</div><span class="synth-tag tag-direction">Direction</span></div>
+            <div class="synth-tile"><div class="synth-tile-text">Launch through creators who already talk about skin science</div><span class="synth-tag tag-keep">Keep</span></div>
+            <div class="synth-tile"><div class="synth-tile-text">Build a subscription around skin cycling routines</div><span class="synth-tag tag-direction">Direction</span></div>
+          </div>
+          <div class="synth-col">
+            <div class="synth-col-header">Ideas</div>
+            <div class="synth-tile"><div class="synth-tile-text">Packaging that shows the actual formula ratio on the front label</div><span class="synth-tag tag-riff">Riff</span></div>
+            <div class="synth-tile"><div class="synth-tile-text">A "skin diary" feature in the app that tracks routine changes</div><span class="synth-tag tag-keep">Keep</span></div>
+            <div class="synth-tile"><div class="synth-tile-text">Creator collab where they reformulate one product openly</div><span class="synth-tag tag-riff">Riff</span></div>
+          </div>
+          <div class="synth-col">
+            <div class="synth-col-header">Provocations</div>
+            <div class="synth-tile"><div class="synth-tile-text">What if the brand never runs a traditional ad campaign?</div><span class="synth-tag tag-provocation">Provocation</span></div>
+            <div class="synth-tile"><div class="synth-tile-text">What if customers could vote on the next product?</div><span class="synth-tag tag-keep">Keep</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 1: Round 2 refined board -->
+    <div class="gallery-card">
+      <div class="synth-card">
+        <div class="synth-header">
+          <div class="synth-logo">Seeds<span></span></div>
+          <div class="synth-round">Round 2</div>
+        </div>
+        <div class="synth-prompt">Refined from 4 keeps + 3 riffs — narrowing toward transparency-led strategy...</div>
+        <div class="synth-columns cols-4">
+          <div class="synth-col">
+            <div class="synth-col-header">Core Insight</div>
+            <div class="synth-tile"><div class="synth-tile-text">People will share a product that makes them feel smarter, not just prettier</div><span class="synth-tag tag-keep">Keep</span></div>
+            <div class="synth-tile"><div class="synth-tile-text">Transparency is only interesting if it reveals something unexpected</div><span class="synth-tag tag-direction">Direction</span></div>
+          </div>
+          <div class="synth-col">
+            <div class="synth-col-header">Strategy</div>
+            <div class="synth-tile"><div class="synth-tile-text">Position as the "ingredient-literate" brand — not clean, not clinical, just honest</div><span class="synth-tag tag-keep">Keep</span></div>
+            <div class="synth-tile"><div class="synth-tile-text">Launch with 3 hero SKUs, each with a single standout ingredient story</div><span class="synth-tag tag-direction">Direction</span></div>
+          </div>
+          <div class="synth-col">
+            <div class="synth-col-header">Activation</div>
+            <div class="synth-tile"><div class="synth-tile-text">Send products with "cheat sheets" that explain what each ingredient actually does</div><span class="synth-tag tag-riff">Riff</span></div>
+            <div class="synth-tile"><div class="synth-tile-text">TikTok series: "What's actually in your favorite product?" — compare openly</div><span class="synth-tag tag-keep">Keep</span></div>
+            <div class="synth-tile"><div class="synth-tile-text">Partner with dermatology students, not influencers</div><span class="synth-tag tag-riff">Riff</span></div>
+          </div>
+          <div class="synth-col">
+            <div class="synth-col-header">Open Questions</div>
+            <div class="synth-tile"><div class="synth-tile-text">Does full transparency risk commoditizing the product?</div><span class="synth-tag tag-tension">Tension</span></div>
+            <div class="synth-tile"><div class="synth-tile-text">How do we keep "ingredient literate" from feeling preachy?</div><span class="synth-tag tag-provocation">Provocation</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2: Round 3 converged -->
+    <div class="gallery-card">
+      <div class="synth-card">
+        <div class="synth-header">
+          <div class="synth-logo">Seeds<span></span></div>
+          <div class="synth-round">Round 3</div>
+        </div>
+        <div class="synth-prompt">Converged direction — ready for export as creative brief...</div>
+        <div class="synth-columns cols-3">
+          <div class="synth-col">
+            <div class="synth-col-header">The Direction</div>
+            <div class="synth-tile"><div class="synth-tile-text">"Ingredient-literate beauty" — a brand built on the belief that understanding your skin is more empowering than following trends</div><span class="synth-tag tag-keep">Keep</span></div>
+            <div class="synth-tile"><div class="synth-tile-text">Brand voice: confident, nerdy-cool, never preachy. Think "the friend who actually read the studies"</div><span class="synth-tag tag-keep">Keep</span></div>
+            <div class="synth-tile"><div class="synth-tile-text">Visual identity: clinical-meets-editorial. Formulation data as design element</div><span class="synth-tag tag-direction">Direction</span></div>
+          </div>
+          <div class="synth-col">
+            <div class="synth-col-header">Launch Plan</div>
+            <div class="synth-tile"><div class="synth-tile-text">3 hero SKUs with "formula cards" — ingredient breakdowns designed to be shared</div><span class="synth-tag tag-keep">Keep</span></div>
+            <div class="synth-tile"><div class="synth-tile-text">Seed to 200 derm students + skincare subreddit moderators</div><span class="synth-tag tag-keep">Keep</span></div>
+            <div class="synth-tile"><div class="synth-tile-text">"What's in yours?" TikTok series as anchor content — comparison without shade</div><span class="synth-tag tag-keep">Keep</span></div>
+          </div>
+          <div class="synth-col">
+            <div class="synth-col-header">Guard Rails</div>
+            <div class="synth-tile"><div class="synth-tile-text">Never claim "clean" or "natural" — those are the words of brands with something to hide</div><span class="synth-tag tag-keep">Keep</span></div>
+            <div class="synth-tile"><div class="synth-tile-text">Transparency should feel like generosity, not a lecture</div><span class="synth-tag tag-keep">Keep</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3: Different brief entirely -->
+    <div class="gallery-card">
+      <div class="synth-card">
+        <div class="synth-header">
+          <div class="synth-logo">Seeds<span></span></div>
+          <div class="synth-round">Round 1</div>
+        </div>
+        <div class="synth-prompt">Rebrand positioning for a B2B fintech moving upmarket from SMB to enterprise...</div>
+        <div class="synth-columns cols-5">
+          <div class="synth-col">
+            <div class="synth-col-header">Tensions</div>
+            <div class="synth-tile"><div class="synth-tile-text">"Easy to use" got you SMBs but enterprise buyers read it as "not serious"</div><span class="synth-tag tag-keep">Keep</span></div>
+            <div class="synth-tile"><div class="synth-tile-text">Your best feature is speed — but enterprise procurement is slow by nature</div><span class="synth-tag tag-tension">Tension</span></div>
+          </div>
+          <div class="synth-col">
+            <div class="synth-col-header">Signals</div>
+            <div class="synth-tile"><div class="synth-tile-text">Enterprise buyers now expect product-led discovery before sales calls</div><span class="synth-tag tag-signal">Signal</span></div>
+            <div class="synth-tile"><div class="synth-tile-text">CFOs increasingly making software decisions, not just CIOs</div><span class="synth-tag tag-keep">Keep</span></div>
+          </div>
+          <div class="synth-col">
+            <div class="synth-col-header">Directions</div>
+            <div class="synth-tile"><div class="synth-tile-text">Reframe "easy" as "fast time-to-value" — same DNA, enterprise language</div><span class="synth-tag tag-direction">Direction</span></div>
+            <div class="synth-tile"><div class="synth-tile-text">Lead with compliance and audit trails — table stakes you already have</div><span class="synth-tag tag-direction">Direction</span></div>
+          </div>
+          <div class="synth-col">
+            <div class="synth-col-header">Ideas</div>
+            <div class="synth-tile"><div class="synth-tile-text">ROI calculator that uses their actual data from a trial</div><span class="synth-tag tag-riff">Riff</span></div>
+            <div class="synth-tile"><div class="synth-tile-text">Case studies structured as CFO conversations, not feature tours</div><span class="synth-tag tag-keep">Keep</span></div>
+          </div>
+          <div class="synth-col">
+            <div class="synth-col-header">Provocations</div>
+            <div class="synth-tile"><div class="synth-tile-text">What if you never hired enterprise sales reps and stayed fully PLG?</div><span class="synth-tag tag-provocation">Provocation</span></div>
+            <div class="synth-tile"><div class="synth-tile-text">What if the rebrand leaned into "scrappy" as an asset, not something to hide?</div><span class="synth-tag tag-riff">Riff</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="gallery-dots" id="gallery-dots">
+    <button class="active" data-idx="0" aria-label="Show card 1"></button>
+    <button data-idx="1" aria-label="Show card 2"></button>
+    <button data-idx="2" aria-label="Show card 3"></button>
+    <button data-idx="3" aria-label="Show card 4"></button>
+  </div>
+</section>
+
+<!-- How It Works -->
+<section class="how-section" id="how">
+  <div class="container">
+    <h2 class="fade-in">From blank page to<br>sharp direction</h2>
+    <p class="subhead fade-in d1">Seeds works in rounds. Each one responds to your judgement, so the work gets sharper as you go.</p>
+    <div class="steps-grid">
+      <div class="step-card fade-in d1">
+        <div class="step-number">1</div>
+        <h3>Plant a seed</h3>
+        <p>Start with a rough prompt, a brief, or a few source files. You don't need to know the answer yet.</p>
+      </div>
+      <div class="step-card fade-in d2">
+        <div class="step-number">2</div>
+        <h3>Shape the board</h3>
+        <p>Seeds generates a canvas of atomic cards: tensions, signals, directions, ideas. Keep what matters, reject what doesn't.</p>
+      </div>
+      <div class="step-card fade-in d3">
+        <div class="step-number">3</div>
+        <h3>Grow the next round</h3>
+        <p>Your selections become signals for the next generation. The work moves from breadth to coherence, naturally.</p>
+      </div>
+      <div class="step-card fade-in d4">
+        <div class="step-number">4</div>
+        <h3>Riff locally</h3>
+        <p>Push on any single card without regenerating the whole board. Follow a thread without losing the bigger picture.</p>
+      </div>
+      <div class="step-card fade-in d5">
+        <div class="step-number">5</div>
+        <h3>Find the direction</h3>
+        <p>After a few rounds, the noise clears. You're left with a direction you believe in because you shaped it.</p>
+      </div>
+      <div class="step-card fade-in d6">
+        <div class="step-number">6</div>
+        <h3>Export and hand off</h3>
+        <p>When it's ready, export a clean markdown brief. A structured artifact, not an ephemeral conversation.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Principles -->
+<section class="principles-section">
+  <div class="container">
+    <h2 class="fade-in">A different kind of AI tool</h2>
+    <p class="subhead fade-in d1">Most AI tools give you a wall of text or jump to a polished answer. That skips the part where good work actually gets made.</p>
+    <div class="principles-grid">
+      <div class="principle-card fade-in d1">
+        <div class="principle-icon" style="background: rgba(167,139,250,0.1);">
+          <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#a78bfa" stroke-width="1.5"><path d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 8.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/></svg>
+        </div>
+        <h3>Canvas, not chat</h3>
+        <p>Ideas live as small, movable cards on a spatial board. Not buried in paragraphs of prose you'll never re-read.</p>
+      </div>
+      <div class="principle-card fade-in d2">
+        <div class="principle-icon" style="background: rgba(52,211,153,0.1);">
+          <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#34d399" stroke-width="1.5"><path d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>
+        </div>
+        <h3>Works in rounds</h3>
+        <p>Each generation responds to your selections. The system learns what you care about and pushes further in that direction.</p>
+      </div>
+      <div class="principle-card fade-in d3">
+        <div class="principle-icon" style="background: rgba(56,189,248,0.1);">
+          <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#38bdf8" stroke-width="1.5"><path d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/></svg>
+        </div>
+        <h3>Widens before it narrows</h3>
+        <p>AI should open up possibility, not close it down. Seeds explores multiple directions before converging on one.</p>
+      </div>
+      <div class="principle-card fade-in d4">
+        <div class="principle-icon" style="background: rgba(251,191,36,0.1);">
+          <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#fbbf24" stroke-width="1.5"><path d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+        </div>
+        <h3>You keep authorship</h3>
+        <p>Taste is revealed through selection and editing. The best ideas come from your judgement shaping the machine's output.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Audience -->
+<section class="audience-section">
+  <div class="container">
+    <h2 class="fade-in">For people whose work<br>starts in ambiguity</h2>
+    <p class="subhead fade-in d1">When you need more than inspiration, but less than a finished deck.</p>
+    <div class="audience-tags fade-in d2">
+      <span class="audience-tag">Strategists</span>
+      <span class="audience-tag">Creative Directors</span>
+      <span class="audience-tag">Designers</span>
+      <span class="audience-tag">Founders</span>
+      <span class="audience-tag">Brand Leads</span>
+      <span class="audience-tag">Product Managers</span>
+    </div>
+    <p class="audience-quote fade-in d3">"Make AI feel less like a vending machine for answers and more like a sharp creative partner."</p>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="container">
+    <h2 class="fade-in">Start with a seed,<br>arrive at a direction</h2>
+    <p class="subhead fade-in d1">Seeds is in private beta. Join the waitlist to get early access.</p>
+    <div class="fade-in d2">
+      <a href="#" class="btn btn-dark">Get early access</a>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <span class="nav-logo">Seeds<span></span></span>
+  <span>&copy; 2026 Seeds</span>
+  <div class="footer-links">
+    <a href="#">Twitter</a>
+    <a href="#">Discord</a>
+  </div>
+</footer>
+
+<script>
+// ─── Spring Physics (same as wabi.ai) ───
+function springStep(pos, target, vel, omega, zeta, dt) {
+  const t = Math.min(dt, 0.064);
+  const d = pos - target;
+  if (Math.abs(d) < 0.01 && Math.abs(vel) < 0.1) return { position: target, velocity: 0 };
+  const wd = omega * Math.sqrt(1 - zeta * zeta);
+  const decay = Math.exp(-zeta * omega * t);
+  const cos = Math.cos(wd * t);
+  const sin = Math.sin(wd * t);
+  const m = (vel + zeta * omega * d) / wd;
+  return {
+    position: target + decay * (d * cos + m * sin),
+    velocity: decay * ((m * wd - zeta * omega * d) * cos - (d * wd + zeta * omega * m) * sin)
+  };
+}
+
+// Spring configs
+const SPRING = {
+  layout: { omega: 2 * Math.PI / 0.45, zeta: 0.85 },
+  snapBack: { omega: 2 * Math.PI / 0.4, zeta: 0.70 },
+  overshoot: { omega: Math.sqrt(250), zeta: 12 / (2 * Math.sqrt(90)) }
+};
+
+// ─── Card Gallery ───
+(function() {
+  const container = document.getElementById('gallery');
+  const cards = Array.from(container.querySelectorAll('.gallery-card'));
+  const dots = Array.from(document.querySelectorAll('#gallery-dots button'));
+  const count = cards.length;
+
+  // Card layout function
+  function layout(stackIdx) {
+    if (stackIdx === 0) return { x: 0, y: 0, rot: 0, scale: 1 };
+    const mobile = window.innerWidth < 641;
+    const even = stackIdx % 2 === 0;
+    return {
+      x: even ? (mobile ? 12 : 28) : (mobile ? -12 : -28),
+      y: even ? (mobile ? 12 : 20) : (mobile ? 4 : 8),
+      rot: even ? (mobile ? 3.5 : 5) : (mobile ? -3.5 : -5),
+      scale: Math.max(0.8, 1 - 0.068 * stackIdx)
+    };
+  }
+
+  // Initialize order: front card first
+  let order = [0, 1, 2, 3].filter(i => i < count);
+  let transitioning = false;
+
+  // Per-card spring state
+  const state = new Map();
+  cards.forEach((_, i) => {
+    state.set(i, {
+      x: { position: 0, velocity: 0, target: 0 },
+      y: { position: 40, velocity: 0, target: 40 },
+      rot: { position: 0, velocity: 0, target: 0 },
+      scale: { position: 0.95, velocity: 0, target: 0.95 },
+      opacity: { position: 0, velocity: 0, target: 0 }
+    });
+  });
+
+  // Container rotation state
+  const containerRot = { position: 0, velocity: 0, target: 0 };
+
+  // Drag state
+  let dragging = false;
+  let dragX = 0, dragY = 0;
+  let startX = 0, startY = 0;
+  let dragDir = null;
+  let justSwiped = false;
+
+  function updateDots() {
+    const front = order[0];
+    dots.forEach((d, i) => d.classList.toggle('active', i === front));
+  }
+
+  function transition() {
+    if (transitioning) return;
+    transitioning = true;
+    const frontIdx = order[0];
+    const frontState = state.get(frontIdx);
+    if (!frontState) return;
+
+    // Fling the front card to the back position
+    const backLayout = layout(count - 1);
+    frontState.x.velocity += 3 * dragX;
+    frontState.y.velocity += 3 * dragY;
+    frontState.x.target = backLayout.x;
+    frontState.y.target = backLayout.y;
+    frontState.rot.target = backLayout.rot;
+    frontState.scale.target = backLayout.scale;
+
+    setTimeout(() => { containerRot.target = 0; }, 80);
+
+    setTimeout(() => {
+      const removed = order.shift();
+      if (removed !== undefined) order.push(removed);
+      transitioning = false;
+      updateDots();
+      setTargets();
+    }, 180);
+  }
+
+  function setTargets() {
+    order.forEach((cardIdx, stackIdx) => {
+      const s = state.get(cardIdx);
+      if (!s) return;
+      const l = layout(stackIdx);
+      s.x.target = l.x;
+      s.y.target = l.y;
+      s.rot.target = l.rot;
+      s.scale.target = l.scale;
+      s.opacity.target = stackIdx === 0 ? 1 : Math.max(0.7, 1 - 0.15 * stackIdx);
+    });
+  }
+
+  // Drag handlers
+  function onDown(cx, cy) {
+    if (transitioning) return;
+    dragging = true;
+    justSwiped = false;
+    dragDir = null;
+    startX = cx;
+    startY = cy;
+    dragX = 0;
+    dragY = 0;
+  }
+
+  function onMove(cx, cy) {
+    if (!dragging || dragDir === 'vertical') return;
+    dragX = cx - startX;
+    dragY = cy - startY;
+    const dist = Math.hypot(dragX, dragY);
+    if (dragDir === null && dist > 10) {
+      if (Math.abs(dragY) > 1.2 * Math.abs(dragX)) {
+        dragDir = 'vertical';
+        dragging = false;
+        dragX = 0;
+        dragY = 0;
+        return;
+      }
+      dragDir = 'horizontal';
+    }
+    const w = container.offsetWidth || 600;
+    containerRot.target = Math.max(-25, Math.min(25, dragX / (w / 2) * 25));
+  }
+
+  function onUp() {
+    if (!dragging) { dragDir = null; return; }
+    dragging = false;
+    dragDir = null;
+    const frontIdx = order[0];
+    const s = state.get(frontIdx);
+    if (s) {
+      s.x.position = dragX;
+      s.y.position = dragY;
+      s.rot.position = dragX / 20;
+      if (Math.abs(dragX) > 60) {
+        justSwiped = true;
+        transition();
+      } else {
+        s.x.target = 0;
+        s.y.target = 0;
+        s.rot.target = 0;
+        s.scale.target = 1;
+        containerRot.target = 0;
+      }
+    }
+    dragX = 0;
+    dragY = 0;
+  }
+
+  // Mouse events
+  container.addEventListener('mousedown', e => { onDown(e.clientX, e.clientY); e.preventDefault(); });
+  window.addEventListener('mousemove', e => { onMove(e.clientX, e.clientY); });
+  window.addEventListener('mouseup', onUp);
+
+  // Touch events
+  container.addEventListener('touchstart', e => {
+    const t = e.touches[0];
+    if (t) onDown(t.clientX, t.clientY);
+  }, { passive: true });
+  container.addEventListener('touchmove', e => {
+    const t = e.touches[0];
+    if (t) {
+      onMove(t.clientX, t.clientY);
+      if (dragDir === 'horizontal') e.preventDefault();
+    }
+  }, { passive: false });
+  container.addEventListener('touchend', onUp);
+
+  // Click on non-front card to advance
+  cards.forEach((card, i) => {
+    card.addEventListener('click', () => {
+      if (justSwiped || transitioning) return;
+      if (order.indexOf(i) > 0) transition();
+    });
+  });
+
+  // Dot clicks
+  dots.forEach(dot => {
+    dot.addEventListener('click', () => {
+      if (transitioning) return;
+      const target = Number(dot.dataset.idx ?? 0);
+      if (order[0] !== target) transition();
+    });
+  });
+
+  // ─── Animation Loop ───
+  let lastTime = 0;
+  let raf;
+
+  function tick(time) {
+    const dt = lastTime ? (time - lastTime) / 1000 : 1 / 60;
+    lastTime = time;
+
+    // Update container rotation
+    const cr = springStep(containerRot.position, containerRot.target, containerRot.velocity, SPRING.layout.omega, SPRING.layout.zeta, dt);
+    containerRot.position = cr.position;
+    containerRot.velocity = cr.velocity;
+    container.style.transform = `perspective(1200px) rotateY(${containerRot.position}deg)`;
+
+    // Update each card
+    order.forEach((cardIdx, stackIdx) => {
+      const card = cards[cardIdx];
+      const s = state.get(cardIdx);
+      if (!card || !s) return;
+
+      const isFront = stackIdx === 0;
+      const spring = transitioning && cardIdx === order[0] ? SPRING.overshoot :
+                     isFront && !dragging ? SPRING.snapBack : SPRING.layout;
+
+      ['x', 'y', 'rot', 'scale', 'opacity'].forEach(prop => {
+        const p = s[prop];
+        const r = springStep(p.position, p.target, p.velocity, spring.omega, spring.zeta, dt);
+        p.position = r.position;
+        p.velocity = r.velocity;
+      });
+
+      const dx = isFront && dragging ? dragX : s.x.position;
+      const dy = isFront && dragging ? dragY : s.y.position;
+      const dr = isFront && dragging ? dragX / 20 : s.rot.position;
+      const ds = isFront && dragging ? 1 : s.scale.position;
+      const dz = count - stackIdx;
+
+      card.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) rotate(${dr}deg) scale(${ds})`;
+      card.style.zIndex = String(dz);
+      card.style.opacity = String(s.opacity.position);
+    });
+
+    raf = requestAnimationFrame(tick);
+  }
+
+  // Initialize with fade-in delay
+  setTimeout(() => {
+    order.forEach((cardIdx, stackIdx) => {
+      const s = state.get(cardIdx);
+      if (!s) return;
+      const l = layout(stackIdx);
+      s.x.target = l.x;
+      s.y.target = l.y;
+      s.rot.target = l.rot;
+      s.scale.target = l.scale;
+      s.opacity.target = stackIdx === 0 ? 1 : Math.max(0.7, 1 - 0.15 * stackIdx);
+    });
+    updateDots();
+  }, 600);
+
+  raf = requestAnimationFrame(tick);
+
+  // Auto-advance every 5 seconds
+  let autoTimer = setInterval(() => {
+    if (!dragging && !transitioning) transition();
+  }, 5000);
+
+  container.addEventListener('mousedown', () => { clearInterval(autoTimer); });
+  container.addEventListener('touchstart', () => { clearInterval(autoTimer); });
+})();
+
+// ─── Scroll Fade-in ───
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+// ─── Nav Scroll ───
+window.addEventListener('scroll', () => {
+  document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 20);
+}, { passive: true });
+</script>
+</body>
+</html>

@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seeds Canvas — Clustered & Riffing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #0a0a0a; --surface: #161616; --cream: #e8e4de; --fg: #e8e4de;
+  --fg-2: rgba(232,228,222,0.5); --fg-3: rgba(232,228,222,0.25);
+  --border: rgba(255,255,255,0.06); --dot: rgba(255,255,255,0.06);
+  --font: 'Inter', -apple-system, system-ui, sans-serif;
+  --keep: #34d399; --riff: #fbbf24; --tension: #f472b6;
+  --direction: #a78bfa; --signal: #38bdf8; --provocation: #fb923c;
+  --idea: #34d399; --guardrail: #ef4444;
+}
+html, body {
+  font-family: var(--font); color: var(--fg); background: var(--bg);
+  -webkit-font-smoothing: antialiased; overflow: hidden; height: 100vh; width: 100vw;
+}
+
+/* ── Dot Grid ── */
+.canvas-world {
+  position: absolute; inset: 0; overflow: hidden; cursor: grab;
+  background: radial-gradient(circle, var(--dot) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+.canvas-world:active { cursor: grabbing; }
+.canvas-inner { position: absolute; width: 3000px; height: 2000px; transform-origin: 0 0; }
+
+/* ── Connections ── */
+.connections { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
+.connections line { stroke: rgba(255,255,255,0.03); stroke-width: 1; stroke-dasharray: 4 4; }
+.connections line.strong { stroke: rgba(167,139,250,0.15); stroke-width: 1.5; stroke-dasharray: none; }
+.connections line.riff-line { stroke: rgba(251,191,36,0.15); stroke-width: 1.5; stroke-dasharray: 6 3; }
+.connections line.keep-line { stroke: rgba(52,211,153,0.12); stroke-width: 1; }
+
+/* ── Top Bar ── */
+.topbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  height: 48px; display: flex; align-items: center; justify-content: space-between;
+  padding: 0 16px;
+  background: rgba(10,10,10,0.8); backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+}
+.topbar-left { display: flex; align-items: center; gap: 14px; }
+.topbar-logo canvas { image-rendering: pixelated; height: 13px; width: auto; opacity: 0.6; }
+.topbar-brief { font-size: 12px; color: var(--fg-3); padding-left: 14px; border-left: 1px solid var(--border); }
+.topbar-center { display: flex; align-items: center; gap: 2px; position: absolute; left: 50%; transform: translateX(-50%); }
+.round-tab {
+  padding: 5px 14px; border-radius: 6px; border: none; cursor: pointer;
+  font-family: var(--font); font-size: 11px; font-weight: 500;
+  color: var(--fg-3); background: transparent; transition: all 0.15s; letter-spacing: 0.03em;
+}
+.round-tab.done { color: var(--fg-3); text-decoration: line-through; }
+.round-tab.active { color: var(--cream); background: rgba(255,255,255,0.08); }
+.topbar-right { display: flex; align-items: center; gap: 8px; }
+.btn-sm {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 12px; border-radius: 7px; border: none; cursor: pointer;
+  font-family: var(--font); font-size: 11px; font-weight: 500;
+  color: var(--fg-2); background: rgba(255,255,255,0.06); transition: all 0.15s;
+}
+.btn-sm:hover { background: rgba(255,255,255,0.1); color: var(--fg); }
+.btn-sm:active { transform: scale(0.96); }
+.btn-primary { background: var(--cream); color: var(--bg); }
+.btn-primary:hover { background: #fff; }
+
+/* ── Left Toolbar ── */
+.toolbar {
+  position: fixed; left: 12px; top: 50%; transform: translateY(-50%); z-index: 200;
+  display: flex; flex-direction: column; gap: 2px;
+  padding: 6px; border-radius: 12px;
+  background: rgba(20,20,20,0.9); backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+}
+.tool-btn {
+  width: 32px; height: 32px; border-radius: 8px; border: none;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  background: transparent; color: var(--fg-3); font-size: 14px; transition: all 0.12s;
+}
+.tool-btn:hover { background: rgba(255,255,255,0.06); color: var(--fg); }
+.tool-btn.active { background: rgba(255,255,255,0.1); color: var(--cream); }
+.tool-sep { width: 20px; height: 1px; background: var(--border); margin: 4px auto; }
+
+/* ── Zoom ── */
+.zoom-controls {
+  position: fixed; bottom: 76px; right: 16px; z-index: 200;
+  display: flex; align-items: center; gap: 2px;
+  padding: 4px; border-radius: 8px;
+  background: rgba(20,20,20,0.9); backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+}
+.zoom-btn { width: 28px; height: 28px; border-radius: 6px; border: none; cursor: pointer; background: transparent; color: var(--fg-3); font-size: 14px; display: flex; align-items: center; justify-content: center; }
+.zoom-btn:hover { background: rgba(255,255,255,0.08); color: var(--fg); }
+.zoom-level { font-size: 11px; color: var(--fg-3); padding: 0 6px; font-variant-numeric: tabular-nums; min-width: 36px; text-align: center; }
+
+/* ── Cards ── */
+.card {
+  position: absolute; width: 220px; border-radius: 10px; padding: 14px 16px;
+  cursor: grab; user-select: none; -webkit-user-select: none;
+  transition: box-shadow 0.2s; z-index: 10;
+}
+.card:hover { z-index: 50; box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+.card:active { cursor: grabbing; }
+.card.dragging { z-index: 100; box-shadow: 0 12px 48px rgba(0,0,0,0.5); }
+
+.card-dark { background: var(--surface); border: 1px solid var(--border); }
+.card-warm { background: linear-gradient(145deg, #1c1917, #292524); border: 1px solid rgba(251,191,36,0.06); }
+.card-cool { background: linear-gradient(145deg, #0c1222, #1e293b); border: 1px solid rgba(56,189,248,0.06); }
+.card-deep { background: linear-gradient(145deg, #1a0a2e, #2d1b4e); border: 1px solid rgba(167,139,250,0.06); }
+.card-forest { background: linear-gradient(145deg, #052e16, #14532d); border: 1px solid rgba(52,211,153,0.06); }
+.card-ember { background: linear-gradient(145deg, #2a0a0a, #4a1212); border: 1px solid rgba(239,68,68,0.06); }
+
+.card-type { display: inline-flex; align-items: center; gap: 5px; font-size: 9px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 8px; }
+.card-type-dot { width: 5px; height: 5px; border-radius: 50%; }
+.card-text { font-size: 13px; line-height: 1.5; color: var(--fg); }
+.card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.04); }
+.card-tag { font-size: 10px; color: var(--fg-3); }
+
+.card-actions { display: flex; gap: 2px; opacity: 0; transition: opacity 0.12s; }
+.card:hover .card-actions { opacity: 1; }
+.card-action { width: 22px; height: 22px; border-radius: 5px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.06); color: var(--fg-3); font-size: 11px; transition: all 0.12s; }
+.card-action:hover { background: rgba(255,255,255,0.12); color: var(--fg); }
+
+.card.selected { box-shadow: 0 0 0 2px var(--keep), 0 4px 16px rgba(52,211,153,0.12); }
+.card.riffed { box-shadow: 0 0 0 2px var(--riff), 0 4px 16px rgba(251,191,36,0.12); }
+
+/* Rejected / dimmed cards */
+.card.rejected { opacity: 0.25; filter: grayscale(0.5); pointer-events: none; }
+
+/* Card badge */
+.card-badge {
+  position: absolute; top: -6px; right: 10px;
+  padding: 2px 7px; border-radius: 4px;
+  font-size: 9px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase;
+}
+.badge-kept { background: rgba(52,211,153,0.15); color: var(--keep); border: 1px solid rgba(52,211,153,0.2); }
+.badge-riffed { background: rgba(251,191,36,0.15); color: var(--riff); border: 1px solid rgba(251,191,36,0.2); }
+.badge-new { background: rgba(167,139,250,0.15); color: var(--direction); border: 1px solid rgba(167,139,250,0.2); }
+
+/* ── Cluster Groups ── */
+.cluster {
+  position: absolute; border-radius: 20px;
+  border: 1px dashed rgba(255,255,255,0.06);
+  pointer-events: none; z-index: 2;
+}
+.cluster::before {
+  content: ''; position: absolute; inset: 0; border-radius: inherit;
+}
+.cluster-label {
+  position: absolute; top: -10px; left: 16px;
+  padding: 2px 10px; border-radius: 4px;
+  font-size: 10px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase;
+}
+.cluster-core .cluster-label { background: rgba(167,139,250,0.1); color: var(--direction); }
+.cluster-core { border-color: rgba(167,139,250,0.12); }
+.cluster-evidence .cluster-label { background: rgba(56,189,248,0.1); color: var(--signal); }
+.cluster-evidence { border-color: rgba(56,189,248,0.08); }
+.cluster-execution .cluster-label { background: rgba(52,211,153,0.1); color: var(--idea); }
+.cluster-execution { border-color: rgba(52,211,153,0.08); }
+
+/* ── Riff Zone (AI expanding) ── */
+.riff-zone {
+  position: absolute;
+  border: 1px dashed rgba(251,191,36,0.2);
+  border-radius: 16px;
+  z-index: 3; pointer-events: none;
+}
+.riff-zone::before {
+  content: ''; position: absolute; inset: 0; border-radius: inherit;
+  background: radial-gradient(ellipse at center, rgba(251,191,36,0.02), transparent 70%);
+}
+.riff-label {
+  position: absolute; top: -10px; left: 16px;
+  padding: 2px 10px; border-radius: 4px;
+  background: rgba(251,191,36,0.12);
+  font-size: 10px; font-weight: 500; color: var(--riff); letter-spacing: 0.04em;
+}
+
+/* ── Ghost card ── */
+.card-ghost {
+  position: absolute; width: 220px; min-height: 100px;
+  border-radius: 10px; border: 1px dashed rgba(251,191,36,0.2);
+  background: rgba(251,191,36,0.02);
+  display: flex; align-items: center; justify-content: center;
+  gap: 8px; z-index: 10;
+}
+.card-ghost canvas { image-rendering: pixelated; opacity: 0.3; }
+.card-ghost-label { font-size: 11px; color: var(--fg-3); animation: pulse-text 2s ease-in-out infinite; }
+@keyframes pulse-text { 0%,100%{opacity:0.3} 50%{opacity:0.8} }
+
+/* ── Shimmer for generating ── */
+.card-generating { position: relative; overflow: hidden; }
+.card-generating::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.02), transparent);
+  animation: shimmer 2s ease-in-out infinite;
+}
+@keyframes shimmer { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
+
+/* ── Prompt Bar ── */
+.prompt-bar {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
+  padding: 10px 24px 14px;
+  background: rgba(10,10,10,0.9); backdrop-filter: blur(16px);
+  border-top: 1px solid var(--border);
+}
+.prompt-inner { max-width: 600px; margin: 0 auto; display: flex; align-items: center; gap: 8px; }
+.prompt-input {
+  flex: 1; padding: 9px 14px; border-radius: 9px; border: 1px solid var(--border);
+  background: var(--surface); color: var(--fg); font-family: var(--font); font-size: 13px;
+  outline: none;
+}
+.prompt-input::placeholder { color: var(--fg-3); }
+.prompt-input:focus { border-color: rgba(255,255,255,0.12); }
+.prompt-send {
+  width: 34px; height: 34px; border-radius: 8px; border: none; cursor: pointer;
+  background: var(--cream); color: var(--bg); display: flex; align-items: center;
+  justify-content: center; font-size: 15px;
+}
+.prompt-send:hover { transform: scale(1.06); }
+
+/* ── Status badge ── */
+.canvas-status {
+  position: fixed; bottom: 60px; left: 50%; transform: translateX(-50%);
+  z-index: 200;
+  display: flex; align-items: center; gap: 10px;
+  padding: 6px 14px; border-radius: 8px;
+  background: rgba(20,20,20,0.95); backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.06);
+  font-size: 11px; color: var(--fg-3);
+}
+.status-dot { width: 6px; height: 6px; border-radius: 50%; animation: status-pulse 1.5s ease-in-out infinite; }
+@keyframes status-pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+</style>
+</head>
+<body>
+
+<!-- Top Bar -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="topbar-logo"><canvas id="nav-logo" width="1464" height="344"></canvas></div>
+    <div class="topbar-brief">Skincare launch — Gen Z ingredient-forward</div>
+  </div>
+  <div class="topbar-center">
+    <button class="round-tab done">Round 1</button>
+    <button class="round-tab active">Round 2</button>
+    <button class="round-tab">Round 3</button>
+  </div>
+  <div class="topbar-right">
+    <button class="btn-sm">Export</button>
+    <button class="btn-sm btn-primary">Next round →</button>
+  </div>
+</div>
+
+<!-- Left Toolbar -->
+<div class="toolbar">
+  <button class="tool-btn active" title="Select">↖</button>
+  <button class="tool-btn" title="Hand">✋</button>
+  <div class="tool-sep"></div>
+  <button class="tool-btn" title="Tensions" style="color:var(--tension)">●</button>
+  <button class="tool-btn" title="Signals" style="color:var(--signal)">●</button>
+  <button class="tool-btn" title="Directions" style="color:var(--direction)">●</button>
+  <button class="tool-btn" title="Ideas" style="color:var(--idea)">●</button>
+  <button class="tool-btn" title="Provocations" style="color:var(--provocation)">●</button>
+  <div class="tool-sep"></div>
+  <button class="tool-btn" title="AI Riff" style="color:var(--riff)">✦</button>
+</div>
+
+<!-- Zoom -->
+<div class="zoom-controls">
+  <button class="zoom-btn" id="zoom-out">−</button>
+  <span class="zoom-level" id="zoom-level">85%</span>
+  <button class="zoom-btn" id="zoom-in">+</button>
+</div>
+
+<!-- Canvas -->
+<div class="canvas-world" id="canvas-world">
+  <div class="canvas-inner" id="canvas-inner">
+
+    <svg class="connections" width="3000" height="2000">
+      <!-- Core positioning cluster internal -->
+      <line x1="380" y1="250" x2="580" y2="200" class="strong" />
+      <line x1="380" y1="250" x2="360" y2="400" class="strong" />
+      <line x1="580" y1="200" x2="360" y2="400" class="strong" />
+      <!-- Core to evidence -->
+      <line x1="580" y1="200" x2="800" y2="180" class="keep-line" />
+      <line x1="380" y1="350" x2="800" y2="320" />
+      <!-- Core to execution -->
+      <line x1="580" y1="300" x2="820" y2="490" class="keep-line" />
+      <!-- Riff lines from core to riff zone -->
+      <line x1="380" y1="250" x2="200" y2="550" class="riff-line" />
+      <!-- Rejected cards lines (faded) -->
+      <line x1="1100" y1="200" x2="800" y2="180" style="stroke:rgba(255,255,255,0.02)" />
+    </svg>
+
+    <!-- ═══ CLUSTER: Core Positioning ═══ -->
+    <div class="cluster cluster-core" style="left:180px; top:120px; width:480px; height:340px;">
+      <div class="cluster-label">Core positioning</div>
+    </div>
+
+    <div class="card card-deep" style="left:220px; top:160px; transform:rotate(-0.8deg);">
+      <div class="card-badge badge-riffed">Riffed</div>
+      <div class="card-type"><div class="card-type-dot" style="background:var(--direction)"></div><span style="color:var(--direction)">Direction</span></div>
+      <div class="card-text">Position as "ingredient-literate" beauty. Not a lifestyle brand. A brand that treats its audience as smart enough for the truth.</div>
+      <div class="card-footer"><span class="card-tag">#brand · #core</span><div class="card-actions"><button class="card-action">✓</button><button class="card-action">↻</button><button class="card-action">×</button></div></div>
+    </div>
+
+    <div class="card card-dark" style="left:420px; top:160px; transform:rotate(0.5deg);">
+      <div class="card-badge badge-riffed">Riffed</div>
+      <div class="card-type"><div class="card-type-dot" style="background:var(--direction)"></div><span style="color:var(--direction)">Direction</span></div>
+      <div class="card-text">Anti-marketing as tone: no hype, no miracle claims. "Here's what's in it, here's what it does, here's what it doesn't." Restraint as signal.</div>
+      <div class="card-footer"><span class="card-tag">#tone</span><div class="card-actions"><button class="card-action">✓</button><button class="card-action">↻</button><button class="card-action">×</button></div></div>
+    </div>
+
+    <div class="card card-ember" style="left:200px; top:340px; transform:rotate(1deg);">
+      <div class="card-badge badge-kept">Kept</div>
+      <div class="card-type"><div class="card-type-dot" style="background:var(--tension)"></div><span style="color:var(--tension)">Tension</span></div>
+      <div class="card-text">"Clean beauty" peaked — the next wave claims literacy, not purity. But literacy is harder to market.</div>
+      <div class="card-footer"><span class="card-tag">#positioning</span><div class="card-actions"><button class="card-action">✓</button><button class="card-action">↻</button><button class="card-action">×</button></div></div>
+    </div>
+
+    <!-- ═══ CLUSTER: Evidence ═══ -->
+    <div class="cluster cluster-evidence" style="left:700px; top:100px; width:320px; height:290px;">
+      <div class="cluster-label">Evidence</div>
+    </div>
+
+    <div class="card card-cool" style="left:740px; top:140px; transform:rotate(-0.3deg);">
+      <div class="card-badge badge-kept">Kept</div>
+      <div class="card-type"><div class="card-type-dot" style="background:var(--signal)"></div><span style="color:var(--signal)">Signal</span></div>
+      <div class="card-text">Reddit skincare: 4M+ members dissecting INCI lists. The audience exists. They don't have a brand speaking their language.</div>
+      <div class="card-footer"><span class="card-tag">#market</span><div class="card-actions"><button class="card-action">✓</button><button class="card-action">↻</button><button class="card-action">×</button></div></div>
+    </div>
+
+    <div class="card card-cool" style="left:760px; top:290px; transform:rotate(0.7deg);">
+      <div class="card-badge badge-new">New</div>
+      <div class="card-type"><div class="card-type-dot" style="background:var(--signal)"></div><span style="color:var(--signal)">Signal</span></div>
+      <div class="card-text">Notion-ification of beauty: consumers curate routines like databases. Give them the system they're already building.</div>
+      <div class="card-footer"><span class="card-tag">#culture</span><div class="card-actions"><button class="card-action">✓</button><button class="card-action">↻</button><button class="card-action">×</button></div></div>
+    </div>
+
+    <!-- ═══ CLUSTER: Execution ═══ -->
+    <div class="cluster cluster-execution" style="left:700px; top:420px; width:360px; height:280px;">
+      <div class="cluster-label">Execution</div>
+    </div>
+
+    <div class="card card-forest" style="left:740px; top:460px; transform:rotate(-1deg);">
+      <div class="card-badge badge-kept">Kept</div>
+      <div class="card-type"><div class="card-type-dot" style="background:var(--idea)"></div><span style="color:var(--idea)">Idea</span></div>
+      <div class="card-text">Formula card: heavy stock, collectible, shelfie-ready. The ingredients are the story. Replace the brand story with the INCI list.</div>
+      <div class="card-footer"><span class="card-tag">#packaging</span><div class="card-actions"><button class="card-action">✓</button><button class="card-action">↻</button><button class="card-action">×</button></div></div>
+    </div>
+
+    <div class="card card-warm" style="left:760px; top:610px; transform:rotate(0.4deg);">
+      <div class="card-badge badge-riffed">Riffed</div>
+      <div class="card-type"><div class="card-type-dot" style="background:var(--provocation)"></div><span style="color:var(--provocation)">Provocation</span></div>
+      <div class="card-text">"Formulation diary" per drop: every choice explained. Transparency becomes the content engine, not a marketing add-on.</div>
+      <div class="card-footer"><span class="card-tag">#content</span><div class="card-actions"><button class="card-action">✓</button><button class="card-action">↻</button><button class="card-action">×</button></div></div>
+    </div>
+
+    <!-- ═══ RIFF ZONE (AI expanding from kept card) ═══ -->
+    <div class="riff-zone" style="left:100px; top:500px; width:360px; height:240px;">
+      <div class="riff-label">✦ Riffing on "anti-marketing tone"</div>
+    </div>
+
+    <div class="card card-dark card-generating" style="left:140px; top:540px; transform:rotate(-0.5deg);">
+      <div class="card-badge badge-new">New</div>
+      <div class="card-type"><div class="card-type-dot" style="background:var(--guardrail)"></div><span style="color:var(--guardrail)">Guard Rail</span></div>
+      <div class="card-text">Never lead with results. Results are subjective and legally risky. Lead with process, ingredients, and reasoning.</div>
+      <div class="card-footer"><span class="card-tag">#voice · #legal</span></div>
+    </div>
+
+    <div class="card-ghost" style="left:340px; top:560px;">
+      <canvas id="gen-dots" width="186" height="62"></canvas>
+      <span class="card-ghost-label">Finding guard rails…</span>
+    </div>
+
+    <!-- ═══ REJECTED (faded, pushed to edge) ═══ -->
+    <div class="card card-dark rejected" style="left:1100px; top:160px; transform:rotate(2deg);">
+      <div class="card-type"><div class="card-type-dot" style="background:var(--tension)"></div><span style="color:var(--tension)">Tension</span></div>
+      <div class="card-text">Ingredient transparency creates decision fatigue. Consumers want to feel smart without the work.</div>
+      <div class="card-footer"><span class="card-tag">#ux</span></div>
+    </div>
+
+    <div class="card card-dark rejected" style="left:1120px; top:320px; transform:rotate(-1.5deg);">
+      <div class="card-type"><div class="card-type-dot" style="background:var(--provocation)"></div><span style="color:var(--provocation)">Provocation</span></div>
+      <div class="card-text">What if we published the full cost breakdown?</div>
+      <div class="card-footer"><span class="card-tag">#pricing</span></div>
+    </div>
+
+    <div class="card card-dark rejected" style="left:1140px; top:440px; transform:rotate(0.8deg);">
+      <div class="card-type"><div class="card-type-dot" style="background:var(--idea)"></div><span style="color:var(--idea)">Idea</span></div>
+      <div class="card-text">Partner with chemistry educators on TikTok.</div>
+      <div class="card-footer"><span class="card-tag">#launch</span></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Status -->
+<div class="canvas-status">
+  <div class="status-dot" style="background:var(--riff)"></div>
+  <span>AI riffing on 1 card · 8 active · 3 rejected</span>
+</div>
+
+<!-- Prompt Bar -->
+<div class="prompt-bar">
+  <div class="prompt-inner">
+    <input type="text" class="prompt-input" value="Push harder on the anti-marketing angle" disabled style="opacity:0.5" />
+    <button class="prompt-send" disabled style="opacity:0.5">→</button>
+  </div>
+</div>
+
+<script>
+const SVG_PATH="M120.68 0C123.275 0 124.573 1.29829 124.573 3.89355V26.9912C124.573 29.8459 123.275 31.1436 120.68 31.1436H38.6689C33.7382 31.1437 31.1436 33.7393 31.1436 38.9297V62.2871C31.1437 67.4773 33.7383 70.0721 38.6689 70.0723H97.3223C99.9174 70.0723 101.216 71.3701 101.216 74.2246V85.6445C101.216 90.8348 103.811 93.4296 109.001 93.4297H120.68C123.275 93.4297 124.573 94.7275 124.573 97.582V143.778C124.573 146.633 123.275 147.931 120.68 147.931H109.001C103.811 147.931 101.216 150.526 101.216 155.457V167.396C101.216 169.991 99.9174 171.288 97.3223 171.288H3.89258C1.29753 171.288 0.000108743 169.991 0 167.396V144.297C0.0001236 141.442 1.29755 140.145 3.89258 140.145H85.9033C90.8342 140.145 93.4296 137.55 93.4297 132.359V109.002C93.4297 103.811 90.8343 101.216 85.9033 101.216H27.25C24.6549 101.216 23.3575 99.9181 23.3574 97.0635V85.6445C23.3574 80.454 20.7618 77.8584 15.5713 77.8584H3.89258C1.29746 77.8583 3.18864e-05 76.5607 0 73.7061V27.5098C0.000117108 24.6553 1.29754 23.3575 3.89258 23.3574H15.5713C20.7618 23.3574 23.3574 20.7621 23.3574 15.8311V3.89355C23.3574 1.29835 24.6548 6.00221e-05 27.25 0H120.68ZM272.584 0C275.179 0 276.478 1.29829 276.478 3.89355V27.251C276.477 29.846 275.179 31.1436 272.584 31.1436H190.833C185.643 31.1436 183.048 33.739 183.048 38.6699V62.5459C183.048 67.4768 185.643 70.0722 190.833 70.0723H249.227C251.822 70.0723 253.12 71.3706 253.12 73.9658V97.3232C253.12 99.9183 251.822 101.216 249.227 101.216H190.833C185.643 101.216 183.048 103.811 183.048 108.742V132.618C183.048 137.549 185.643 140.144 190.833 140.145H272.584C275.179 140.145 276.478 141.443 276.478 144.038V167.396C276.477 169.991 275.179 171.288 272.584 171.288H155.797C153.202 171.288 151.904 169.99 151.904 167.396V3.89355C151.904 1.29837 153.202 8.08707e-05 155.797 0H272.584ZM424.397 0C426.993 2.76769e-05 428.29 1.29832 428.29 3.89355V27.251C428.29 29.846 426.993 31.1435 424.397 31.1436H342.646C337.456 31.1436 334.86 33.7389 334.86 38.6699V62.5459C334.86 67.4769 337.456 70.0723 342.646 70.0723H401.04C403.635 70.0723 404.933 71.3706 404.933 73.9658V97.3232C404.933 99.9183 403.635 101.216 401.04 101.216H342.646C337.456 101.216 334.86 103.811 334.86 108.742V132.618C334.86 137.549 337.456 140.145 342.646 140.145H424.397C426.993 140.145 428.29 141.443 428.29 144.038V167.396C428.29 169.991 426.993 171.288 424.397 171.288H307.61C305.015 171.288 303.718 169.991 303.718 167.396V3.89355C303.718 1.29829 305.015 0 307.61 0H424.397ZM552.854 0C555.448 0.000151161 556.746 1.29798 556.746 4.15234V15.5723C556.746 20.7626 559.342 23.3574 564.272 23.3574H576.211C578.806 23.3576 580.103 24.6554 580.104 27.5098V144.038C580.103 146.633 578.806 147.931 576.211 147.931H564.272C559.341 147.931 556.746 150.526 556.746 155.717V167.396C556.746 169.99 555.448 171.288 552.854 171.288H459.424C456.829 171.288 455.53 169.991 455.53 167.396V3.89355C455.53 1.29829 456.829 0 459.424 0H552.854ZM727.933 0C730.528 8.42668e-05 731.825 1.29837 731.825 3.89355V26.9912C731.825 29.8458 730.528 31.1435 727.933 31.1436H645.922C640.991 31.1436 638.396 33.7392 638.396 38.9297V62.2871C638.396 67.4774 640.991 70.0723 645.922 70.0723H704.575C707.17 70.0724 708.468 71.3702 708.468 74.2246V85.6445C708.468 90.8348 711.063 93.4297 716.254 93.4297H727.933C730.528 93.4298 731.825 94.7276 731.825 97.582V143.778C731.825 146.633 730.528 147.931 727.933 147.931H716.254C711.063 147.931 708.468 150.526 708.468 155.457V167.396C708.468 169.99 707.17 171.288 704.575 171.288H611.146C608.55 171.288 607.252 169.991 607.252 167.396V144.297C607.252 141.442 608.55 140.145 611.146 140.145H693.155C698.086 140.145 700.682 137.55 700.682 132.359V109.002C700.682 103.811 698.086 101.216 693.155 101.216H634.503C631.908 101.216 630.609 99.9182 630.609 97.0635V85.6445C630.609 80.4541 628.015 77.8585 622.824 77.8584H611.146C608.55 77.8584 607.252 76.5608 607.252 73.7061V27.5098C607.252 24.6552 608.55 23.3574 611.146 23.3574H622.824C628.015 23.3573 630.609 20.762 630.609 15.8311V3.89355C630.609 1.29829 631.908 0 634.503 0H727.933ZM494.46 31.1436C489.269 31.1436 486.674 33.7389 486.674 38.6699V132.618C486.674 137.549 489.269 140.145 494.46 140.145H541.175C546.365 140.144 548.96 137.549 548.96 132.618V38.6699C548.96 33.7391 546.365 31.1437 541.175 31.1436H494.46Z";
+const BK=31,SVG_W=732,SVG_H=172,GC=Math.ceil(SVG_W/BK),GR=Math.ceil(SVG_H/BK);
+function getCells(){const c=document.createElement('canvas');c.width=SVG_W;c.height=SVG_H;const x=c.getContext('2d');x.fillStyle='white';x.fill(new Path2D(SVG_PATH));const d=x.getImageData(0,0,SVG_W,SVG_H),f=[];for(let r=0;r<GR;r++)for(let col=0;col<GC;col++){const cx=col*BK+BK/2,cy=r*BK+BK/2;if(cx<SVG_W&&cy<SVG_H){const i=(Math.floor(cy)*SVG_W+Math.floor(cx))*4;if(d.data[i+3]>128)f.push({col,row:r})}}return f}
+function drawStaticLogo(id,color){const cv=document.getElementById(id);if(!cv)return;const ctx=cv.getContext('2d'),cells=getCells(),px=BK*2;ctx.fillStyle=color;for(const c of cells)ctx.fillRect(c.col*px,c.row*px,px,px)}
+function initDots(id){const cv=document.getElementById(id);if(!cv)return;const ctx=cv.getContext('2d'),px=BK;let frame=0,lt=0;function tick(t){const dt=lt?(t-lt)/1000:1/30;lt=t;frame+=dt*30;ctx.clearRect(0,0,cv.width,cv.height);ctx.fillStyle='#e8e4de';for(let d=0;d<3;d++){const col=d*3,phase=(frame-d*6)/36,bounce=Math.sin(phase*Math.PI*2),yOff=bounce>0?-Math.round(bounce):0;ctx.fillRect(col*px,(1+yOff)*px,px,px)}requestAnimationFrame(tick)}requestAnimationFrame(tick)}
+
+// Canvas pan & zoom
+const world=document.getElementById('canvas-world'),inner=document.getElementById('canvas-inner');
+let panX=-80,panY=-40,zoom=0.85,isPanning=false,startX,startY,startPanX,startPanY;
+function applyTransform(){inner.style.transform=`translate(${panX}px,${panY}px) scale(${zoom})`;document.getElementById('zoom-level').textContent=Math.round(zoom*100)+'%'}
+world.addEventListener('mousedown',e=>{if(e.target.closest('.card')||e.target.closest('.prompt-bar')||e.target.closest('.topbar')||e.target.closest('.toolbar'))return;isPanning=true;startX=e.clientX;startY=e.clientY;startPanX=panX;startPanY=panY});
+window.addEventListener('mousemove',e=>{if(!isPanning)return;panX=startPanX+(e.clientX-startX);panY=startPanY+(e.clientY-startY);applyTransform()});
+window.addEventListener('mouseup',()=>{isPanning=false});
+world.addEventListener('wheel',e=>{e.preventDefault();zoom=Math.max(0.3,Math.min(2,zoom*(e.deltaY>0?0.92:1.08)));applyTransform()},{passive:false});
+document.getElementById('zoom-in').onclick=()=>{zoom=Math.min(2,zoom*1.15);applyTransform()};
+document.getElementById('zoom-out').onclick=()=>{zoom=Math.max(0.3,zoom*0.85);applyTransform()};
+
+// Card dragging
+document.querySelectorAll('.card:not(.rejected)').forEach(card=>{let dx,dy,dragging=false;card.addEventListener('mousedown',e=>{e.stopPropagation();dragging=true;card.classList.add('dragging');const rect=card.getBoundingClientRect();dx=e.clientX-rect.left;dy=e.clientY-rect.top;const onMove=ev=>{if(!dragging)return;const wr=inner.getBoundingClientRect();card.style.left=(ev.clientX-wr.left-dx*zoom)/zoom+'px';card.style.top=(ev.clientY-wr.top-dy*zoom)/zoom+'px';card.style.transform='rotate(0deg)'};const onUp=()=>{dragging=false;card.classList.remove('dragging');window.removeEventListener('mousemove',onMove);window.removeEventListener('mouseup',onUp)};window.addEventListener('mousemove',onMove);window.addEventListener('mouseup',onUp)})});
+
+window.addEventListener('DOMContentLoaded',()=>{drawStaticLogo('nav-logo','#e8e4de');initDots('gen-dots');applyTransform()});
+</script>
+</body>
+</html>
