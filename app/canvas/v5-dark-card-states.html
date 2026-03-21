@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seeds — Card States Reference</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+      colors: {
+        canvas: { bg: '#0b0b0e', surface: '#18181c' },
+        fg: { DEFAULT: '#e0ddd8', 2: 'rgba(224,221,216,0.5)', 3: 'rgba(224,221,216,0.25)', 4: 'rgba(224,221,216,0.12)' },
+        accent: { DEFAULT: '#eac1f5' },
+        tension: '#f472b6', signal: '#38bdf8', direction: '#a78bfa',
+        idea: '#34d399', provocation: '#fb923c', guardrail: '#ef4444',
+      }
+    }
+  }
+}
+</script>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { font-family: 'Inter', system-ui, sans-serif; background: #0b0b0e; color: #e0ddd8; min-height: 100vh; -webkit-font-smoothing: antialiased; }
+
+  .state-card {
+    width: 220px; border-radius: 10px; padding: 14px 16px; position: relative;
+    background: #18181c; border: 1px solid rgba(255,255,255,0.06);
+    transition: all 0.15s;
+  }
+  .state-card .card-type { display: inline-flex; align-items: center; gap: 5px; font-size: 9px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 7px; }
+  .state-card .card-dot { width: 5px; height: 5px; border-radius: 50%; }
+  .state-card .card-text { font-size: 13px; line-height: 1.5; color: #e0ddd8; }
+  .state-card .card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 9px; padding-top: 7px; border-top: 1px solid rgba(255,255,255,0.04); }
+  .state-card .card-tag { font-size: 9px; color: rgba(224,221,216,0.2); }
+  .card-actions { display: flex; gap: 2px; }
+  .card-act { width: 22px; height: 22px; border-radius: 5px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.06); color: rgba(224,221,216,0.4); font-size: 10px; }
+
+  /* States */
+  .state-hover { box-shadow: 0 8px 32px rgba(0,0,0,0.5); z-index: 10; background: #1e1e23; }
+  .state-selected { box-shadow: 0 0 0 2px #eac1f5, 0 0 16px rgba(234,193,245,0.2); background: rgba(234,193,245,0.03); }
+  .state-locked { box-shadow: 0 0 0 2.5px #eac1f5, 0 0 20px rgba(234,193,245,0.25); }
+  .state-locked::after { content: '🔒'; position: absolute; top: 10px; right: 12px; font-size: 11px; }
+  .state-rejected { border-color: rgba(239,68,68,0.15); opacity: 0.55; filter: saturate(0.5); }
+  .state-rejected .card-text { text-decoration: line-through; text-decoration-color: rgba(239,68,68,0.3); }
+  .state-has-note::before { content: ''; position: absolute; top: 8px; right: 10px; width: 7px; height: 7px; border-radius: 50%; background: #d4922e; }
+  .state-selected-locked { box-shadow: 0 0 0 2.5px #eac1f5, 0 0 24px rgba(234,193,245,0.3); background: rgba(234,193,245,0.04); }
+  .state-selected-locked::after { content: '🔒'; position: absolute; top: 10px; right: 12px; font-size: 11px; }
+  .state-promoted { border-color: rgba(52,211,153,0.2); box-shadow: 0 0 0 1.5px rgba(52,211,153,0.3), 0 0 12px rgba(52,211,153,0.1); }
+
+  /* Skeleton */
+  @keyframes shimmer { 0% { background-position: -200px 0; } 100% { background-position: 200px 0; } }
+  .skel-line { height: 10px; border-radius: 4px; background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%); background-size: 200px 100%; animation: shimmer 1.6s ease-in-out infinite; }
+  @keyframes float-y { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+  .skel-float { animation: float-y 3s ease-in-out infinite; }
+
+  /* Enter animation */
+  @keyframes card-enter { from { opacity: 0; transform: scale(0.97); filter: blur(2px); } to { opacity: 1; transform: scale(1); filter: blur(0px); } }
+  .state-entering { animation: card-enter 0.28s cubic-bezier(0.22,1,0.36,1) both; }
+  .state-entering-delayed { animation: card-enter 0.28s cubic-bezier(0.22,1,0.36,1) 0.12s both; }
+
+  .section-label { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(224,221,216,0.3); margin-bottom: 14px; }
+  .section-panel { background: rgba(255,255,255,0.015); border-radius: 14px; padding: 20px; }
+</style>
+</head>
+<body>
+
+<!-- Top Bar -->
+<div class="fixed top-0 left-0 right-0 z-50 h-10 flex items-center px-4 border-b border-white/[0.06]" style="background:rgba(11,11,14,0.9);backdrop-filter:blur(12px);">
+  <span class="text-[10px] font-semibold tracking-widest text-fg-3 uppercase">Seeds</span>
+  <div class="w-px h-3 bg-white/[0.06] mx-3"></div>
+  <span class="text-[11px] text-fg-3 font-normal">Card States Reference</span>
+</div>
+
+<div class="pt-14 px-8 pb-12">
+  <div class="flex flex-wrap gap-6">
+
+    <!-- Default -->
+    <div class="section-panel">
+      <div class="section-label">Default</div>
+      <div class="flex gap-3">
+        <div class="state-card">
+          <div class="card-type"><div class="card-dot" style="background:#38bdf8"></div><span style="color:#38bdf8">Signal</span></div>
+          <div class="card-text">Reddit skincare communities have 4M+ members dissecting ingredient lists. The audience exists.</div>
+          <div class="card-footer"><span class="card-tag">#market</span></div>
+        </div>
+        <div class="state-card">
+          <div class="card-type"><div class="card-dot" style="background:#a78bfa"></div><span style="color:#a78bfa">Direction</span></div>
+          <div class="card-text">Position as ingredient-literate beauty. Not clean, not clinical, just honest.</div>
+          <div class="card-footer"><span class="card-tag">#brand</span></div>
+        </div>
+        <div class="state-card">
+          <div class="card-type"><div class="card-dot" style="background:#34d399"></div><span style="color:#34d399">Idea</span></div>
+          <div class="card-text">Formula card shipped with every product — designed to be photographed and shared.</div>
+          <div class="card-footer"><span class="card-tag">#packaging</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hover -->
+    <div class="section-panel">
+      <div class="section-label">Hover</div>
+      <div class="state-card state-hover">
+        <div class="card-type"><div class="card-dot" style="background:#38bdf8"></div><span style="color:#38bdf8">Signal</span></div>
+        <div class="card-text">The Ordinary proved commodity positioning can be premium if framing is sharp enough.</div>
+        <div class="card-footer"><span class="card-tag">#precedent</span><div class="card-actions"><button class="card-act">✓</button><button class="card-act">↻</button><button class="card-act">✎</button><button class="card-act">💬</button><button class="card-act">🔒</button><button class="card-act">×</button></div></div>
+      </div>
+    </div>
+
+    <!-- Selected -->
+    <div class="section-panel">
+      <div class="section-label">Selected</div>
+      <div class="flex gap-3">
+        <div class="state-card state-selected">
+          <div class="card-type"><div class="card-dot" style="background:#a78bfa"></div><span style="color:#a78bfa">Direction</span></div>
+          <div class="card-text">"Boring" as brand attitude. No hype. No miracle claims. The anti-marketing position is the marketing.</div>
+          <div class="card-footer"><span class="card-tag">#tone</span></div>
+        </div>
+        <div class="state-card state-selected">
+          <div class="card-type"><div class="card-dot" style="background:#34d399"></div><span style="color:#34d399">Idea</span></div>
+          <div class="card-text">"Why we didn't include" page — list trending ingredients you left out and explain why.</div>
+          <div class="card-footer"><span class="card-tag">#content</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Locked -->
+    <div class="section-panel">
+      <div class="section-label">Locked</div>
+      <div class="flex gap-3">
+        <div class="state-card state-locked">
+          <div class="card-type"><div class="card-dot" style="background:#a78bfa"></div><span style="color:#a78bfa">Direction</span></div>
+          <div class="card-text">Lead with "why this concentration." Each product page is a micro-essay on formulation choices.</div>
+          <div class="card-footer"><span class="card-tag">#content</span></div>
+        </div>
+        <div class="state-card state-locked">
+          <div class="card-type"><div class="card-dot" style="background:#f472b6"></div><span style="color:#f472b6">Tension</span></div>
+          <div class="card-text">Ingredient transparency creates decision fatigue. People want to feel smart without homework.</div>
+          <div class="card-footer"><span class="card-tag">#ux</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rejected -->
+    <div class="section-panel">
+      <div class="section-label">Rejected</div>
+      <div class="flex gap-3">
+        <div class="state-card state-rejected">
+          <div class="card-type"><div class="card-dot" style="background:#fb923c"></div><span style="color:#fb923c">Provocation</span></div>
+          <div class="card-text">What if the packaging had no product name — only the INCI list?</div>
+          <div class="card-footer"><span class="card-tag">#branding</span></div>
+        </div>
+        <div class="state-card state-rejected">
+          <div class="card-type"><div class="card-dot" style="background:#34d399"></div><span style="color:#34d399">Idea</span></div>
+          <div class="card-text">Publish the full cost breakdown — niacinamide cost, our margin. Radical transparency.</div>
+          <div class="card-footer"><span class="card-tag">#pricing</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Has Note -->
+    <div class="section-panel">
+      <div class="section-label">Has Note</div>
+      <div class="flex gap-3 items-start">
+        <div class="state-card state-has-note">
+          <div class="card-type"><div class="card-dot" style="background:#38bdf8"></div><span style="color:#38bdf8">Signal</span></div>
+          <div class="card-text">De-influencing is a demand for specificity. People want why this, not just what.</div>
+          <div class="card-footer"><span class="card-tag">#culture</span></div>
+        </div>
+        <div>
+          <div class="state-card state-has-note">
+            <div class="card-type"><div class="card-dot" style="background:#a78bfa"></div><span style="color:#a78bfa">Direction</span></div>
+            <div class="card-text">Formula-first brand voice. Let the science be the copywriting.</div>
+            <div class="card-footer"><span class="card-tag">#voice</span></div>
+          </div>
+          <div class="mt-1 ml-3 px-3 py-2 rounded-lg text-[11px] text-fg-2 leading-relaxed" style="background:rgba(212,146,71,0.08);border-left:2px solid rgba(212,146,71,0.3);max-width:200px;">
+            "Push this further — what if the formula IS the packaging? No separate branding at all."
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Skeleton -->
+    <div class="section-panel">
+      <div class="section-label">Skeleton / Loading</div>
+      <div class="flex gap-3">
+        <div class="state-card skel-float">
+          <div class="skel-line w-full mb-2.5"></div>
+          <div class="skel-line w-[85%] mb-2.5"></div>
+          <div class="skel-line w-[60%]"></div>
+        </div>
+        <div class="state-card skel-float" style="animation-delay:0.3s;">
+          <div class="skel-line w-[90%] mb-2.5"></div>
+          <div class="skel-line w-[70%]"></div>
+        </div>
+        <div class="state-card skel-float" style="animation-delay:0.6s;">
+          <div class="skel-line w-full mb-2.5"></div>
+          <div class="skel-line w-[80%] mb-2.5"></div>
+          <div class="skel-line w-[45%]"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Entering -->
+    <div class="section-panel">
+      <div class="section-label">Entering (blur-in)</div>
+      <div class="flex gap-3">
+        <div class="state-card state-entering">
+          <div class="card-type"><div class="card-dot" style="background:#34d399"></div><span style="color:#34d399">Idea</span></div>
+          <div class="card-text">Notion-style routine builder — users drag ingredients into slots. Makes complexity a game.</div>
+          <div class="card-footer"><span class="card-tag">#product</span></div>
+        </div>
+        <div class="state-card state-entering-delayed">
+          <div class="card-type"><div class="card-dot" style="background:#38bdf8"></div><span style="color:#38bdf8">Signal</span></div>
+          <div class="card-text">TikTok dermatologists have 50M+ combined followers. Science content has an audience.</div>
+          <div class="card-footer"><span class="card-tag">#audience</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Riff Pocket -->
+    <div class="section-panel">
+      <div class="section-label">Riff Pocket</div>
+      <div class="flex gap-6 items-start">
+        <!-- Source card -->
+        <div class="state-card state-selected">
+          <div class="card-type"><div class="card-dot" style="background:#a78bfa"></div><span style="color:#a78bfa">Direction</span></div>
+          <div class="card-text">Position as ingredient-literate beauty. Let the formula be the personality.</div>
+          <div class="card-footer"><span class="card-tag">#core</span></div>
+        </div>
+        <!-- Pocket -->
+        <div class="rounded-xl border border-dashed border-accent/20 bg-accent/[0.02] p-3 flex flex-col gap-2">
+          <div class="text-[9px] font-semibold text-accent/60 uppercase tracking-wide mb-1">Riff pocket · 3 variants</div>
+          <div class="state-card" style="width:190px;padding:10px 12px;background:#1a1520;border-color:rgba(234,193,245,0.08);">
+            <div class="card-text" style="font-size:12px;">"Ingredient-first" beauty — where the formula is the brand story, not a footnote.</div>
+          </div>
+          <div class="state-card" style="width:190px;padding:10px 12px;background:#1a1520;border-color:rgba(234,193,245,0.08);">
+            <div class="card-text" style="font-size:12px;">Literacy as luxury. Knowing your ingredients shouldn't require a chemistry degree.</div>
+          </div>
+          <div class="state-card" style="width:190px;padding:10px 12px;background:#1a1520;border-color:rgba(234,193,245,0.08);">
+            <div class="card-text" style="font-size:12px;">Anti-opacity positioning — radical formula transparency as the entire brand identity.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Combined: Selected + Locked -->
+    <div class="section-panel">
+      <div class="section-label">Selected + Locked (combined)</div>
+      <div class="state-card state-selected-locked">
+        <div class="card-type"><div class="card-dot" style="background:#a78bfa"></div><span style="color:#a78bfa">Direction</span></div>
+        <div class="card-text">"Boring" as brand attitude. No hype. No miracle claims. The anti-marketing IS the marketing.</div>
+        <div class="card-footer"><span class="card-tag">#tone · #core</span></div>
+      </div>
+    </div>
+
+    <!-- Promoted Riff -->
+    <div class="section-panel">
+      <div class="section-label">Promoted Riff</div>
+      <div class="state-card state-promoted">
+        <div class="card-type"><div class="card-dot" style="background:#34d399"></div><span style="color:#34d399">Idea</span> <span class="text-[8px] text-idea/60 ml-1">↑ promoted</span></div>
+        <div class="card-text">Anti-opacity positioning — radical formula transparency as the entire brand identity.</div>
+        <div class="card-footer"><span class="card-tag">#riff → #main</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

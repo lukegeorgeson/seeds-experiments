@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seeds — Dense Board</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: { sans: ['IBM Plex Sans', 'system-ui', 'sans-serif'] },
+      colors: {
+        canvas: { bg: '#eeecea' },
+        fg: { DEFAULT: '#3a3a38', 2: '#6a6a66', 3: '#9a9a96', 4: '#c0c0bc' },
+        accent: { DEFAULT: '#eac1f5', text: '#2f2433' },
+        tension: '#d45a8e', signal: '#2196d4', direction: '#8b6fc0',
+        idea: '#2bb380', provocation: '#d97b2a', guardrail: '#d94444',
+      }
+    }
+  }
+}
+</script>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { font-family: 'IBM Plex Sans', system-ui, sans-serif; background: #eeecea; color: #3a3a38; overflow-x: hidden; min-height: 100vh; -webkit-font-smoothing: antialiased; }
+
+  .mini-card {
+    width: 165px; border-radius: 8px; padding: 8px 10px; background: #ffffff;
+    border: 1px solid rgba(0,0,0,0.07);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    font-size: 11px; line-height: 1.45; color: #3a3a38;
+    transition: all 0.15s;
+  }
+  .mini-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .mini-card.selected { box-shadow: 0 0 0 1.5px #eac1f5; }
+  .mini-card.locked { box-shadow: 0 0 0 2px #eac1f5; }
+  .mini-card.rejected { opacity: 0.45; border-color: rgba(217,68,68,0.15); }
+  .mini-card.has-note { position: relative; }
+  .mini-card.has-note::after { content: ''; position: absolute; top: 5px; right: 6px; width: 5px; height: 5px; border-radius: 50%; background: #d4922e; }
+
+  .mini-dot { width: 4px; height: 4px; border-radius: 50%; display: inline-block; margin-right: 2px; flex-shrink: 0; }
+
+  .connections-svg { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 0; }
+  .connections-svg line { stroke: rgba(0,0,0,0.04); stroke-width: 1; }
+</style>
+</head>
+<body>
+
+<!-- Top Bar -->
+<div class="fixed top-0 left-0 right-0 z-50 h-11 flex items-center justify-between px-5 border-b border-black/[0.06]" style="background:rgba(238,236,234,0.92);backdrop-filter:blur(16px);">
+  <div class="flex items-center gap-3">
+    <span class="text-[10px] font-semibold tracking-widest text-fg-3 uppercase">Seeds</span>
+    <div class="w-px h-3 bg-black/[0.08]"></div>
+    <span class="text-[12px] text-fg-2 font-medium">EV brand positioning vs Tesla</span>
+  </div>
+  <div class="flex items-center gap-2">
+    <div class="flex items-center gap-0.5 mr-3">
+      <button class="px-2.5 py-1 rounded-full text-[10px] font-medium text-fg-4">R1</button>
+      <button class="px-2.5 py-1 rounded-full text-[10px] font-semibold text-fg border-b-2 border-accent bg-accent/10">Round 2</button>
+    </div>
+    <button class="px-3.5 py-1.5 rounded-full text-[11px] font-bold bg-accent text-accent-text shadow-sm">Grow →</button>
+  </div>
+</div>
+
+<!-- Minimap -->
+<div class="fixed bottom-16 left-3 z-40 w-[140px] h-[90px] rounded-md overflow-hidden border border-black/[0.08] bg-white/80 shadow-sm">
+  <div class="absolute border border-accent/40 rounded-sm" style="left:10px;top:8px;width:40px;height:28px;background:rgba(234,193,245,0.08);"></div>
+  <div style="position:absolute;left:15px;top:14px;width:3px;height:3px;border-radius:1px;background:#d45a8e;"></div>
+  <div style="position:absolute;left:22px;top:18px;width:3px;height:3px;border-radius:1px;background:#d45a8e;"></div>
+  <div style="position:absolute;left:30px;top:14px;width:3px;height:3px;border-radius:1px;background:#2196d4;"></div>
+  <div style="position:absolute;left:38px;top:20px;width:3px;height:3px;border-radius:1px;background:#2196d4;"></div>
+  <div style="position:absolute;left:50px;top:16px;width:3px;height:3px;border-radius:1px;background:#8b6fc0;"></div>
+  <div style="position:absolute;left:58px;top:22px;width:3px;height:3px;border-radius:1px;background:#8b6fc0;"></div>
+  <div style="position:absolute;left:70px;top:18px;width:3px;height:3px;border-radius:1px;background:#2bb380;"></div>
+  <div style="position:absolute;left:78px;top:25px;width:3px;height:3px;border-radius:1px;background:#2bb380;"></div>
+  <div style="position:absolute;left:90px;top:20px;width:3px;height:3px;border-radius:1px;background:#d97b2a;"></div>
+  <div style="position:absolute;left:40px;top:40px;width:3px;height:3px;border-radius:1px;background:#d94444;"></div>
+  <div style="position:absolute;left:65px;top:50px;width:3px;height:3px;border-radius:1px;background:#8b6fc0;"></div>
+</div>
+
+<!-- Dense Column Board -->
+<div class="pt-14 px-6 pb-16 overflow-x-auto">
+  <div class="flex gap-4 min-w-max pt-3 relative">
+
+    <!-- Connections SVG -->
+    <svg class="connections-svg" width="1400" height="1200">
+      <line x1="170" y1="80" x2="350" y2="100" />
+      <line x1="350" y1="160" x2="530" y2="120" />
+      <line x1="530" y1="200" x2="710" y2="140" />
+      <line x1="710" y1="250" x2="890" y2="180" />
+    </svg>
+
+    <!-- Column: Tensions -->
+    <div class="flex flex-col gap-2 w-[165px]">
+      <div class="flex items-center gap-1.5 mb-0.5 px-0.5">
+        <div class="mini-dot" style="background:#d45a8e;"></div>
+        <span class="text-[9px] font-semibold text-tension uppercase tracking-[0.08em]">Tensions</span>
+        <span class="text-[8px] text-fg-4 ml-auto">8</span>
+      </div>
+      <div class="mini-card selected">Tesla owns "tech-forward EV." Competing on technology is a losing game. Find a different axis entirely.</div>
+      <div class="mini-card">Range anxiety is declining but charging UX is still terrible. The car is fine — the infrastructure is the blocker.</div>
+      <div class="mini-card has-note">EVs are positioned as "responsible" purchases. Nobody gets excited about responsibility. Need an emotional hook.</div>
+      <div class="mini-card rejected">The luxury EV segment is overcrowded — Lucid, Rivian, Mercedes EQ. Mid-market has more room.</div>
+      <div class="mini-card">Legacy automakers are catching up fast. The pure-EV advantage window is closing in 18 months.</div>
+      <div class="mini-card selected">Sustainability messaging is commodity. Every EV claims it. Zero differentiation potential.</div>
+      <div class="mini-card rejected">Young buyers can't afford new EVs. The secondary market is where volume will come from.</div>
+      <div class="mini-card">EV design converged on the same aerodynamic blob. The cars are indistinguishable. Design is an opening.</div>
+    </div>
+
+    <!-- Column: Signals -->
+    <div class="flex flex-col gap-2 w-[165px]">
+      <div class="flex items-center gap-1.5 mb-0.5 px-0.5">
+        <div class="mini-dot" style="background:#2196d4;"></div>
+        <span class="text-[9px] font-semibold text-signal uppercase tracking-[0.08em]">Signals</span>
+        <span class="text-[8px] text-fg-4 ml-auto">7</span>
+      </div>
+      <div class="mini-card locked">BYD is winning on price in China and EU. The cost-value equation has shifted permanently.</div>
+      <div class="mini-card">Tesla brand sentiment is polarizing. A significant segment actively wants an alternative. Not anti-EV — anti-Tesla.</div>
+      <div class="mini-card selected">Rivian's adventure positioning proved EVs can own a lifestyle niche, not just a technology category.</div>
+      <div class="mini-card">Subscription models for car features are generating backlash. Ownership clarity is becoming a differentiator.</div>
+      <div class="mini-card">V2G (vehicle-to-grid) is approaching viability. The car as a home battery changes the value proposition entirely.</div>
+      <div class="mini-card has-note">Volvo's safety legacy transferred cleanly to EV. Heritage brands have a narrative advantage over startups.</div>
+      <div class="mini-card selected">The "anti-Tesla" buyer exists and is growing: wants an EV, rejects the culture around Tesla.</div>
+    </div>
+
+    <!-- Column: Directions -->
+    <div class="flex flex-col gap-2 w-[165px]">
+      <div class="flex items-center gap-1.5 mb-0.5 px-0.5">
+        <div class="mini-dot" style="background:#8b6fc0;"></div>
+        <span class="text-[9px] font-semibold text-direction uppercase tracking-[0.08em]">Directions</span>
+        <span class="text-[8px] text-fg-4 ml-auto">6</span>
+      </div>
+      <div class="mini-card locked">"The anti-ego EV." Position against Tesla's personality cult. The car speaks for itself. No founder worship.</div>
+      <div class="mini-card selected">"Infrastructure-first." Don't sell a car — sell the charging network, the ownership ecosystem, the after-purchase experience.</div>
+      <div class="mini-card">"Design that doesn't apologize." Give it a visual identity so distinct people recognize it from a block away. Not another blob.</div>
+      <div class="mini-card selected">"Community-owned charging." Build the network with owners, not for them. Co-op model creates loyalty Tesla can't match.</div>
+      <div class="mini-card rejected">Premium positioning with Scandinavian design language. (Too close to Polestar — not distinct enough.)</div>
+      <div class="mini-card">"Right-sized." Not the biggest battery, not the most range. The amount you actually need, priced accordingly.</div>
+    </div>
+
+    <!-- Column: Ideas -->
+    <div class="flex flex-col gap-2 w-[165px]">
+      <div class="flex items-center gap-1.5 mb-0.5 px-0.5">
+        <div class="mini-dot" style="background:#2bb380;"></div>
+        <span class="text-[9px] font-semibold text-idea uppercase tracking-[0.08em]">Ideas</span>
+        <span class="text-[8px] text-fg-4 ml-auto">8</span>
+      </div>
+      <div class="mini-card selected">Test drive isn't at a dealership — it's a weekend rental through Turo partnership. Try it in your real life.</div>
+      <div class="mini-card">Transparent pricing page: exact cost of battery, motors, software. "Here's what you're paying for."</div>
+      <div class="mini-card">"Charge map" app that shows real availability, real speeds, real wait times. Solve the anxiety, not the range.</div>
+      <div class="mini-card selected">Trade-in program that guarantees battery value. Remove the depreciation fear that holds back EV adoption.</div>
+      <div class="mini-card">Launch with one model, one color, one config. Simplicity as a brand statement. The anti-configurator.</div>
+      <div class="mini-card has-note">Partner with local mechanics for service. Not proprietary service centers. "Your mechanic can fix it."</div>
+      <div class="mini-card">Annual "owner summit" — a festival, not a shareholders meeting. Build the community in person.</div>
+      <div class="mini-card rejected">Celebrity launch campaign. (Goes against anti-ego positioning.)</div>
+    </div>
+
+    <!-- Column: Modifiers -->
+    <div class="flex flex-col gap-2 w-[165px]">
+      <div class="flex items-center gap-1.5 mb-0.5 px-0.5">
+        <div class="mini-dot" style="background:#d97b2a;"></div>
+        <span class="text-[9px] font-semibold text-provocation uppercase tracking-[0.08em]">Modifiers</span>
+        <span class="text-[8px] text-fg-4 ml-auto">6</span>
+      </div>
+      <div class="mini-card">What if there was no app? Physical key, analog controls. Position against the over-digitized car.</div>
+      <div class="mini-card selected">What if you sold the battery separately? Car price drops 40%. Lease the battery. Totally new economics.</div>
+      <div class="mini-card">Constraint: no over-the-air feature unlocks. Everything the car can do, it does from day one. No paywalls.</div>
+      <div class="mini-card">What if you published a "things we got wrong" report annually? Radical honesty as brand ritual.</div>
+      <div class="mini-card" style="border-color:rgba(217,68,68,0.1);">Never compare to Tesla in marketing. Comparisons elevate them. Be the thing people discover on their own.</div>
+      <div class="mini-card" style="border-color:rgba(217,68,68,0.1);">Never use "sustainable" or "green." Show the numbers instead. Let the data do what adjectives can't.</div>
+    </div>
+
+    <!-- Riff Pocket -->
+    <div class="flex flex-col gap-2 w-[165px]">
+      <div class="flex items-center gap-1.5 mb-0.5 px-0.5">
+        <span class="text-[9px] font-semibold text-accent uppercase tracking-[0.08em]">Riff Pocket</span>
+      </div>
+      <div class="rounded-lg border border-dashed border-accent/30 bg-accent/[0.03] p-2 flex flex-col gap-1.5">
+        <div class="text-[8px] text-accent/60 font-medium">from: "anti-ego EV"</div>
+        <div class="mini-card" style="width:145px;font-size:10px;padding:6px 8px;">"The car that doesn't have a CEO." Brand identity built on collective ownership, not a figurehead.</div>
+        <div class="mini-card" style="width:145px;font-size:10px;padding:6px 8px;">"No logo on the outside." The only brand signal is the design itself. Anti-badge luxury.</div>
+        <div class="mini-card" style="width:145px;font-size:10px;padding:6px 8px;">"Employee-owned." Worker cooperative model. The people who build it, own it. Structural anti-ego.</div>
+        <div class="mini-card" style="width:145px;font-size:10px;padding:6px 8px;">"No launch event." Just appear in driveways. Let the car announce itself through presence, not press.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Bottom Grow Bar -->
+<div class="fixed bottom-0 left-0 right-0 z-50 h-11 flex items-center justify-between px-5 border-t border-black/[0.06]" style="background:rgba(238,236,234,0.95);backdrop-filter:blur(12px);">
+  <div class="text-[11px] text-fg-3 font-medium">
+    <span class="text-fg-2 font-semibold">8</span> selected · <span class="text-fg-2 font-semibold">3</span> locked · <span class="text-fg-2 font-semibold">4</span> rejected
+  </div>
+  <button class="px-4 py-1.5 rounded-full text-[11px] font-bold bg-accent text-accent-text shadow-sm hover:shadow-md transition-all">Grow next round →</button>
+</div>
+
+</body>
+</html>

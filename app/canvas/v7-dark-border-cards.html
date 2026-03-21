@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seeds — Border Cards</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: { sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'] },
+      colors: {
+        canvas: { bg: '#0a0a0d', surface: '#141417' },
+        fg: { DEFAULT: '#d8d5cf', 2: 'rgba(216,213,207,0.5)', 3: 'rgba(216,213,207,0.25)', 4: 'rgba(216,213,207,0.12)' },
+        accent: { DEFAULT: '#eac1f5' },
+        tension: '#f472b6', signal: '#38bdf8', direction: '#a78bfa',
+        idea: '#34d399', provocation: '#fb923c', guardrail: '#ef4444',
+      }
+    }
+  }
+}
+</script>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; background: #0a0a0d; color: #d8d5cf; overflow: hidden; height: 100vh; width: 100vw; -webkit-font-smoothing: antialiased; }
+
+  .canvas-world { position: absolute; inset: 0; overflow: hidden; cursor: grab;
+    background: radial-gradient(circle, rgba(255,255,255,0.035) 1px, transparent 1px);
+    background-size: 24px 24px; }
+  .canvas-world:active { cursor: grabbing; }
+  .canvas-inner { position: absolute; width: 4000px; height: 3000px; transform-origin: 0 0; }
+
+  .card {
+    position: absolute; width: 220px; padding: 14px 16px;
+    cursor: grab; user-select: none;
+    background: #141417;
+    border: 1px solid rgba(255,255,255,0.04);
+    border-left: 3px solid;
+    border-radius: 2px 10px 10px 2px;
+    transition: all 0.15s; z-index: 10;
+  }
+  .card:hover { z-index: 50; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
+  .card:active { cursor: grabbing; }
+  .card.dragging { z-index: 100; transform: scale(1.02) !important; }
+  .card.selected { border-left-color: #eac1f5 !important; box-shadow: 0 0 0 1px rgba(234,193,245,0.3), 0 0 16px rgba(234,193,245,0.15); }
+  .card.locked { border-left-width: 5px; }
+  .card.locked::after { content: '🔒'; position: absolute; top: 8px; right: 10px; font-size: 10px; }
+
+  .card-type { font-size: 8px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 7px; }
+  .card-text { font-size: 13px; line-height: 1.55; color: #d8d5cf; font-weight: 400; }
+  .card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.04); }
+  .card-tag { font-size: 9px; color: rgba(216,213,207,0.2); }
+  .card-actions { display: flex; gap: 2px; opacity: 0; transition: opacity 0.12s; }
+  .card:hover .card-actions { opacity: 1; }
+  .card-act { width: 22px; height: 22px; border-radius: 5px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.06); color: rgba(216,213,207,0.4); font-size: 10px; transition: all 0.1s; }
+  .card-act:hover { background: rgba(255,255,255,0.12); color: #d8d5cf; }
+
+  .zone { position: absolute; border-radius: 14px; pointer-events: none; z-index: 2; }
+  .zone-label { position: absolute; top: -9px; left: 14px; padding: 2px 9px; border-radius: 4px; font-size: 10px; font-weight: 500; letter-spacing: 0.04em; }
+
+  .connections { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
+</style>
+</head>
+<body>
+
+<!-- Top Bar -->
+<div class="fixed top-0 left-0 right-0 z-[200] h-11 flex items-center justify-between px-3.5" style="background:rgba(10,10,13,0.88);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,0.06);">
+  <div class="flex items-center gap-3">
+    <span class="text-[11px] font-bold tracking-widest text-fg-3 uppercase">Seeds</span>
+    <div class="w-px h-4 bg-white/[0.06]"></div>
+    <span class="text-[12px] text-fg-2 font-normal">Music festival — experiential concept development</span>
+  </div>
+  <div class="flex items-center gap-1.5">
+    <button class="px-2.5 py-1 rounded-md text-[11px] font-medium text-fg-3 hover:bg-white/[0.06] transition-all">16 cards</button>
+    <button class="px-2.5 py-1 rounded-md text-[11px] font-medium text-fg-3 hover:bg-white/[0.06] transition-all">3 zones</button>
+    <button class="px-2.5 py-1.5 rounded-md text-[11px] font-bold bg-fg text-canvas-bg hover:bg-white transition-all">Share</button>
+  </div>
+</div>
+
+<!-- Left Toolbar -->
+<div class="fixed left-2.5 top-1/2 -translate-y-1/2 z-[200] flex flex-col gap-px p-1.5 rounded-xl border border-white/[0.06]" style="background:rgba(18,18,22,0.95);backdrop-filter:blur(12px);">
+  <button class="w-[30px] h-[30px] rounded-lg flex items-center justify-center text-[13px] bg-white/[0.08] text-fg">↖</button>
+  <button class="w-[30px] h-[30px] rounded-lg flex items-center justify-center text-[13px] text-fg-3 hover:bg-white/[0.06] transition-all">✋</button>
+  <div class="w-[18px] h-px bg-white/[0.06] mx-auto my-1"></div>
+  <button class="w-[30px] h-[30px] rounded-lg flex items-center justify-center text-[13px] text-fg-3 hover:bg-white/[0.06] transition-all">▢</button>
+  <button class="w-[30px] h-[30px] rounded-lg flex items-center justify-center text-[13px] text-fg-3 hover:bg-white/[0.06] transition-all">⤳</button>
+  <div class="w-[18px] h-px bg-white/[0.06] mx-auto my-1"></div>
+  <button class="w-[30px] h-[30px] rounded-lg flex items-center justify-center text-[13px] text-direction hover:bg-white/[0.06] transition-all">✦</button>
+  <button class="w-[30px] h-[30px] rounded-lg flex items-center justify-center text-[13px] text-provocation hover:bg-white/[0.06] transition-all">↻</button>
+</div>
+
+<!-- Canvas -->
+<div class="canvas-world" id="canvas-world">
+  <div class="canvas-inner" id="canvas-inner">
+
+    <svg class="connections" width="4000" height="3000">
+      <line x1="330" y1="210" x2="550" y2="170" style="stroke:rgba(244,114,182,0.08);stroke-width:1.5;" />
+      <line x1="770" y1="200" x2="980" y2="220" style="stroke:rgba(56,189,248,0.08);stroke-width:1.5;" />
+      <line x1="980" y1="360" x2="1200" y2="230" style="stroke:rgba(167,139,250,0.08);stroke-width:1.5;" />
+      <line x1="1200" y1="360" x2="1400" y2="260" style="stroke:rgba(52,211,153,0.08);stroke-width:1.5;" />
+    </svg>
+
+    <!-- Zone: audience tension -->
+    <div class="zone" style="left:100px;top:90px;width:480px;height:340px;border:1px dashed rgba(244,114,182,0.1);background:rgba(244,114,182,0.01);">
+      <div class="zone-label" style="background:rgba(244,114,182,0.08);color:#f472b6;">audience tensions</div>
+    </div>
+
+    <!-- Tension cards (pink left border) -->
+    <div class="card" style="left:140px;top:140px;border-left-color:#f472b6;transform:rotate(-0.5deg);">
+      <div class="card-type" style="color:#f472b6;">Tension</div>
+      <div class="card-text">Festivalgoers want "authentic" experiences but document every moment for social media. The lens changes the event.</div>
+      <div class="card-footer"><span class="card-tag">#behavior</span><div class="card-actions"><button class="card-act">✓</button><button class="card-act">↻</button><button class="card-act">×</button></div></div>
+    </div>
+
+    <div class="card selected" style="left:380px;top:130px;border-left-color:#f472b6;transform:rotate(0.4deg);">
+      <div class="card-type" style="color:#f472b6;">Tension</div>
+      <div class="card-text">Live music is competing with bedroom DJs and AI-generated playlists. The festival needs to offer what algorithms can't.</div>
+      <div class="card-footer"><span class="card-tag">#competition</span><div class="card-actions"><button class="card-act">✓</button><button class="card-act">↻</button><button class="card-act">×</button></div></div>
+    </div>
+
+    <div class="card" style="left:160px;top:300px;border-left-color:#f472b6;transform:rotate(0.8deg);">
+      <div class="card-type" style="color:#f472b6;">Tension</div>
+      <div class="card-text">Sustainability messaging at festivals feels performative when the event itself generates massive waste.</div>
+      <div class="card-footer"><span class="card-tag">#sustainability</span><div class="card-actions"><button class="card-act">✓</button><button class="card-act">↻</button><button class="card-act">×</button></div></div>
+    </div>
+
+    <div class="card" style="left:400px;top:290px;border-left-color:#f472b6;transform:rotate(-0.3deg);">
+      <div class="card-type" style="color:#f472b6;">Tension</div>
+      <div class="card-text">VIP areas create hierarchy but also resentment. Exclusivity and community are at odds.</div>
+      <div class="card-footer"><span class="card-tag">#design</span><div class="card-actions"><button class="card-act">✓</button><button class="card-act">↻</button><button class="card-act">×</button></div></div>
+    </div>
+
+    <!-- Zone: signals -->
+    <div class="zone" style="left:650px;top:90px;width:480px;height:340px;border:1px solid rgba(56,189,248,0.08);background:rgba(56,189,248,0.008);">
+      <div class="zone-label" style="background:rgba(56,189,248,0.08);color:#38bdf8;">cultural signals</div>
+    </div>
+
+    <!-- Signal cards (blue left border) -->
+    <div class="card" style="left:690px;top:140px;border-left-color:#38bdf8;transform:rotate(0.3deg);">
+      <div class="card-type" style="color:#38bdf8;">Signal</div>
+      <div class="card-text">Burning Man's "no spectators" principle is spreading. Audiences want to participate, not just watch.</div>
+      <div class="card-footer"><span class="card-tag">#culture</span><div class="card-actions"><button class="card-act">✓</button><button class="card-act">↻</button><button class="card-act">×</button></div></div>
+    </div>
+
+    <div class="card locked" style="left:920px;top:130px;border-left-color:#38bdf8;transform:rotate(-0.6deg);">
+      <div class="card-type" style="color:#38bdf8;">Signal</div>
+      <div class="card-text">Immersive theater (Sleep No More, Punchdrunk) proved people will pay premium for spatial narrative. Festivals haven't caught up.</div>
+      <div class="card-footer"><span class="card-tag">#opportunity</span><div class="card-actions"><button class="card-act">✓</button><button class="card-act">🔒</button><button class="card-act">↻</button></div></div>
+    </div>
+
+    <div class="card" style="left:690px;top:300px;border-left-color:#38bdf8;transform:rotate(-0.4deg);">
+      <div class="card-type" style="color:#38bdf8;">Signal</div>
+      <div class="card-text">Sound healing, breathwork tents, and micro-dosing lounges are now standard. Wellness is the new VIP.</div>
+      <div class="card-footer"><span class="card-tag">#wellness</span><div class="card-actions"><button class="card-act">✓</button><button class="card-act">↻</button><button class="card-act">×</button></div></div>
+    </div>
+
+    <div class="card selected" style="left:920px;top:300px;border-left-color:#38bdf8;transform:rotate(0.6deg);">
+      <div class="card-type" style="color:#38bdf8;">Signal</div>
+      <div class="card-text">Gen Z is choosing festivals by lineup AND by "vibe infrastructure" — hammock zones, art installations, food quality.</div>
+      <div class="card-footer"><span class="card-tag">#audience</span><div class="card-actions"><button class="card-act">✓</button><button class="card-act">↻</button><button class="card-act">×</button></div></div>
+    </div>
+
+    <!-- Direction cards (purple left border) -->
+    <div class="zone" style="left:1170px;top:120px;width:300px;height:320px;border:1px solid rgba(167,139,250,0.1);background:rgba(167,139,250,0.01);">
+      <div class="zone-label" style="background:rgba(167,139,250,0.08);color:#a78bfa;">emerging directions</div>
+    </div>
+
+    <div class="card selected" style="left:1200px;top:170px;border-left-color:#a78bfa;transform:rotate(-0.3deg);">
+      <div class="card-type" style="color:#a78bfa;">Direction</div>
+      <div class="card-text">"The festival as a world." Not stages and tents — environments with their own logic, lore, and discovery paths.</div>
+      <div class="card-footer"><span class="card-tag">#core</span><div class="card-actions"><button class="card-act">✓</button><button class="card-act">↻</button><button class="card-act">×</button></div></div>
+    </div>
+
+    <div class="card locked" style="left:1200px;top:330px;border-left-color:#a78bfa;transform:rotate(0.5deg);">
+      <div class="card-type" style="color:#a78bfa;">Direction</div>
+      <div class="card-text">Design for serendipity. The best festival moments are unplanned. Build architecture that makes accidents happen.</div>
+      <div class="card-footer"><span class="card-tag">#experience</span><div class="card-actions"><button class="card-act">✓</button><button class="card-act">🔒</button><button class="card-act">↻</button></div></div>
+    </div>
+
+    <!-- Idea cards (green left border) -->
+    <div class="card" style="left:400px;top:500px;border-left-color:#34d399;transform:rotate(1deg);">
+      <div class="card-type" style="color:#34d399;">Idea</div>
+      <div class="card-text">A "lost and found" stage — no lineup posted, just follow the music. Discovery as the mechanic.</div>
+      <div class="card-footer"><span class="card-tag">#activation</span><div class="card-actions"><button class="card-act">✓</button><button class="card-act">↻</button><button class="card-act">×</button></div></div>
+    </div>
+
+    <div class="card" style="left:650px;top:510px;border-left-color:#34d399;transform:rotate(-0.7deg);">
+      <div class="card-type" style="color:#34d399;">Idea</div>
+      <div class="card-text">Wearable RFID that unlocks hidden experiences as you explore. Gamify the grounds without screens.</div>
+      <div class="card-footer"><span class="card-tag">#tech</span><div class="card-actions"><button class="card-act">✓</button><button class="card-act">↻</button><button class="card-act">×</button></div></div>
+    </div>
+
+    <!-- Guardrail (red left border) -->
+    <div class="card" style="left:900px;top:520px;border-left-color:#ef4444;transform:rotate(0.3deg);">
+      <div class="card-type" style="color:#ef4444;">Guard Rail</div>
+      <div class="card-text">Never call it "experiential." Show the experience, don't label it. The word is dead.</div>
+      <div class="card-footer"><span class="card-tag">#language</span></div>
+    </div>
+
+    <!-- Provocation (orange left border) -->
+    <div class="card" style="left:1150px;top:510px;border-left-color:#fb923c;transform:rotate(-0.5deg);">
+      <div class="card-type" style="color:#fb923c;">Provocation</div>
+      <div class="card-text">What if there were no headliners? Equal billing, random scheduling. Kill the hierarchy entirely.</div>
+      <div class="card-footer"><span class="card-tag">#bold</span><div class="card-actions"><button class="card-act">✓</button><button class="card-act">↻</button><button class="card-act">×</button></div></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Prompt Bar -->
+<div class="fixed bottom-0 left-0 right-0 z-[200] px-5 pb-3 pt-2 border-t border-white/[0.06]" style="background:rgba(10,10,13,0.92);backdrop-filter:blur(16px);">
+  <div class="max-w-[580px] mx-auto flex items-center gap-1.5">
+    <input type="text" class="flex-1 px-3 py-2 rounded-lg border border-white/[0.06] bg-canvas-surface text-fg text-[12px] outline-none placeholder:text-fg-4 focus:border-white/10" placeholder="Ask anything…" />
+    <button class="w-8 h-8 rounded-lg bg-fg text-canvas-bg flex items-center justify-center text-sm shrink-0">→</button>
+  </div>
+</div>
+
+<script>
+const world = document.getElementById('canvas-world');
+const inner = document.getElementById('canvas-inner');
+let panX = -50, panY = -20, zoom = 1, isPanning = false, startX, startY, startPanX, startPanY;
+
+function applyTransform() { inner.style.transform = `translate(${panX}px,${panY}px) scale(${zoom})`; }
+
+world.addEventListener('mousedown', e => {
+  if (e.target.closest('.card')) return;
+  isPanning = true; startX = e.clientX; startY = e.clientY; startPanX = panX; startPanY = panY;
+});
+window.addEventListener('mousemove', e => { if (!isPanning) return; panX = startPanX + (e.clientX - startX); panY = startPanY + (e.clientY - startY); applyTransform(); });
+window.addEventListener('mouseup', () => { isPanning = false; });
+world.addEventListener('wheel', e => { e.preventDefault(); zoom = Math.max(0.25, Math.min(2.5, zoom * (e.deltaY > 0 ? 0.92 : 1.08))); applyTransform(); }, { passive: false });
+
+document.querySelectorAll('.card').forEach(card => {
+  let dx, dy, dragging = false;
+  card.addEventListener('mousedown', e => {
+    e.stopPropagation(); dragging = true; card.classList.add('dragging');
+    const rect = card.getBoundingClientRect(); dx = e.clientX - rect.left; dy = e.clientY - rect.top;
+    const onMove = ev => { if (!dragging) return; const wr = inner.getBoundingClientRect(); card.style.left = (ev.clientX - wr.left - dx * zoom) / zoom + 'px'; card.style.top = (ev.clientY - wr.top - dy * zoom) / zoom + 'px'; card.style.transform = 'rotate(0deg)'; };
+    const onUp = () => { dragging = false; card.classList.remove('dragging'); window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); };
+    window.addEventListener('mousemove', onMove); window.addEventListener('mouseup', onUp);
+  });
+});
+
+applyTransform();
+</script>
+</body>
+</html>
