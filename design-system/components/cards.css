@@ -1,0 +1,312 @@
+/* ── Project Cards ── */
+
+.project-grid {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  align-content: start;
+}
+
+.project-grid::-webkit-scrollbar { width: 6px; }
+.project-grid::-webkit-scrollbar-track { background: transparent; }
+.project-grid::-webkit-scrollbar-thumb { background: var(--border); border-radius: 0; }
+.project-grid::-webkit-scrollbar-thumb:hover { background: var(--border-strong); }
+
+.project-card {
+  border: 1px solid var(--border);
+  border-radius: 0;
+  background: var(--surface);
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  transition: border-color var(--transition-fast);
+  position: relative;
+}
+
+.project-card:hover {
+  border-color: var(--border-strong);
+}
+
+.project-card:hover .card-more {
+  opacity: 1;
+}
+
+.card-thumb {
+  height: 160px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.thumb-dots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 20px;
+  max-width: 200px;
+}
+
+.thumb-dot {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+}
+
+.card-more {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--border);
+  border-radius: 0;
+  background: var(--surface);
+  color: var(--fg-3);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity var(--transition-medium), background var(--transition-fast);
+  font-family: var(--mono);
+  font-size: 14px;
+  line-height: 1;
+  padding: 0;
+}
+
+.card-more:hover {
+  background: var(--fg);
+  color: var(--bg);
+}
+
+.card-more:active {
+  opacity: 0.85;
+}
+
+.card-info {
+  padding: 12px 14px;
+}
+
+.card-name {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fg);
+  margin-bottom: 4px;
+}
+
+.card-meta {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: var(--fg-3);
+  text-transform: uppercase;
+}
+
+/* ── List view ── */
+.project-grid.list-view {
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+
+.project-grid.list-view .project-card {
+  display: flex;
+  align-items: center;
+  border-bottom: none;
+}
+
+.project-grid.list-view .project-card + .project-card {
+  border-top: none;
+}
+
+.project-grid.list-view .card-thumb {
+  width: 80px;
+  height: 52px;
+  min-width: 80px;
+  border-bottom: none;
+  border-right: 1px solid var(--border);
+}
+
+.project-grid.list-view .thumb-dots {
+  padding: 8px;
+  gap: 2px;
+  max-width: 72px;
+}
+
+.project-grid.list-view .thumb-dot {
+  width: 4px;
+  height: 4px;
+}
+
+.project-grid.list-view .card-info {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 14px;
+}
+
+.project-grid.list-view .card-name {
+  margin-bottom: 0;
+  min-width: 180px;
+}
+
+.project-grid.list-view .card-more {
+  position: relative;
+  top: auto;
+  right: auto;
+  margin-right: 10px;
+}
+
+/* ── Post-it Cards ── */
+.postit-node {
+  width: 180px;
+  height: 180px;
+  border-radius: 0;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  cursor: grab;
+  position: relative;
+  border: none;
+  transition: transform var(--transition-normal);
+  overflow: visible;
+}
+
+.postit-node:hover { transform: translateY(-1px); }
+
+/* Post-it color variants */
+.postit-node[data-color="yellow"] { background: var(--postit-yellow); color: var(--postit-yellow-fg); }
+.postit-node[data-color="pink"] { background: var(--postit-pink); color: var(--postit-pink-fg); }
+.postit-node[data-color="green"] { background: var(--postit-green); color: var(--postit-green-fg); }
+.postit-node[data-color="blue"] { background: var(--postit-blue); color: var(--postit-blue-fg); }
+.postit-node[data-color="orange"] { background: var(--postit-orange); color: var(--postit-yellow-fg); }
+.postit-node[data-color="purple"] { background: var(--postit-purple); color: var(--postit-pink-fg); }
+
+.postit-type {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: inherit;
+  opacity: 0.55;
+  margin-bottom: 10px;
+  flex-shrink: 0;
+}
+
+.postit-text {
+  font-size: 12px;
+  line-height: 1.55;
+  color: inherit;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 7;
+  -webkit-box-orient: vertical;
+}
+
+.postit-actions {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  display: flex;
+  flex-direction: row;
+  gap: 0;
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+  z-index: 5;
+}
+
+.postit-node:hover .postit-actions { opacity: 1; }
+
+.postit-action {
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--overlay);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-base);
+  transition: background var(--transition-normal);
+  color: inherit;
+  margin-left: 1px;
+}
+
+.postit-action:first-child { margin-left: 0; }
+.postit-action:hover { background: var(--overlay-strong); }
+.postit-action:active { opacity: 0.7; }
+
+.postit-distill {
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--overlay);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-base);
+  transition: background var(--transition-normal);
+  color: inherit;
+  margin-left: 1px;
+}
+
+.postit-distill:hover { background: var(--overlay-strong); }
+.postit-distill:active { opacity: 0.7; }
+
+.postit-star-badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  color: inherit;
+  opacity: 0.7;
+  font-size: 12px;
+  line-height: 1;
+  pointer-events: none;
+}
+
+/* ── Card animations ── */
+@keyframes card-reject {
+  0% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.95); }
+}
+
+.postit-node.rejecting {
+  animation: card-reject 0.2s ease-out forwards;
+}
+
+@keyframes card-distill {
+  0% { opacity: 1; transform: scale(1); }
+  50% { transform: scale(1.03); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.postit-node.distilling {
+  animation: card-distill 0.25s ease-out;
+}
+
+/* ── Responsive ── */
+@media (max-width: 1100px) {
+  .project-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 700px) {
+  .project-grid { grid-template-columns: 1fr; }
+}

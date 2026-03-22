@@ -1,0 +1,128 @@
+/* ── Floating Toolbar ── */
+
+.floating-toolbar {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  padding: 3px;
+  box-shadow: none;
+  z-index: 50;
+}
+
+.toolbar-divider {
+  width: 1px;
+  height: 20px;
+  background: var(--border);
+  margin: 0 3px;
+}
+
+.new-block-btn {
+  height: 32px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 0;
+  background: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--fg-2);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  transition: background var(--transition-fast), color var(--transition-fast);
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.new-block-btn:hover {
+  background: var(--fg);
+  color: var(--bg);
+}
+
+.new-block-btn:active {
+  opacity: 0.85;
+}
+
+.new-block-btn svg { width: 14px; height: 14px; }
+
+/* ── Zoom Controls ── */
+
+.zoom-controls {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  padding: 2px;
+  box-shadow: none;
+  z-index: 50;
+}
+
+.zoom-btn {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 0;
+  background: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--fg-2);
+  font-size: 14px;
+  font-family: var(--mono);
+  transition: background var(--transition-fast);
+}
+
+.zoom-btn:hover {
+  background: var(--fg);
+  color: var(--bg);
+}
+
+.zoom-btn:active {
+  opacity: 0.85;
+}
+
+.zoom-level {
+  font-family: var(--mono);
+  font-size: 9px;
+  text-align: center;
+  color: var(--fg-3);
+  padding: 1px 0;
+  font-weight: 400;
+}
+
+/* ── Responsive ── */
+@media (max-width: 700px) {
+  .floating-toolbar {
+    bottom: 12px;
+    padding: 2px;
+  }
+
+  .new-block-btn {
+    padding: 0 8px;
+    font-size: var(--text-sm);
+  }
+
+  .new-block-btn span {
+    display: none;
+  }
+
+  .zoom-controls {
+    bottom: 12px;
+    right: 12px;
+  }
+}
