@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seeds Canvas Reference</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../design-system/index.css">
+<style>
+  html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    overflow: hidden;
+  }
+
+  body {
+    font-family: var(--font);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .reference-sidebar-header {
+    padding: 0 16px 16px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 12px;
+  }
+
+  .reference-sidebar-kicker,
+  .reference-sidebar-copy,
+  .reference-chip,
+  .reference-stage-kicker,
+  .reference-zone-count,
+  .reference-stage-note,
+  .reference-legend-label {
+    font-family: var(--mono);
+  }
+
+  .reference-sidebar-kicker {
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--fg-3);
+    margin-bottom: 10px;
+  }
+
+  .reference-sidebar-copy {
+    font-size: 11px;
+    line-height: 1.7;
+    color: var(--fg-2);
+    letter-spacing: 0.04em;
+  }
+
+  .reference-sidebar-section {
+    padding: 0 16px 16px;
+  }
+
+  .reference-sidebar-section + .reference-sidebar-section {
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+  }
+
+  .reference-chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+  }
+
+  .reference-chip {
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border: 1px solid var(--border);
+    padding: 4px 8px;
+    color: var(--fg-2);
+    background: var(--bg);
+  }
+
+  .reference-canvas-shell {
+    position: relative;
+    flex: 1;
+    overflow: auto;
+    background:
+      linear-gradient(to right, color-mix(in srgb, var(--dot-color) 35%, transparent) 1px, transparent 1px),
+      linear-gradient(to bottom, color-mix(in srgb, var(--dot-color) 35%, transparent) 1px, transparent 1px),
+      var(--bg);
+    background-size: 20px 20px, 20px 20px, auto;
+  }
+
+  .reference-canvas-shell::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .reference-canvas-shell::-webkit-scrollbar-thumb {
+    background: var(--border);
+  }
+
+  .reference-canvas {
+    position: relative;
+    width: 1960px;
+    min-height: 1480px;
+    padding: 72px 72px 220px;
+  }
+
+  .reference-stage-kicker {
+    position: absolute;
+    top: 28px;
+    left: 72px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--fg-3);
+  }
+
+  .reference-stage-kicker strong {
+    color: var(--fg);
+    font-weight: var(--weight-semibold);
+  }
+
+  .reference-stage-note {
+    position: absolute;
+    top: 28px;
+    right: 72px;
+    max-width: 320px;
+    font-size: 9px;
+    line-height: 1.7;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--fg-3);
+    text-align: right;
+  }
+
+  .reference-panel {
+    position: absolute;
+  }
+
+  .reference-brief {
+    top: 96px;
+    left: 72px;
+    width: 380px;
+  }
+
+  .reference-question {
+    top: 112px;
+    left: 510px;
+    width: 380px;
+  }
+
+  .reference-generate {
+    top: 140px;
+    left: 950px;
+  }
+
+  .reference-mini-note {
+    top: 112px;
+    left: 1220px;
+    width: 300px;
+    padding: 18px;
+  }
+
+  .reference-mini-note .node-header {
+    margin-bottom: 12px;
+  }
+
+  .reference-mini-note-copy {
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--fg-2);
+  }
+
+  .reference-mini-note-list {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .reference-mini-note-list div {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--fg-3);
+  }
+
+  .reference-mini-note-swatch {
+    width: 10px;
+    height: 10px;
+    background: var(--fg);
+  }
+
+  .reference-zone-shell {
+    position: absolute;
+    width: 600px;
+  }
+
+  .reference-zone-shell .zone-summary-node {
+    width: 600px;
+    margin-bottom: 10px;
+  }
+
+  .reference-zone-shell .zone-node {
+    width: 600px;
+    height: 500px;
+  }
+
+  .reference-zone-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 180px);
+    gap: 20px;
+    margin-top: 28px;
+    align-content: start;
+  }
+
+  .reference-zone-grid .postit-node {
+    width: 180px;
+    height: 180px;
+  }
+
+  .reference-zone-caption {
+    position: absolute;
+    top: 18px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--fg-3);
+  }
+
+  .reference-zone-count {
+    opacity: 0.7;
+  }
+
+  .reference-legend {
+    position: absolute;
+    right: 72px;
+    top: 890px;
+    width: 280px;
+    padding: 18px;
+  }
+
+  .reference-legend-label {
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--fg-3);
+    margin-bottom: 12px;
+  }
+
+  .reference-legend-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .reference-legend-item {
+    display: grid;
+    grid-template-columns: 72px 1fr;
+    gap: 12px;
+    align-items: start;
+  }
+
+  .reference-legend-key {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--fg-3);
+  }
+
+  .reference-legend-value {
+    font-size: 12px;
+    line-height: 1.55;
+    color: var(--fg-2);
+  }
+
+  .reference-selection-box {
+    left: 1130px;
+    top: 660px;
+    width: 410px;
+    height: 220px;
+  }
+
+  .reference-context-menu {
+    position: absolute;
+    left: 1390px;
+    top: 610px;
+    z-index: 30;
+  }
+
+  .reference-edges {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .reference-edges path,
+  .reference-edges line {
+    fill: none;
+    stroke: var(--connection);
+    stroke-width: 1.5;
+    stroke-dasharray: 6 3;
+  }
+
+  .reference-edges text {
+    fill: var(--fg-3);
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .reference-toolbar-stack {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    transform: translateX(-50%);
+    z-index: 80;
+  }
+
+  .reference-toolbar-stack .floating-toolbar {
+    position: static;
+    left: auto;
+    bottom: auto;
+    transform: none;
+  }
+
+  .reference-toolbar-stack .new-node-dropdown {
+    left: 72px;
+  }
+
+  .reference-empty-state {
+    display: none;
+  }
+
+  .reference-top-right {
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+
+  .reference-user-badge {
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--fg-2);
+    margin-left: -1px;
+    cursor: pointer;
+    transition: background var(--transition-fast), color var(--transition-fast);
+  }
+
+  .reference-user-badge:hover {
+    background: var(--fg);
+    color: var(--bg);
+  }
+
+  .reference-user-badge svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .reference-kpi {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 10px;
+    height: 32px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--fg-2);
+  }
+
+  .reference-kpi strong {
+    color: var(--fg);
+    font-weight: var(--weight-semibold);
+  }
+
+  .reference-lower-note {
+    position: absolute;
+    left: 72px;
+    top: 1290px;
+    width: 600px;
+    padding: 18px;
+  }
+
+  .reference-lower-note p {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.65;
+    color: var(--fg-2);
+  }
+
+  @media (max-width: 1100px) {
+    .reference-canvas {
+      width: 1840px;
+      min-height: 1520px;
+    }
+  }
+
+  @media (max-width: 700px) {
+    .reference-stage-kicker,
+    .reference-stage-note {
+      position: static;
+      max-width: none;
+      text-align: left;
+      margin-bottom: 12px;
+    }
+
+    .reference-canvas {
+      padding: 20px 20px 180px;
+    }
+
+    .reference-toolbar-stack {
+      bottom: 12px;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top-bar">
+    <div class="top-bar-left">
+      <a class="logo" href="#">Seeds</a>
+      <div class="btn-icon-group">
+        <button class="btn-icon" title="Canvas View">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18"></rect>
+          </svg>
+        </button>
+        <button class="btn-icon" title="Board View">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="7" height="7"></rect>
+            <rect x="14" y="4" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div class="top-bar-center">Seeds Canvas Reference</div>
+    <div class="top-bar-right reference-top-right">
+      <div class="reference-kpi"><strong>14</strong> active cards</div>
+      <button class="btn-icon" id="themeToggle" title="Toggle theme">
+        <svg id="sunIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <svg id="moonIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3A7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </button>
+      <div class="theme-picker-wrapper">
+        <button class="btn-icon" id="colorwayToggle" title="Change colorway">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="13.5" cy="6.5" r="0.5" fill="currentColor" stroke="none"></circle>
+            <circle cx="17.5" cy="10.5" r="0.5" fill="currentColor" stroke="none"></circle>
+            <circle cx="8.5" cy="7.5" r="0.5" fill="currentColor" stroke="none"></circle>
+            <circle cx="6.5" cy="12" r="0.5" fill="currentColor" stroke="none"></circle>
+            <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.93 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.04-.23-.29-.38-.63-.38-1.02 0-.83.67-1.5 1.5-1.5H16c3.31 0 6-2.69 6-6 0-5.17-4.49-9-10-9z"></path>
+          </svg>
+        </button>
+        <div class="theme-picker-dropdown" id="colorwayDropdown" style="display:none;">
+          <div class="dropdown-section-label">Color</div>
+          <button class="theme-picker-item active" data-colorway="gruvbox"><span class="theme-picker-swatch" style="background:#fabd2f;"></span>Gruvbox</button>
+          <button class="theme-picker-item" data-colorway="andromeda"><span class="theme-picker-swatch" style="background:#8aadf4;"></span>Andromeda</button>
+          <button class="theme-picker-item" data-colorway="rosepine"><span class="theme-picker-swatch" style="background:#ebbcba;"></span>Rose Pine</button>
+          <button class="theme-picker-item" data-colorway="nord"><span class="theme-picker-swatch" style="background:#88c0d0;"></span>Nord</button>
+          <button class="theme-picker-item" data-colorway="solarized"><span class="theme-picker-swatch" style="background:#268bd2;"></span>Solarized</button>
+          <button class="theme-picker-item" data-colorway="flexoki"><span class="theme-picker-swatch" style="background:#d0a215;"></span>Flexoki</button>
+          <div class="theme-picker-divider"></div>
+          <div class="dropdown-section-label">Mono</div>
+          <button class="theme-picker-item" data-colorway="ink"><span class="theme-picker-swatch" style="background:#b0b0b0;"></span>Ink</button>
+          <button class="theme-picker-item" data-colorway="ash"><span class="theme-picker-swatch" style="background:#8e8e94;"></span>Ash</button>
+          <button class="theme-picker-item" data-colorway="bone"><span class="theme-picker-swatch" style="background:#d8d3cb;"></span>Bone</button>
+        </div>
+      </div>
+      <button class="reference-user-badge" title="User">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="body">
+    <aside class="sidebar">
+      <div class="reference-sidebar-header">
+        <div class="reference-sidebar-kicker">Reference Intent</div>
+        <div class="reference-sidebar-copy">
+          This file is the design-system rebuild of the original hardcoded post-it canvas. Use it as the visual and structural source of truth when translating the board into the real app.
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button class="nav-item active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18"></rect></svg>
+          Canvas
+        </button>
+        <button class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5V4.5"></path><path d="M10 19.5V10"></path><path d="M16 19.5V7"></path><path d="M22 19.5V13"></path></svg>
+          Distill
+        </button>
+        <button class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          Search
+        </button>
+        <button class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.45 4.35L18 9l-4.55 1.65L12 15l-1.45-4.35L6 9l4.55-1.65L12 3z"></path></svg>
+          Prompts
+        </button>
+      </nav>
+
+      <div class="reference-sidebar-section">
+        <div class="reference-sidebar-kicker">System Coverage</div>
+        <div class="reference-chip-row">
+          <span class="reference-chip">brief</span>
+          <span class="reference-chip">questions</span>
+          <span class="reference-chip">zones</span>
+          <span class="reference-chip">post-its</span>
+          <span class="reference-chip">ai bubble</span>
+          <span class="reference-chip">toolbar</span>
+        </div>
+      </div>
+
+      <div class="sidebar-bottom">
+        <button class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+          Upload
+        </button>
+        <button class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-6 0v4"></path><rect x="4" y="9" width="16" height="11"></rect></svg>
+          Guard Rails
+        </button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="action-bar">
+        <div class="search-wrapper">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input class="search-input" value="ingredient transparency" readonly>
+        </div>
+        <div class="sort-select-wrapper">
+          <select class="sort-select">
+            <option>Round 2</option>
+            <option>Round 1</option>
+          </select>
+        </div>
+        <div class="sort-select-wrapper">
+          <select class="sort-select">
+            <option>Prompting View</option>
+            <option>Editing View</option>
+          </select>
+        </div>
+        <div class="spacer"></div>
+        <button class="btn-secondary">Export</button>
+        <button class="btn-primary">Grow Round</button>
+      </div>
+
+      <div class="reference-canvas-shell canvas-pointer-mode">
+        <div class="reference-canvas">
+          <svg class="reference-edges" viewBox="0 0 1960 1480" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M 460 228 C 520 260, 570 300, 620 350"></path>
+            <path d="M 865 286 C 980 320, 1080 336, 1220 356"></path>
+            <path d="M 905 302 C 830 392, 790 482, 736 586"></path>
+            <path d="M 905 302 C 1020 400, 1100 510, 1235 584"></path>
+            <path d="M 1230 900 C 1360 950, 1480 990, 1630 1030"></path>
+            <text x="752" y="556">brief drives framing</text>
+            <text x="1132" y="548">answers steer priority</text>
+            <text x="1460" y="998">distill for next round</text>
+          </svg>
+
+          <div class="reference-stage-kicker">
+            <span>Design-system rebuild</span>
+            <strong>quiet, sharp, premium</strong>
+          </div>
+          <div class="reference-stage-note">
+            Same working surface as the original canvas, but every visible element now comes from the system primitives instead of one-off CSS.
+          </div>
+
+          <section class="reference-panel reference-brief">
+            <div class="node-base brief-node-input">
+              <div class="node-header">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                </svg>
+                <span>Brief</span>
+              </div>
+
+              <textarea class="brief-input-text" rows="5">Position a new skincare line for Gen Z around ingredient literacy, visible proof, and a tone that feels lucid rather than clinical.</textarea>
+
+              <div class="brief-suggestions-divider"></div>
+              <div class="brief-suggestions">
+                <div class="brief-suggestions-label">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 3l1.45 4.35L18 9l-4.55 1.65L12 15l-1.45-4.35L6 9l4.55-1.65L12 3z"></path>
+                  </svg>
+                  Suggested prompts
+                </div>
+                <div class="brief-suggestion-chips">
+                  <button class="brief-suggestion">Define what transparency should feel like in-language</button>
+                  <button class="brief-suggestion">List 3 category cliches to reject outright</button>
+                </div>
+              </div>
+
+              <div class="brief-drop-zone">
+                <div class="brief-drop-zone-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                  </svg>
+                </div>
+                <div class="brief-drop-zone-text">Drop references or click to upload</div>
+                <div class="brief-drop-zone-hint">PDF, decks, screenshots, research notes</div>
+              </div>
+
+              <div class="brief-attachments">
+                <div class="brief-attachment">
+                  <div class="brief-attachment-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                      <polyline points="14 2 14 8 20 8"></polyline>
+                    </svg>
+                  </div>
+                  <div class="brief-attachment-info">
+                    <div class="brief-attachment-name">founder-interview.pdf</div>
+                    <div class="brief-attachment-size">3.2 MB</div>
+                  </div>
+                </div>
+                <div class="brief-attachment uploading">
+                  <div class="brief-attachment-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="3" width="18" height="18"></rect>
+                      <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                      <polyline points="21 15 16 10 5 21"></polyline>
+                    </svg>
+                  </div>
+                  <div class="brief-attachment-progress">
+                    <div class="brief-attachment-name">category-grid.png</div>
+                    <div class="brief-attachment-progress-bar">
+                      <div class="brief-attachment-progress-fill" style="width:72%;"></div>
+                    </div>
+                    <div class="brief-attachment-progress-text">72% - uploading</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="brief-input-footer">
+                <span class="brief-char-count">139 / 2000</span>
+                <div class="spacer"></div>
+                <button class="btn-ghost" style="padding:5px 8px; font-size:9px;">Reset</button>
+                <button class="btn-primary" style="padding:5px 10px; font-size:9px;">Save Brief</button>
+              </div>
+            </div>
+          </section>
+
+          <section class="reference-panel reference-question">
+            <div class="question-node">
+              <div class="question-node-header">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+                <span>Question</span>
+                <span class="question-progress">2 / 4</span>
+              </div>
+              <div class="question-text">What tone should ingredient transparency take so it feels generous, not corrective?</div>
+              <div class="question-options">
+                <button class="question-option selected">
+                  <span class="question-option-key">A</span>
+                  <span class="question-option-text">Calm editorial language that explains without scolding</span>
+                </button>
+                <button class="question-option">
+                  <span class="question-option-key">B</span>
+                  <span class="question-option-text">Clinical precision with stronger proof points and citations</span>
+                </button>
+                <label class="question-option-custom">
+                  <span class="question-option-key">C</span>
+                  <input class="question-custom-input" value="Use the brand as an interpreter, not an expert." readonly>
+                </label>
+              </div>
+              <button class="question-skip">Skip for now</button>
+            </div>
+          </section>
+
+          <section class="reference-panel reference-generate">
+            <div class="generate-node results-in">
+              <div class="generate-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 3l1.45 4.35L18 9l-4.55 1.65L12 15l-1.45-4.35L6 9l4.55-1.65L12 3z"></path>
+                </svg>
+                Generate
+              </div>
+              <button class="generate-btn">Find tensions</button>
+              <button class="generate-btn">Propose directions</button>
+              <button class="generate-btn">Distill carry-forward</button>
+            </div>
+          </section>
+
+          <section class="reference-panel reference-mini-note node-base">
+            <div class="node-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18"></rect>
+              </svg>
+              <span>Reference Rules</span>
+            </div>
+            <div class="reference-mini-note-copy">
+              The real app should preserve editorial calm: restrained chrome, compact mono labels, and color reserved for notes, zones, and important state changes.
+            </div>
+            <div class="reference-mini-note-list">
+              <div><span class="reference-mini-note-swatch"></span> zero radius everywhere</div>
+              <div><span class="reference-mini-note-swatch"></span> zone colors carry meaning</div>
+              <div><span class="reference-mini-note-swatch"></span> selection uses blue, not accent red</div>
+            </div>
+          </section>
+
+          <section class="reference-zone-shell" style="left:520px; top:360px;">
+            <div class="zone-summary-node">
+              <div class="zone-summary-header">
+                <span class="zone-summary-label">Summary</span>
+                <span class="zone-summary-zone-name" data-color="yellow">Cultural Landscape</span>
+              </div>
+              <div class="zone-summary-text">People do not want purity theater. They want plainspoken evidence, visible texture, and language that respects how much they already know.</div>
+            </div>
+            <div class="zone-node" data-zone-color="yellow">
+              <div class="zone-header">
+                <span class="zone-label">Cultural Landscape</span>
+                <div class="zone-actions">
+                  <button class="zone-action-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>
+                  </button>
+                </div>
+              </div>
+              <div class="reference-zone-caption"><span class="reference-zone-count">4 cards</span></div>
+              <div class="reference-zone-grid">
+                <div class="postit-node" data-color="yellow">
+                  <div class="postit-type">Tension</div>
+                  <div class="postit-text">Ingredient transparency has become expected, but most brands still present it like legal fine print.</div>
+                </div>
+                <div class="postit-node" data-color="yellow">
+                  <div class="postit-type">Signal</div>
+                  <div class="postit-text">Routine videos perform better when creators explain what each ingredient is doing to the skin.</div>
+                </div>
+                <div class="postit-node" data-color="orange">
+                  <div class="postit-type">Provocation</div>
+                  <div class="postit-text">What if the package copy read like museum labels: factual, short, and unexpectedly beautiful?</div>
+                </div>
+                <div class="postit-node" data-color="yellow">
+                  <div class="postit-type">Signal</div>
+                  <div class="postit-text">Consumers reward brands that explain formulation tradeoffs instead of pretending every choice is perfect.</div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="reference-zone-shell" style="left:1180px; top:360px;">
+            <div class="zone-summary-node">
+              <div class="zone-summary-header">
+                <span class="zone-summary-label">Summary</span>
+                <span class="zone-summary-zone-name" data-color="pink">Strategic Direction</span>
+              </div>
+              <div class="zone-summary-text">The strongest route is formula-forward generosity: information-dense, emotionally calm, and specific enough to feel earned.</div>
+            </div>
+            <div class="zone-node multi-selected" data-zone-color="pink">
+              <div class="zone-header">
+                <span class="zone-label">Strategic Direction</span>
+                <div class="zone-actions">
+                  <button class="zone-action-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16"></rect></svg>
+                  </button>
+                  <button class="zone-action-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18"></path><path d="M6 6l12 12"></path></svg>
+                  </button>
+                </div>
+              </div>
+              <div class="reference-zone-caption"><span class="reference-zone-count">4 cards</span></div>
+              <div class="reference-zone-grid">
+                <div class="postit-node multi-selected" data-color="pink">
+                  <div class="postit-type">Direction</div>
+                  <div class="postit-text">Frame the brand as an interpreter of formulas, not a moral judge of what other brands are doing.</div>
+                </div>
+                <div class="postit-node multi-selected" data-color="pink">
+                  <div class="postit-type">Direction</div>
+                  <div class="postit-text">Use short editorial labels that translate ingredient function into a concrete benefit with zero fluff.</div>
+                </div>
+                <div class="postit-node" data-color="purple">
+                  <div class="postit-type">Direction</div>
+                  <div class="postit-text">Build brand confidence through legibility: typography, structure, and proof before lifestyle imagery.</div>
+                </div>
+                <div class="postit-node" data-color="pink">
+                  <div class="postit-type">Guard Rail</div>
+                  <div class="postit-text">Avoid purity claims, overpromising, and "clean girl" codes that flatten the intelligence of the audience.</div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="reference-zone-shell" style="left:520px; top:960px;">
+            <div class="zone-summary-node">
+              <div class="zone-summary-header">
+                <span class="zone-summary-label">Summary</span>
+                <span class="zone-summary-zone-name" data-color="green">Creative Ideas</span>
+              </div>
+              <div class="zone-summary-text">Execution should make explanation desirable: tactile, scannable, and composed like a printed reference sheet rather than an ad.</div>
+            </div>
+            <div class="zone-node" data-zone-color="green">
+              <div class="zone-header">
+                <span class="zone-label">Creative Ideas</span>
+              </div>
+              <div class="reference-zone-caption"><span class="reference-zone-count">4 cards</span></div>
+              <div class="reference-zone-grid">
+                <div class="postit-node" data-color="green">
+                  <div class="postit-type">Idea</div>
+                  <div class="postit-text">Ship a printed formula card with each product so the packaging feels like the beginning of the story, not the whole story.</div>
+                </div>
+                <div class="postit-node" data-color="blue">
+                  <div class="postit-type">Idea</div>
+                  <div class="postit-text">Let customers tap any ingredient online to reveal role, texture, and why it is present in that exact percentage band.</div>
+                </div>
+                <div class="postit-node" data-color="green">
+                  <div class="postit-type">Idea</div>
+                  <div class="postit-text">Use studio-light macro photography of textures with annotation lines instead of generic lifestyle stills.</div>
+                </div>
+                <div class="postit-node" data-color="orange">
+                  <div class="postit-type">Prompt</div>
+                  <div class="postit-text">How could the formula become the brand mark rather than just the proof behind the brand?</div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="reference-zone-shell" style="left:1180px; top:960px;">
+            <div class="zone-summary-node">
+              <div class="zone-summary-header">
+                <span class="zone-summary-label">Summary</span>
+                <span class="zone-summary-zone-name" data-color="distilled">Carry Forward</span>
+              </div>
+              <div class="zone-summary-text">The winning material is concise, interpretable, and specific enough to survive the next round without losing texture.</div>
+            </div>
+            <div class="zone-node" data-zone-color="distilled">
+              <div class="zone-header">
+                <span class="zone-label">Carry Forward</span>
+              </div>
+              <div class="reference-zone-caption"><span class="reference-zone-count">3 distilled cards</span></div>
+              <div class="reference-zone-grid">
+                <div class="postit-node" data-color="blue">
+                  <div class="postit-star-badge">&#9733;</div>
+                  <div class="postit-type">Distilled</div>
+                  <div class="postit-text">Formula-forward generosity should be the system-level north star for messaging, layout, and proof.</div>
+                </div>
+                <div class="postit-node" data-color="green">
+                  <div class="postit-star-badge">&#9733;</div>
+                  <div class="postit-type">Distilled</div>
+                  <div class="postit-text">Turn ingredient explanation into a compositional strength, not a compliance block tucked into the corner.</div>
+                </div>
+                <div class="postit-node" data-color="yellow">
+                  <div class="postit-star-badge">&#9733;</div>
+                  <div class="postit-type">Distilled</div>
+                  <div class="postit-text">Design for clarity first: labels, structured rhythm, and visible hierarchy should do more work than decoration.</div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <div class="selection-box reference-selection-box"></div>
+
+          <div class="context-menu reference-context-menu">
+            <button class="context-menu-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.45 4.35L18 9l-4.55 1.65L12 15l-1.45-4.35L6 9l4.55-1.65L12 3z"></path></svg>
+              Distill selection
+            </button>
+            <button class="context-menu-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              Duplicate
+            </button>
+            <div class="context-menu-divider"></div>
+            <button class="context-menu-item danger">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path></svg>
+              Reject
+            </button>
+          </div>
+
+          <section class="reference-panel reference-legend node-base">
+            <div class="reference-legend-label">What To Mirror In Product Code</div>
+            <div class="reference-legend-list">
+              <div class="reference-legend-item">
+                <div class="reference-legend-key">Chrome</div>
+                <div class="reference-legend-value">Use the system shell: top bar, sidebar, action bar, toolbar, and zoom controls without inventing new container patterns.</div>
+              </div>
+              <div class="reference-legend-item">
+                <div class="reference-legend-key">Nodes</div>
+                <div class="reference-legend-value">Brief, questions, summaries, zones, generate blocks, and post-its should be straight mappings to the shared classes and component APIs.</div>
+              </div>
+              <div class="reference-legend-item">
+                <div class="reference-legend-key">State</div>
+                <div class="reference-legend-value">Selection, context menu, AI prompts, and carry-forward behavior should all feel like system states, not canvas-specific visual exceptions.</div>
+              </div>
+            </div>
+          </section>
+
+          <section class="reference-panel reference-lower-note node-base">
+            <div class="node-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 12h18"></path>
+                <path d="M3 6h18"></path>
+                <path d="M3 18h18"></path>
+              </svg>
+              <span>Implementation Note</span>
+            </div>
+            <p>
+              The geometry here should map 1:1 into React Flow: zone summaries sit above their zones, the prompt layer sits outside the grid, and the distilled area behaves like a deliberate carry-forward pocket rather than a generic archive.
+            </p>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<div class="selection-count">
+  <span><span class="selection-count-number">4</span> selected</span>
+  <div class="selection-count-actions">
+    <button class="btn-ghost" style="padding:4px 8px; font-size:9px;">Group</button>
+    <button class="btn-ghost" style="padding:4px 8px; font-size:9px;">Distill</button>
+  </div>
+</div>
+
+<div class="reference-toolbar-stack">
+  <div class="new-node-dropdown" id="newNodeDropdown" style="display:none;">
+    <button class="new-node-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.45 4.35L18 9l-4.55 1.65L12 15l-1.45-4.35L6 9l4.55-1.65L12 3z"></path></svg>
+      Zone
+      <span class="new-node-item-desc">thinking area</span>
+    </button>
+    <button class="new-node-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18"></rect></svg>
+      Post-it
+      <span class="new-node-item-desc">180 x 180</span>
+    </button>
+    <button class="new-node-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle></svg>
+      Question
+      <span class="new-node-item-desc">decision prompt</span>
+    </button>
+  </div>
+  <div class="floating-toolbar">
+    <button class="toolbar-btn active" id="pointerMode" title="Pointer">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"></path>
+        <path d="M13 13l6 6"></path>
+      </svg>
+    </button>
+    <button class="toolbar-btn" id="nodeMode" title="Place Node">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 5v14"></path>
+        <path d="M5 12h14"></path>
+      </svg>
+    </button>
+    <div class="toolbar-divider"></div>
+    <button class="new-block-btn" id="newNodeToggle">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 5v14"></path>
+        <path d="M5 12h14"></path>
+      </svg>
+      <span>Node</span>
+    </button>
+    <button class="new-block-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="3" width="18" height="18"></rect>
+      </svg>
+      <span>Summary</span>
+    </button>
+  </div>
+</div>
+
+<div class="zoom-controls">
+  <button class="zoom-btn">+</button>
+  <div class="zoom-level">100%</div>
+  <button class="zoom-btn">-</button>
+</div>
+
+<div class="ai-bubble" id="aiBubble">
+  <div class="ai-bubble-card" id="aiBubbleCard" style="display:flex;">
+    <div class="ai-bubble-card-header">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 3l1.45 4.35L18 9l-4.55 1.65L12 15l-1.45-4.35L6 9l4.55-1.65L12 3z"></path>
+      </svg>
+      <span>Suggestion</span>
+      <span class="ai-bubble-card-count" id="aiBubbleCount">1 / 3</span>
+    </div>
+    <div class="ai-bubble-card-text" id="aiBubbleText">The strongest cards already point toward formula-forward generosity. Distill those before generating more.</div>
+    <div class="ai-bubble-card-actions" id="aiBubbleActions">
+      <button class="ai-bubble-action">
+        <span class="ai-bubble-action-key">A</span>
+        Distill 3 cards
+      </button>
+      <button class="ai-bubble-action">
+        <span class="ai-bubble-action-key">B</span>
+        Show tensions
+      </button>
+    </div>
+    <button class="ai-bubble-later" id="aiBubbleLater">Later</button>
+  </div>
+  <button class="ai-bubble-trigger has-suggestion" id="aiBubbleTrigger" title="AI Suggestions">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M12 3l1.45 4.35L18 9l-4.55 1.65L12 15l-1.45-4.35L6 9l4.55-1.65L12 3z"></path>
+    </svg>
+  </button>
+</div>
+
+<div class="toast" id="toast">updated</div>
+
+<script>
+  const root = document.documentElement;
+  const themeToggle = document.getElementById('themeToggle');
+  const sunIcon = document.getElementById('sunIcon');
+  const moonIcon = document.getElementById('moonIcon');
+  const colorwayToggle = document.getElementById('colorwayToggle');
+  const colorwayDropdown = document.getElementById('colorwayDropdown');
+  const colorwayItems = Array.from(document.querySelectorAll('.theme-picker-item'));
+  const newNodeToggle = document.getElementById('newNodeToggle');
+  const newNodeDropdown = document.getElementById('newNodeDropdown');
+  const pointerMode = document.getElementById('pointerMode');
+  const nodeMode = document.getElementById('nodeMode');
+  const canvasShell = document.querySelector('.reference-canvas-shell');
+  const toast = document.getElementById('toast');
+  const aiBubbleTrigger = document.getElementById('aiBubbleTrigger');
+  const aiBubbleCard = document.getElementById('aiBubbleCard');
+  const aiBubbleText = document.getElementById('aiBubbleText');
+  const aiBubbleCount = document.getElementById('aiBubbleCount');
+  const aiBubbleActions = document.getElementById('aiBubbleActions');
+  const aiBubbleLater = document.getElementById('aiBubbleLater');
+
+  const aiSuggestions = [
+    {
+      text: 'The strongest cards already point toward formula-forward generosity. Distill those before generating more.',
+      actions: ['Distill 3 cards', 'Show tensions']
+    },
+    {
+      text: 'Creative Ideas are strong, but the carry-forward pocket is still slightly broad. Tighten the language before the next round.',
+      actions: ['Tighten wording', 'Find duplicates']
+    },
+    {
+      text: 'The board has enough evidence to turn one direction into a sharper proposition. Ask one more question, then commit.',
+      actions: ['Ask next question', 'Promote direction']
+    }
+  ];
+
+  let aiIndex = 0;
+
+  function showToast(message) {
+    toast.textContent = message;
+    toast.classList.add('show');
+    window.clearTimeout(showToast.timer);
+    showToast.timer = window.setTimeout(() => {
+      toast.classList.remove('show');
+    }, 1200);
+  }
+
+  function syncThemeIcon() {
+    const dark = root.dataset.theme === 'dark';
+    sunIcon.style.display = dark ? 'none' : 'block';
+    moonIcon.style.display = dark ? 'block' : 'none';
+  }
+
+  function syncColorwayState(activeId) {
+    colorwayItems.forEach((item) => {
+      item.classList.toggle('active', item.dataset.colorway === activeId);
+    });
+  }
+
+  function renderAiSuggestion() {
+    const suggestion = aiSuggestions[aiIndex];
+    aiBubbleText.textContent = suggestion.text;
+    aiBubbleCount.textContent = (aiIndex + 1) + ' / ' + aiSuggestions.length;
+    aiBubbleActions.innerHTML = suggestion.actions.map((label, index) => {
+      return '<button class="ai-bubble-action"><span class="ai-bubble-action-key">' + String.fromCharCode(65 + index) + '</span>' + label + '</button>';
+    }).join('');
+  }
+
+  themeToggle.addEventListener('click', () => {
+    root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
+    syncThemeIcon();
+  });
+
+  colorwayToggle.addEventListener('click', (event) => {
+    event.stopPropagation();
+    colorwayDropdown.style.display = colorwayDropdown.style.display === 'none' ? 'block' : 'none';
+  });
+
+  colorwayItems.forEach((item) => {
+    item.addEventListener('click', () => {
+      const next = item.dataset.colorway;
+      if (next === 'gruvbox') {
+        root.removeAttribute('data-colorway');
+      } else {
+        root.dataset.colorway = next;
+      }
+      syncColorwayState(next);
+      colorwayDropdown.style.display = 'none';
+      showToast('colorway: ' + item.textContent.trim().toLowerCase());
+    });
+  });
+
+  newNodeToggle.addEventListener('click', (event) => {
+    event.stopPropagation();
+    newNodeDropdown.style.display = newNodeDropdown.style.display === 'none' ? 'flex' : 'none';
+  });
+
+  pointerMode.addEventListener('click', () => {
+    pointerMode.classList.add('active');
+    nodeMode.classList.remove('active');
+    canvasShell.classList.remove('canvas-node-mode');
+    canvasShell.classList.add('canvas-pointer-mode');
+    newNodeDropdown.style.display = 'none';
+  });
+
+  nodeMode.addEventListener('click', () => {
+    nodeMode.classList.add('active');
+    pointerMode.classList.remove('active');
+    canvasShell.classList.remove('canvas-pointer-mode');
+    canvasShell.classList.add('canvas-node-mode');
+  });
+
+  aiBubbleTrigger.addEventListener('click', () => {
+    const open = aiBubbleCard.style.display !== 'none';
+    aiBubbleCard.style.display = open ? 'none' : 'flex';
+  });
+
+  aiBubbleLater.addEventListener('click', () => {
+    aiIndex = (aiIndex + 1) % aiSuggestions.length;
+    renderAiSuggestion();
+    aiBubbleCard.style.display = 'none';
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!colorwayDropdown.contains(event.target) && event.target !== colorwayToggle && !colorwayToggle.contains(event.target)) {
+      colorwayDropdown.style.display = 'none';
+    }
+    if (!newNodeDropdown.contains(event.target) && event.target !== newNodeToggle && !newNodeToggle.contains(event.target)) {
+      newNodeDropdown.style.display = 'none';
+    }
+  });
+
+  syncThemeIcon();
+  syncColorwayState(root.dataset.colorway || 'gruvbox');
+  renderAiSuggestion();
+</script>
+</body>
+</html>
