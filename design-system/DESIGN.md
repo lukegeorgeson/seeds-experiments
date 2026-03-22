@@ -3,6 +3,7 @@
 A geometric, token-driven design system built on the Gruvbox palette with 9 colorway variants. Zero border-radius, IBM Plex Mono + Inter typography, 20px grid foundation.
 
 **Showcase**: Serve this directory and open `index.html` for a live component reference.
+**Implementation reference**: Open `references/seeds-canvas-reference.html` for the canonical canvas-level composition reference built from this design system.
 
 ---
 
@@ -17,6 +18,8 @@ design-system/
   reset.css              # CSS reset
   tokens.css             # All design tokens (primitives + semantic + state)
   index.html             # Live component showcase
+  references/
+    seeds-canvas-reference.html  # Canonical canvas implementation reference
   DESIGN.md              # This document
   components/
     layout.css           # Sidebar, top bar, page shells
@@ -55,6 +58,12 @@ Import order matters — later files can override earlier ones:
 @import 'components/nodes.css';
 @import 'components/animations.css';
 ```
+
+### Reference Artifacts
+
+- `index.html` is the component showcase and token browser.
+- `references/seeds-canvas-reference.html` is the full-board reference for agents or engineers implementing the real canvas in product code.
+- Use the reference page to validate composition, spacing, and interaction patterns across multiple primitives together. Use the showcase for individual component states.
 
 ---
 
