@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seeds — Think in cards. See in zones.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #fbf1c7;
+  --bg-1: #f2e5bc;
+  --surface: #f9f5d7;
+  --fg: #3c3836;
+  --fg-2: #504945;
+  --fg-3: #928374;
+  --fg-4: #a89984;
+  --border: #d5c4a1;
+  --border-strong: #a89984;
+  --postit-yellow: #fabd2f;
+  --postit-pink: #d3869b;
+  --postit-green: #b8bb26;
+  --postit-blue: #83a598;
+  --postit-orange: #fe8019;
+  --postit-fg: #282828;
+  --accent: #cc241d;
+  --dot-color: #d5c4a1;
+  --zone-yellow: #d79921;
+  --zone-pink: #b16286;
+  --zone-green: #98971a;
+  --zone-blue: #458588;
+  --font: 'Inter', -apple-system, system-ui, sans-serif;
+  --mono: 'IBM Plex Mono', 'SF Mono', 'Consolas', monospace;
+}
+
+html, body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--fg);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ── Nav ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 20px 32px;
+  display: flex; align-items: center; justify-content: space-between;
+  transition: background 0.2s, backdrop-filter 0.2s;
+}
+nav.scrolled {
+  background: rgba(251, 241, 199, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo {
+  font-family: var(--mono); font-size: 13px; font-weight: 600;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--fg);
+}
+.nav-cta {
+  font-family: var(--mono); font-size: 11px; font-weight: 500;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 10px 20px; border: 1px solid var(--fg); border-radius: 0;
+  background: var(--fg); color: var(--bg); cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+.nav-cta:hover { background: transparent; color: var(--fg); }
+.nav-cta:active { transform: scale(0.98); }
+
+/* ── Hero ── */
+.hero {
+  min-height: 100vh; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 120px 32px 80px; text-align: center;
+}
+.hero-label {
+  font-family: var(--mono); font-size: 10px; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.14em; color: var(--fg-3);
+  margin-bottom: 20px;
+  opacity: 0; animation: fadeUp 0.3s cubic-bezier(0.22, 1, 0.36, 1) 0.1s forwards;
+}
+.hero h1 {
+  font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 400;
+  letter-spacing: -0.03em; line-height: 1.1; text-wrap: balance;
+  opacity: 0; animation: fadeUp 0.3s cubic-bezier(0.22, 1, 0.36, 1) 0.15s forwards;
+}
+.hero-sub {
+  font-size: clamp(1rem, 1.5vw, 1.2rem); color: var(--fg-2);
+  margin-top: 20px; max-width: 500px; line-height: 1.5;
+  opacity: 0; animation: fadeUp 0.3s cubic-bezier(0.22, 1, 0.36, 1) 0.25s forwards;
+}
+.hero-cta-btn {
+  margin-top: 32px;
+  font-family: var(--mono); font-size: 12px; font-weight: 500;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 14px 36px; border: none; border-radius: 0;
+  background: var(--accent); color: #fff; cursor: pointer;
+  transition: opacity 0.12s, transform 0.18s;
+  opacity: 0; animation: fadeUp 0.3s cubic-bezier(0.22, 1, 0.36, 1) 0.35s forwards;
+}
+.hero-cta-btn:hover { opacity: 0.85; transform: translateY(-1px); }
+.hero-cta-btn:active { transform: scale(0.98); }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Product mockup ── */
+.product-mockup {
+  margin-top: 64px; width: 100%; max-width: 1000px;
+  transform: perspective(1200px) rotateX(2deg);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  padding: 0; overflow: hidden; position: relative;
+  opacity: 0; animation: fadeUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) 0.5s forwards;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.04);
+}
+.mockup-inner {
+  width: 100%; padding: 32px; position: relative;
+  background:
+    radial-gradient(circle, var(--dot-color) 1px, transparent 1px);
+  background-size: 20px 20px;
+  min-height: 480px;
+}
+
+/* Mockup chrome */
+.mockup-chrome {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 20px; border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+.mockup-logo {
+  font-family: var(--mono); font-size: 11px; font-weight: 600;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--fg);
+}
+.mockup-dots {
+  display: flex; gap: 4px;
+}
+.mockup-dot {
+  width: 6px; height: 6px; border: 1px solid var(--border); border-radius: 0;
+}
+
+/* Mockup elements */
+.m-brief {
+  position: absolute; top: 40px; left: 32px;
+  width: 200px; background: var(--surface); border: 1px solid var(--border);
+  padding: 14px;
+}
+.m-brief-label {
+  font-family: var(--mono); font-size: 8px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.14em; color: var(--fg-3);
+  margin-bottom: 8px;
+}
+.m-brief-text { font-size: 11px; line-height: 1.5; color: var(--fg); }
+
+.m-zone {
+  position: absolute; border: 1px solid;
+}
+.m-zone-label {
+  position: absolute; top: -8px; left: 8px;
+  font-family: var(--mono); font-size: 7px; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.12em;
+  padding: 1px 5px; background: var(--surface);
+}
+
+.m-postit {
+  position: absolute; width: 120px; height: 120px; padding: 10px;
+  border-radius: 0;
+}
+.m-postit-type {
+  font-family: var(--mono); font-size: 7px; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  opacity: 0.55; margin-bottom: 6px;
+}
+.m-postit-text { font-size: 9px; line-height: 1.45; }
+
+/* Connection lines */
+.m-connection {
+  position: absolute; border-top: 1px dashed var(--border-strong);
+}
+
+/* ── Numbers strip ── */
+.numbers {
+  background: var(--fg); color: var(--bg); padding: 64px 32px;
+}
+.numbers-grid {
+  max-width: 900px; margin: 0 auto;
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 48px; text-align: center;
+}
+.number-val {
+  font-family: var(--mono); font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 400; letter-spacing: -0.02em;
+}
+.number-label {
+  font-family: var(--mono); font-size: 10px; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--fg-4); margin-top: 8px;
+}
+
+/* ── Sections ── */
+section { padding: 120px 0; }
+.container { max-width: 1000px; margin: 0 auto; padding: 0 32px; }
+.section-label {
+  font-family: var(--mono); font-size: 10px; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.12em; color: var(--fg-3);
+  margin-bottom: 12px;
+}
+.section-title {
+  font-size: clamp(1.5rem, 3vw, 2.25rem); font-weight: 400;
+  letter-spacing: -0.02em; line-height: 1.2; margin-bottom: 16px;
+  text-wrap: balance;
+}
+.section-desc { font-size: 15px; line-height: 1.6; color: var(--fg-2); max-width: 480px; }
+
+.feature-block {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 80px;
+  align-items: center; margin-bottom: 120px;
+}
+.feature-block:last-child { margin-bottom: 0; }
+.feature-block.reverse .feature-vis { order: -1; }
+
+.feature-vis {
+  background: var(--surface); border: 1px solid var(--border);
+  padding: 20px; min-height: 200px;
+  background-image: radial-gradient(circle, var(--dot-color) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.fv-zone { border: 1px solid; padding: 14px; position: relative; margin-bottom: 10px; }
+.fv-zone:last-child { margin-bottom: 0; }
+.fv-zone-label {
+  position: absolute; top: -8px; left: 8px;
+  font-family: var(--mono); font-size: 7px; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  padding: 1px 5px; background: var(--surface);
+}
+.fv-zone[data-c="y"] { border-color: var(--zone-yellow); }
+.fv-zone[data-c="y"] .fv-zone-label { color: var(--zone-yellow); }
+.fv-zone[data-c="p"] { border-color: var(--zone-pink); }
+.fv-zone[data-c="p"] .fv-zone-label { color: var(--zone-pink); }
+.fv-zone[data-c="g"] { border-color: var(--zone-green); }
+.fv-zone[data-c="g"] .fv-zone-label { color: var(--zone-green); }
+.fv-zone[data-c="b"] { border-color: var(--zone-blue); }
+.fv-zone[data-c="b"] .fv-zone-label { color: var(--zone-blue); }
+
+.fv-card {
+  padding: 12px; border-radius: 0; margin-top: 10px;
+  font-size: 10px; line-height: 1.4;
+}
+.fv-card[data-c="y"] { background: var(--postit-yellow); color: var(--postit-fg); }
+.fv-card[data-c="p"] { background: var(--postit-pink); color: var(--postit-fg); }
+.fv-card[data-c="g"] { background: var(--postit-green); color: var(--postit-fg); }
+.fv-card[data-c="b"] { background: var(--postit-blue); color: var(--postit-fg); }
+.fv-card[data-c="o"] { background: var(--postit-orange); color: var(--postit-fg); }
+
+.fv-card-label {
+  font-family: var(--mono); font-size: 7px; text-transform: uppercase;
+  letter-spacing: 0.1em; opacity: 0.55; margin-bottom: 4px;
+}
+
+/* Card actions visual */
+.fv-actions {
+  display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap;
+}
+.fv-action {
+  font-family: var(--mono); font-size: 9px; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--fg-3);
+  padding: 5px 10px; border: 1px solid var(--border);
+  display: flex; align-items: center; gap: 5px;
+}
+.fv-action svg { width: 11px; height: 11px; }
+
+/* Distill flow */
+.fv-distill { display: flex; gap: 16px; align-items: stretch; }
+.fv-distill-left {
+  flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; opacity: 0.35;
+}
+.fv-distill-chip { height: 32px; border-radius: 0; }
+.fv-distill-arrow {
+  display: flex; align-items: center; color: var(--fg-4); flex-shrink: 0;
+}
+.fv-distill-arrow svg { width: 20px; height: 20px; }
+.fv-distill-right {
+  flex: 1; border: 1px dashed var(--fg-3); padding: 10px;
+}
+.fv-distill-label {
+  font-family: var(--mono); font-size: 7px; text-transform: uppercase;
+  letter-spacing: 0.12em; color: var(--fg-3); margin-bottom: 8px;
+}
+
+/* ── Quote ── */
+.quote-section {
+  background: var(--fg); color: var(--bg); padding: 100px 32px; text-align: center;
+}
+.quote-text {
+  font-size: clamp(1.25rem, 2.5vw, 1.75rem); font-weight: 400;
+  font-style: italic; line-height: 1.4; max-width: 640px; margin: 0 auto;
+  letter-spacing: -0.01em; text-wrap: balance;
+}
+.quote-attr {
+  font-family: var(--mono); font-size: 11px; color: var(--fg-4);
+  margin-top: 24px; letter-spacing: 0.04em;
+}
+
+/* ── CTA ── */
+.cta-section {
+  text-align: center; padding: 120px 32px;
+}
+.cta-title {
+  font-size: clamp(1.75rem, 3.5vw, 2.75rem); font-weight: 400;
+  letter-spacing: -0.03em; margin-bottom: 32px; text-wrap: balance;
+}
+.cta-btn {
+  font-family: var(--mono); font-size: 12px; font-weight: 500;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 16px 40px; border: none; border-radius: 0;
+  background: var(--accent); color: #fff; cursor: pointer;
+  transition: opacity 0.12s, transform 0.18s;
+}
+.cta-btn:hover { opacity: 0.85; transform: translateY(-1px); }
+.cta-btn:active { transform: scale(0.98); }
+.cta-note {
+  font-family: var(--mono); font-size: 11px; color: var(--fg-3);
+  margin-top: 16px; letter-spacing: 0.04em;
+}
+
+/* ── Footer ── */
+footer {
+  padding: 32px; display: flex; justify-content: space-between;
+  align-items: center; border-top: 1px solid var(--border);
+}
+.footer-logo {
+  font-family: var(--mono); font-size: 11px; font-weight: 600;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--fg-3);
+}
+.footer-year {
+  font-family: var(--mono); font-size: 11px; color: var(--fg-4);
+}
+
+/* ── Scroll reveal ── */
+.reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.3s cubic-bezier(0.22, 1, 0.36, 1), transform 0.3s cubic-bezier(0.22, 1, 0.36, 1); }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .product-mockup { transform: none; }
+  .mockup-inner { min-height: 320px; padding: 20px; }
+  .m-brief { position: relative; top: 0; left: 0; width: 100%; margin-bottom: 16px; }
+  .m-zone { position: relative !important; width: 100% !important; height: auto !important; margin-bottom: 12px; padding: 10px; }
+  .m-postit { position: relative !important; width: 100% !important; height: auto !important; margin-bottom: 8px; }
+  .m-connection { display: none; }
+  .numbers-grid { grid-template-columns: 1fr; gap: 32px; }
+  .feature-block { grid-template-columns: 1fr; gap: 40px; }
+  .feature-block.reverse .feature-vis { order: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  .reveal { opacity: 1; transform: none; }
+  .hero-label, .hero h1, .hero-sub, .hero-cta-btn, .product-mockup { opacity: 1; animation: none; }
+}
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <div class="nav-logo">Seeds</div>
+  <button class="nav-cta">Get Started</button>
+</nav>
+
+<section class="hero">
+  <div class="hero-label">Creative Strategy Tool</div>
+  <h1>Think in cards.<br>See in zones.<br>Ship sharper work.</h1>
+  <p class="hero-sub">Seeds is an AI canvas where creative teams brief, generate, and curate strategic directions.</p>
+  <button class="hero-cta-btn">Start Creating</button>
+
+  <!-- Product mockup -->
+  <div class="product-mockup">
+    <div class="mockup-chrome">
+      <div class="mockup-logo">Seeds</div>
+      <div class="mockup-dots">
+        <div class="mockup-dot"></div>
+        <div class="mockup-dot"></div>
+        <div class="mockup-dot"></div>
+      </div>
+    </div>
+    <div class="mockup-inner">
+      <!-- Brief -->
+      <div class="m-brief">
+        <div class="m-brief-label">Brief</div>
+        <div class="m-brief-text">Skincare launch — ingredient-forward brand for Gen Z. Position around transparency and formula literacy.</div>
+      </div>
+
+      <!-- Connection line -->
+      <div class="m-connection" style="top: 92px; left: 232px; width: 60px;"></div>
+
+      <!-- Zones -->
+      <div class="m-zone" style="top: 32px; left: 300px; width: 300px; height: 200px; border-color: var(--zone-yellow);">
+        <div class="m-zone-label" style="color: var(--zone-yellow);">Cultural Landscape</div>
+        <div class="m-postit" style="top: 20px; left: 12px; background: var(--postit-yellow); color: var(--postit-fg);">
+          <div class="m-postit-type">Tension</div>
+          <div class="m-postit-text">Gen Z craves authenticity but engages most with highly produced content.</div>
+        </div>
+        <div class="m-postit" style="top: 20px; left: 144px; background: var(--postit-yellow); color: var(--postit-fg);">
+          <div class="m-postit-type">Signal</div>
+          <div class="m-postit-text">De-influencing is a demand for specificity.</div>
+        </div>
+      </div>
+
+      <div class="m-zone" style="top: 32px; left: 620px; width: 300px; height: 200px; border-color: var(--zone-pink);">
+        <div class="m-zone-label" style="color: var(--zone-pink);">Strategic Direction</div>
+        <div class="m-postit" style="top: 20px; left: 12px; background: var(--postit-pink); color: var(--postit-fg);">
+          <div class="m-postit-type">Direction</div>
+          <div class="m-postit-text">Position as "ingredient-literate" beauty — not clean, not clinical.</div>
+        </div>
+        <div class="m-postit" style="top: 20px; left: 144px; background: var(--postit-pink); color: var(--postit-fg);">
+          <div class="m-postit-type">Direction</div>
+          <div class="m-postit-text">Own the formula-forward space: let ingredients drive the story.</div>
+        </div>
+      </div>
+
+      <div class="m-zone" style="top: 252px; left: 300px; width: 300px; height: 190px; border-color: var(--zone-green);">
+        <div class="m-zone-label" style="color: var(--zone-green);">Creative Ideas</div>
+        <div class="m-postit" style="top: 20px; left: 12px; background: var(--postit-green); color: var(--postit-fg);">
+          <div class="m-postit-type">Idea</div>
+          <div class="m-postit-text">Formula card shipped with every product — designed to be shared.</div>
+        </div>
+        <div class="m-postit" style="top: 20px; left: 144px; background: var(--postit-green); color: var(--postit-fg);">
+          <div class="m-postit-type">Idea</div>
+          <div class="m-postit-text">Interactive ingredient explorer on the website.</div>
+        </div>
+      </div>
+
+      <div class="m-zone" style="top: 252px; left: 620px; width: 300px; height: 190px; border-color: var(--zone-blue);">
+        <div class="m-zone-label" style="color: var(--zone-blue);">Guard Rails</div>
+        <div class="m-postit" style="top: 20px; left: 12px; background: var(--postit-blue); color: var(--postit-fg);">
+          <div class="m-postit-type">Guard Rail</div>
+          <div class="m-postit-text">Never use aspirational lifestyle imagery. Substance over vibes.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Numbers -->
+<div class="numbers reveal">
+  <div class="numbers-grid">
+    <div>
+      <div class="number-val">4</div>
+      <div class="number-label">Thinking zones per round</div>
+    </div>
+    <div>
+      <div class="number-val">12</div>
+      <div class="number-label">Strategic cards generated</div>
+    </div>
+    <div>
+      <div class="number-val">1</div>
+      <div class="number-label">Distilled direction</div>
+    </div>
+  </div>
+</div>
+
+<!-- Feature: Zones -->
+<section>
+  <div class="container">
+    <div class="feature-block reveal">
+      <div>
+        <div class="section-label">Zones</div>
+        <div class="section-title">Organize thinking, not files</div>
+        <div class="section-desc">Zones structure strategic thought. Cultural landscape, direction, ideas, guard rails — each one is a lens on the same brief. Drag cards between them. Resize and rename as you go.</div>
+      </div>
+      <div class="feature-vis">
+        <div class="fv-zone" data-c="y" style="padding: 12px;">
+          <div class="fv-zone-label">Cultural Landscape</div>
+          <div class="fv-card" data-c="y" style="font-size: 10px;">
+            <div class="fv-card-label">Tension</div>
+            Transparency as a brand position is crowded. The unlock is making it feel generous, not preachy.
+          </div>
+        </div>
+        <div class="fv-zone" data-c="g" style="padding: 12px;">
+          <div class="fv-zone-label">Creative Ideas</div>
+          <div class="fv-card" data-c="g" style="font-size: 10px;">
+            <div class="fv-card-label">Idea</div>
+            "What's actually in this" campaign that makes competitor labels look evasive.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feature: Cards -->
+    <div class="feature-block reverse reveal">
+      <div>
+        <div class="section-label">Cards</div>
+        <div class="section-title">Every card is a strategic seed</div>
+        <div class="section-desc">AI generates cards across zones — tensions, signals, ideas, provocations. Star the best, reject the weak, riff on the promising. Your taste shapes the direction.</div>
+      </div>
+      <div class="feature-vis">
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <div class="fv-card" data-c="y" style="flex: 1; min-width: 120px; padding: 10px;">
+            <div class="fv-card-label">Tension</div>
+            Gen Z craves authenticity but engages most with produced content.
+          </div>
+          <div class="fv-card" data-c="o" style="flex: 1; min-width: 120px; padding: 10px;">
+            <div class="fv-card-label">Provocation</div>
+            What if the packaging had no front?
+          </div>
+        </div>
+        <div class="fv-actions">
+          <div class="fv-action">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            Star
+          </div>
+          <div class="fv-action">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            Reject
+          </div>
+          <div class="fv-action">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+            Riff
+          </div>
+          <div class="fv-action">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="10 15 15 20 20 15"/><path d="M4 4h7a4 4 0 0 1 4 4v12"/></svg>
+            Distill
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feature: Distill -->
+    <div class="feature-block reveal">
+      <div>
+        <div class="section-label">Distill</div>
+        <div class="section-title">From many seeds,<br>one direction</div>
+        <div class="section-desc">Distill the strongest cards into a focused zone. What emerges is a clear, defensible direction — not consensus, but curated conviction.</div>
+      </div>
+      <div class="feature-vis">
+        <div class="fv-distill">
+          <div class="fv-distill-left">
+            <div class="fv-distill-chip" style="background: var(--postit-yellow);"></div>
+            <div class="fv-distill-chip" style="background: var(--postit-pink);"></div>
+            <div class="fv-distill-chip" style="background: var(--postit-green);"></div>
+            <div class="fv-distill-chip" style="background: var(--postit-blue);"></div>
+            <div class="fv-distill-chip" style="background: var(--postit-yellow);"></div>
+            <div class="fv-distill-chip" style="background: var(--postit-orange);"></div>
+            <div class="fv-distill-chip" style="background: var(--postit-green);"></div>
+            <div class="fv-distill-chip" style="background: var(--postit-pink);"></div>
+          </div>
+          <div class="fv-distill-arrow">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </div>
+          <div class="fv-distill-right">
+            <div class="fv-distill-label">Distilled</div>
+            <div class="fv-card" data-c="y" style="margin-bottom: 6px; font-size: 10px; padding: 8px;">
+              <div class="fv-card-label">Direction</div>
+              Formula-forward beauty
+            </div>
+            <div class="fv-card" data-c="g" style="font-size: 10px; padding: 8px;">
+              <div class="fv-card-label">Idea</div>
+              Formula cards in every box
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Quote -->
+<div class="quote-section reveal">
+  <div class="quote-text">"It's like having a creative director who never gets tired and never plays favorites."</div>
+  <div class="quote-attr">— Creative Lead, Brand Studio</div>
+</div>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2 class="cta-title">Better strategy starts here</h2>
+  <button class="cta-btn">Start Creating</button>
+  <p class="cta-note">Free to use — no credit card required</p>
+</section>
+
+<footer>
+  <div class="footer-logo">Seeds</div>
+  <div class="footer-year">2026</div>
+</footer>
+
+<script>
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 40);
+}, { passive: true });
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
+}, { threshold: 0.15 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

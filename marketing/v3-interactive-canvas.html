@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seeds — Creative sparring, sharper directions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #282828;
+  --bg-1: #3c3836;
+  --surface: #32302f;
+  --fg: #ebdbb2;
+  --fg-2: #d5c4a1;
+  --fg-3: #a89984;
+  --fg-4: #928374;
+  --fg-5: #665c54;
+  --border: #504945;
+  --border-strong: #7c6f64;
+  --postit-yellow: #fabd2f;
+  --postit-pink: #d3869b;
+  --postit-green: #b8bb26;
+  --postit-blue: #83a598;
+  --postit-orange: #fe8019;
+  --postit-purple: #d3869b;
+  --postit-fg: #282828;
+  --accent: #fb4934;
+  --dot-color: #504945;
+  --zone-yellow: #d79921;
+  --zone-pink: #b16286;
+  --zone-green: #98971a;
+  --zone-blue: #458588;
+  --font: 'Inter', -apple-system, system-ui, sans-serif;
+  --mono: 'IBM Plex Mono', 'SF Mono', 'Consolas', monospace;
+}
+
+html, body {
+  width: 100%; height: 100%;
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--fg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* ── Nav ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 20px 32px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+nav.scrolled {
+  background: rgba(40, 40, 40, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo {
+  font-family: var(--mono); font-size: 13px; font-weight: 600;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--fg);
+}
+.nav-cta {
+  font-family: var(--mono); font-size: 11px; font-weight: 500;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 10px 20px; border: 1px solid var(--border); border-radius: 0;
+  background: none; color: var(--fg-3); cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+.nav-cta:hover { background: var(--fg); color: var(--bg); }
+.nav-cta:active { transform: scale(0.98); }
+
+/* ── Hero ── */
+.hero {
+  position: relative; width: 100%; height: 100vh; overflow: hidden;
+  background:
+    radial-gradient(circle, var(--dot-color) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* ── Zone hints behind cards ── */
+.zone-hint {
+  position: absolute; border: 1px dashed; border-radius: 0; pointer-events: none; opacity: 0.35;
+}
+
+/* ── Draggable sticky notes ── */
+.postit {
+  position: absolute; width: 180px; height: 180px; border-radius: 0;
+  padding: 16px; display: flex; flex-direction: column;
+  cursor: grab; user-select: none; touch-action: none;
+  transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.18s;
+  z-index: 10; opacity: 0;
+}
+.postit.visible { opacity: 1; }
+.postit:hover { transform: translateY(-2px) rotate(var(--rot, 0deg)); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+.postit.dragging { cursor: grabbing; z-index: 50; transform: scale(1.03) rotate(0deg); box-shadow: 0 12px 32px rgba(0,0,0,0.4); transition: box-shadow 0.12s; }
+.postit[data-color="yellow"] { background: var(--postit-yellow); color: var(--postit-fg); }
+.postit[data-color="pink"] { background: var(--postit-pink); color: var(--postit-fg); }
+.postit[data-color="green"] { background: var(--postit-green); color: var(--postit-fg); }
+.postit[data-color="blue"] { background: var(--postit-blue); color: var(--postit-fg); }
+.postit[data-color="orange"] { background: var(--postit-orange); color: var(--postit-fg); }
+.postit-type {
+  font-family: var(--mono); font-size: 9px; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.12em;
+  opacity: 0.55; margin-bottom: 10px; flex-shrink: 0;
+}
+.postit-text {
+  font-size: 12px; line-height: 1.55; flex: 1;
+  overflow: hidden; text-overflow: ellipsis;
+  display: -webkit-box; -webkit-line-clamp: 7; -webkit-box-orient: vertical;
+}
+.postit-star {
+  position: absolute; top: 6px; right: 8px; opacity: 0.5; font-size: 12px; pointer-events: none;
+}
+
+/* ── Hero overlay content ── */
+.hero-content {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  text-align: center; z-index: 20; pointer-events: none;
+}
+.hero-content h1 {
+  font-size: clamp(2.5rem, 5.5vw, 4.5rem); font-weight: 400;
+  letter-spacing: -0.03em; line-height: 1.1;
+  text-wrap: balance; color: var(--fg);
+  text-shadow: 0 2px 40px rgba(40,40,40,0.8), 0 0 120px rgba(40,40,40,0.6);
+}
+.hero-sub {
+  font-size: clamp(1rem, 1.5vw, 1.25rem); color: var(--fg-3);
+  margin-top: 16px; font-weight: 400;
+  text-shadow: 0 2px 20px rgba(40,40,40,0.9);
+}
+.hero-cta-wrap { pointer-events: auto; margin-top: 32px; }
+.hero-cta {
+  font-family: var(--mono); font-size: 12px; font-weight: 500;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 14px 32px; border: 1px solid var(--fg); border-radius: 0;
+  background: var(--fg); color: var(--bg); cursor: pointer;
+  transition: background 0.12s, color 0.12s, transform 0.18s;
+}
+.hero-cta:hover { background: transparent; color: var(--fg); }
+.hero-cta:active { transform: scale(0.98); }
+
+/* ── Sections ── */
+section { padding: 120px 0; }
+.container { max-width: 1100px; margin: 0 auto; padding: 0 32px; }
+
+.section-label {
+  font-family: var(--mono); font-size: 10px; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.12em; color: var(--fg-4);
+  margin-bottom: 16px; text-align: center;
+}
+.section-title {
+  font-size: clamp(1.75rem, 3.5vw, 2.75rem); font-weight: 400;
+  letter-spacing: -0.03em; line-height: 1.15; text-align: center;
+  text-wrap: balance; margin-bottom: 64px;
+}
+
+/* ── How It Works ── */
+.how-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 48px;
+}
+.how-item { text-align: center; }
+.how-icon {
+  width: 48px; height: 48px; margin: 0 auto 20px;
+  border: 1px solid var(--border); display: flex;
+  align-items: center; justify-content: center; color: var(--fg-3);
+}
+.how-icon svg { width: 20px; height: 20px; }
+.how-label {
+  font-family: var(--mono); font-size: 11px; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg);
+  margin-bottom: 10px;
+}
+.how-desc { font-size: 14px; line-height: 1.6; color: var(--fg-3); max-width: 280px; margin: 0 auto; }
+
+/* ── Features ── */
+.feature-row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 80px;
+  align-items: center; margin-bottom: 120px;
+}
+.feature-row:last-child { margin-bottom: 0; }
+.feature-row.reverse .feature-visual { order: -1; }
+.feature-label {
+  font-family: var(--mono); font-size: 10px; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.12em; color: var(--fg-4);
+  margin-bottom: 12px;
+}
+.feature-title {
+  font-size: clamp(1.25rem, 2.5vw, 1.75rem); font-weight: 500;
+  letter-spacing: -0.02em; line-height: 1.25; margin-bottom: 16px;
+}
+.feature-desc { font-size: 15px; line-height: 1.6; color: var(--fg-3); }
+
+/* Feature visuals */
+.feature-visual {
+  background: var(--surface); border: 1px solid var(--border);
+  padding: 24px; position: relative; min-height: 240px;
+  background-image: radial-gradient(circle, var(--dot-color) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+.mini-zone {
+  border: 1px solid; padding: 16px; position: relative;
+}
+.mini-zone-label {
+  position: absolute; top: -9px; left: 10px;
+  font-family: var(--mono); font-size: 8px; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.12em;
+  padding: 1px 6px; background: var(--surface);
+}
+.mini-zone[data-color="yellow"] { border-color: var(--zone-yellow); }
+.mini-zone[data-color="yellow"] .mini-zone-label { color: var(--zone-yellow); }
+.mini-zone[data-color="pink"] { border-color: var(--zone-pink); }
+.mini-zone[data-color="pink"] .mini-zone-label { color: var(--zone-pink); }
+.mini-zone[data-color="green"] { border-color: var(--zone-green); }
+.mini-zone[data-color="green"] .mini-zone-label { color: var(--zone-green); }
+.mini-zone[data-color="blue"] { border-color: var(--zone-blue); }
+.mini-zone[data-color="blue"] .mini-zone-label { color: var(--zone-blue); }
+
+.mini-postit {
+  width: 100%; padding: 10px; margin-bottom: 8px; border-radius: 0;
+}
+.mini-postit:last-child { margin-bottom: 0; }
+.mini-postit[data-color="yellow"] { background: var(--postit-yellow); color: var(--postit-fg); }
+.mini-postit[data-color="pink"] { background: var(--postit-pink); color: var(--postit-fg); }
+.mini-postit[data-color="green"] { background: var(--postit-green); color: var(--postit-fg); }
+.mini-postit[data-color="blue"] { background: var(--postit-blue); color: var(--postit-fg); }
+.mini-postit-type {
+  font-family: var(--mono); font-size: 7px; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.55; margin-bottom: 6px;
+}
+.mini-postit-text { font-size: 11px; line-height: 1.45; }
+
+/* Card actions visual */
+.card-actions-demo {
+  display: flex; gap: 12px; margin-top: 16px; justify-content: center;
+}
+.action-pill {
+  display: flex; align-items: center; gap: 6px;
+  font-family: var(--mono); font-size: 9px; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--fg-3);
+  padding: 6px 12px; border: 1px solid var(--border);
+}
+.action-pill svg { width: 12px; height: 12px; }
+
+/* Distill visual */
+.distill-visual {
+  display: flex; align-items: center; gap: 20px;
+}
+.distill-source {
+  flex: 1; display: flex; flex-wrap: wrap; gap: 6px; opacity: 0.4;
+}
+.distill-source .mini-chip {
+  width: 40px; height: 40px; border-radius: 0;
+}
+.distill-arrow { color: var(--fg-4); flex-shrink: 0; }
+.distill-arrow svg { width: 24px; height: 24px; }
+.distill-target {
+  flex: 1; border: 1px dashed var(--fg-4); padding: 12px;
+}
+.distill-target-label {
+  font-family: var(--mono); font-size: 8px; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.12em; color: var(--fg-4);
+  margin-bottom: 8px;
+}
+
+/* ── CTA Section ── */
+.cta-section {
+  background: var(--surface); border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  text-align: center; padding: 120px 0;
+}
+.cta-title {
+  font-size: clamp(1.75rem, 3.5vw, 2.75rem); font-weight: 400;
+  letter-spacing: -0.03em; margin-bottom: 32px; text-wrap: balance;
+}
+.cta-btn {
+  font-family: var(--mono); font-size: 12px; font-weight: 500;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 16px 40px; border: 1px solid var(--fg); border-radius: 0;
+  background: var(--fg); color: var(--bg); cursor: pointer;
+  transition: background 0.12s, color 0.12s, transform 0.18s;
+}
+.cta-btn:hover { background: transparent; color: var(--fg); }
+.cta-btn:active { transform: scale(0.98); }
+.cta-note {
+  font-family: var(--mono); font-size: 11px; color: var(--fg-5);
+  margin-top: 16px; letter-spacing: 0.04em;
+}
+
+/* ── Footer ── */
+footer {
+  padding: 32px; display: flex; justify-content: space-between;
+  align-items: center; border-top: 1px solid var(--border);
+}
+.footer-logo {
+  font-family: var(--mono); font-size: 11px; font-weight: 600;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--fg-4);
+}
+.footer-year {
+  font-family: var(--mono); font-size: 11px; color: var(--fg-5);
+}
+
+/* ── Animate on scroll ── */
+.reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.3s cubic-bezier(0.22, 1, 0.36, 1), transform 0.3s cubic-bezier(0.22, 1, 0.36, 1); }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  nav { padding: 16px 20px; }
+  .hero-content h1 { font-size: clamp(2rem, 8vw, 3rem); }
+  .postit { width: 140px; height: 140px; padding: 12px; }
+  .postit-text { font-size: 10px; -webkit-line-clamp: 5; }
+  .how-grid { grid-template-columns: 1fr; gap: 40px; }
+  .feature-row { grid-template-columns: 1fr; gap: 40px; }
+  .feature-row.reverse .feature-visual { order: 0; }
+  section { padding: 80px 0; }
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  .postit { opacity: 1; }
+  .reveal { opacity: 1; transform: none; }
+}
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <div class="nav-logo">Seeds</div>
+  <button class="nav-cta">Get Started</button>
+</nav>
+
+<section class="hero" id="hero">
+  <!-- Zone hints -->
+  <div class="zone-hint" style="top: 15%; left: 8%; width: 380px; height: 320px; border-color: var(--zone-yellow);"></div>
+  <div class="zone-hint" style="top: 20%; right: 10%; width: 340px; height: 300px; border-color: var(--zone-green);"></div>
+
+  <!-- Draggable post-it notes -->
+  <div class="postit" data-color="yellow" style="left: 10%; top: 18%; --rot: -2deg; transform: rotate(-2deg);">
+    <span class="postit-star">&#9733;</span>
+    <div class="postit-type">Tension</div>
+    <div class="postit-text">Gen Z craves authenticity but engages most with highly produced content. The brands that win make production feel effortless.</div>
+  </div>
+
+  <div class="postit" data-color="pink" style="left: 28%; top: 12%; --rot: 1.5deg; transform: rotate(1.5deg);">
+    <div class="postit-type">Direction</div>
+    <div class="postit-text">Position as "ingredient-literate" beauty — not clean, not clinical, just honest.</div>
+  </div>
+
+  <div class="postit" data-color="green" style="right: 12%; top: 16%; --rot: -1deg; transform: rotate(-1deg);">
+    <div class="postit-type">Idea</div>
+    <div class="postit-text">A "formula card" shipped with every product — ingredient breakdown designed to be photographed and shared.</div>
+  </div>
+
+  <div class="postit" data-color="blue" style="left: 15%; bottom: 22%; --rot: 2deg; transform: rotate(2deg);">
+    <div class="postit-type">Signal</div>
+    <div class="postit-text">TikTok skincare routines now get more engagement when they explain why each step matters.</div>
+  </div>
+
+  <div class="postit" data-color="orange" style="right: 20%; bottom: 28%; --rot: -2.5deg; transform: rotate(-2.5deg);">
+    <div class="postit-type">Provocation</div>
+    <div class="postit-text">What if we never claimed "clean" or "natural"? Those are the words of brands with something to hide.</div>
+  </div>
+
+  <div class="postit" data-color="yellow" style="right: 8%; top: 50%; --rot: 1deg; transform: rotate(1deg);">
+    <span class="postit-star">&#9733;</span>
+    <div class="postit-type">Guard Rail</div>
+    <div class="postit-text">Never use aspirational lifestyle imagery. Show the product, the texture, the formula. Substance over vibes.</div>
+  </div>
+
+  <div class="postit" data-color="green" style="left: 5%; top: 52%; --rot: -1.5deg; transform: rotate(-1.5deg);">
+    <div class="postit-type">Idea</div>
+    <div class="postit-text">Interactive ingredient explorer on the website — tap any ingredient to see source, function, and why we chose it.</div>
+  </div>
+
+  <div class="postit" data-color="pink" style="left: 45%; bottom: 15%; --rot: 0.5deg; transform: rotate(0.5deg);">
+    <div class="postit-type">Direction</div>
+    <div class="postit-text">Own the "formula-forward" space: let ingredients drive the brand story.</div>
+  </div>
+
+  <!-- Center overlay -->
+  <div class="hero-content">
+    <h1>Creative sparring,<br>sharper directions</h1>
+    <p class="hero-sub">AI-powered strategic canvas for creative teams</p>
+    <div class="hero-cta-wrap">
+      <button class="hero-cta">Start Creating</button>
+    </div>
+  </div>
+</section>
+
+<!-- How It Works -->
+<section>
+  <div class="container">
+    <div class="section-label">How It Works</div>
+    <h2 class="section-title">From brief to direction<br>in one session</h2>
+    <div class="how-grid">
+      <div class="how-item reveal">
+        <div class="how-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        </div>
+        <div class="how-label">Brief your direction</div>
+        <div class="how-desc">Tell Seeds what you're working on — the audience, the constraints, the ambition. Context in, clarity out.</div>
+      </div>
+      <div class="how-item reveal">
+        <div class="how-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.45 4.35L18 9l-4.55 1.65L12 15l-1.45-4.35L6 9l4.55-1.65L12 3z"/></svg>
+        </div>
+        <div class="how-label">AI generates across zones</div>
+        <div class="how-desc">Seeds creates strategic cards — tensions, signals, ideas, provocations — organized into thinking zones.</div>
+      </div>
+      <div class="how-item reveal">
+        <div class="how-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <div class="how-label">Curate, riff, distill</div>
+        <div class="how-desc">Star the best, reject the weak, riff on the promising. Distill everything down to one clear direction.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Feature 1: Zones -->
+<section>
+  <div class="container">
+    <div class="feature-row reveal">
+      <div class="feature-text">
+        <div class="feature-label">Zones</div>
+        <div class="feature-title">Organize thinking,<br>not files</div>
+        <div class="feature-desc">Zones are how Seeds structures strategic thought. Cultural landscape, strategic direction, creative ideas, guard rails — each zone is a lens on the same brief.</div>
+      </div>
+      <div class="feature-visual">
+        <div class="mini-zone" data-color="yellow" style="margin-bottom: 12px;">
+          <div class="mini-zone-label">Cultural Landscape</div>
+          <div class="mini-postit" data-color="yellow" style="margin-top: 12px;">
+            <div class="mini-postit-type">Tension</div>
+            <div class="mini-postit-text">Transparency as a brand position is crowded. The unlock is making it feel generous.</div>
+          </div>
+        </div>
+        <div class="mini-zone" data-color="pink">
+          <div class="mini-zone-label">Strategic Direction</div>
+          <div class="mini-postit" data-color="pink" style="margin-top: 12px;">
+            <div class="mini-postit-type">Direction</div>
+            <div class="mini-postit-text">Own the "formula-forward" space: let ingredients drive the brand story.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feature 2: Cards -->
+    <div class="feature-row reverse reveal">
+      <div class="feature-text">
+        <div class="feature-label">Cards</div>
+        <div class="feature-title">Every card is a<br>strategic seed</div>
+        <div class="feature-desc">AI generates cards across every zone. Each one can be starred, rejected, remixed, or distilled. Your taste shapes the output.</div>
+      </div>
+      <div class="feature-visual">
+        <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;">
+          <div class="mini-postit" data-color="green" style="width: 140px; padding: 10px;">
+            <div class="mini-postit-type">Idea</div>
+            <div class="mini-postit-text">Launch with a "what's actually in this" campaign</div>
+          </div>
+          <div class="mini-postit" data-color="orange" style="width: 140px; padding: 10px; background: var(--postit-orange); color: var(--postit-fg);">
+            <div class="mini-postit-type">Provocation</div>
+            <div class="mini-postit-text">What if the packaging had no front?</div>
+          </div>
+          <div class="mini-postit" data-color="blue" style="width: 140px; padding: 10px;">
+            <div class="mini-postit-type">Signal</div>
+            <div class="mini-postit-text">De-influencing is a demand for specificity</div>
+          </div>
+        </div>
+        <div class="card-actions-demo">
+          <div class="action-pill">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            Star
+          </div>
+          <div class="action-pill">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            Reject
+          </div>
+          <div class="action-pill">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+            Riff
+          </div>
+          <div class="action-pill">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="10 15 15 20 20 15"/><path d="M4 4h7a4 4 0 0 1 4 4v12"/></svg>
+            Distill
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feature 3: Distill -->
+    <div class="feature-row reveal">
+      <div class="feature-text">
+        <div class="feature-label">Distill</div>
+        <div class="feature-title">From many seeds,<br>one direction</div>
+        <div class="feature-desc">Distill the strongest cards into a focused zone. What emerges is a clear, defensible strategic direction — built from curated thinking, not consensus.</div>
+      </div>
+      <div class="feature-visual">
+        <div class="distill-visual">
+          <div class="distill-source">
+            <div class="mini-chip" style="background: var(--postit-yellow);"></div>
+            <div class="mini-chip" style="background: var(--postit-pink);"></div>
+            <div class="mini-chip" style="background: var(--postit-green);"></div>
+            <div class="mini-chip" style="background: var(--postit-blue);"></div>
+            <div class="mini-chip" style="background: var(--postit-yellow);"></div>
+            <div class="mini-chip" style="background: var(--postit-orange);"></div>
+            <div class="mini-chip" style="background: var(--postit-green);"></div>
+            <div class="mini-chip" style="background: var(--postit-pink);"></div>
+            <div class="mini-chip" style="background: var(--postit-blue);"></div>
+          </div>
+          <div class="distill-arrow">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </div>
+          <div class="distill-target">
+            <div class="distill-target-label">Distilled</div>
+            <div class="mini-postit" data-color="yellow" style="margin-bottom: 6px;">
+              <div class="mini-postit-type">Direction</div>
+              <div class="mini-postit-text">Formula-forward beauty — honest, specific, generous</div>
+            </div>
+            <div class="mini-postit" data-color="green">
+              <div class="mini-postit-type">Idea</div>
+              <div class="mini-postit-text">Formula cards shipped with every product</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-title">Ready to think differently?</h2>
+    <button class="cta-btn">Start Creating</button>
+    <p class="cta-note">Free to use — no credit card</p>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">Seeds</div>
+  <div class="footer-year">2026</div>
+</footer>
+
+<script>
+// ── Nav scroll ──
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 40);
+}, { passive: true });
+
+// ── Draggable post-its ──
+document.querySelectorAll('.postit').forEach((el, i) => {
+  // Staggered entrance
+  setTimeout(() => el.classList.add('visible'), 100 + i * 45);
+
+  let isDragging = false, startX, startY, origX, origY;
+
+  function getPos(e) {
+    const t = e.touches ? e.touches[0] : e;
+    return { x: t.clientX, y: t.clientY };
+  }
+
+  function onStart(e) {
+    e.preventDefault();
+    isDragging = true;
+    const p = getPos(e);
+    startX = p.x; startY = p.y;
+    const rect = el.getBoundingClientRect();
+    origX = rect.left; origY = rect.top;
+    el.classList.add('dragging');
+    el.style.position = 'fixed';
+    el.style.left = origX + 'px';
+    el.style.top = origY + 'px';
+    el.style.right = 'auto';
+    el.style.bottom = 'auto';
+  }
+
+  function onMove(e) {
+    if (!isDragging) return;
+    e.preventDefault();
+    const p = getPos(e);
+    const dx = p.x - startX, dy = p.y - startY;
+    el.style.left = (origX + dx) + 'px';
+    el.style.top = (origY + dy) + 'px';
+  }
+
+  function onEnd() {
+    if (!isDragging) return;
+    isDragging = false;
+    el.classList.remove('dragging');
+  }
+
+  el.addEventListener('mousedown', onStart);
+  el.addEventListener('touchstart', onStart, { passive: false });
+  window.addEventListener('mousemove', onMove);
+  window.addEventListener('touchmove', onMove, { passive: false });
+  window.addEventListener('mouseup', onEnd);
+  window.addEventListener('touchend', onEnd);
+});
+
+// ── Scroll reveal ──
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
+}, { threshold: 0.15 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
