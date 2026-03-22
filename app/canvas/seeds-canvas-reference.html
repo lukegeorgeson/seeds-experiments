@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seeds Canvas Reference</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../design-system/index.css">
+<link href="https://unpkg.com/reactflow@11.11.4/dist/style.css" rel="stylesheet">
+</head>
+<body class="canvas-page">
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://unpkg.com/reactflow@11.11.4/dist/umd/index.js"></script>
+<script src="../../design-system/foundations.js"></script>
+
+<script type="text/babel">
+const {
+  default: ReactFlow,
+  Background,
+  useNodesState,
+  useEdgesState,
+  addEdge,
+  useReactFlow,
+  ReactFlowProvider,
+  Handle,
+  Position,
+} = window.ReactFlow || window.reactflow;
+const {
+  colorways: COLORWAYS,
+  readCanvasTokens,
+  getNodeSize,
+  connectionLineStyle,
+  defaultEdgeOptions,
+} = window.SeedsDesignSystem;
+
+const ZONE_TO_POSTIT = { yellow: 'yellow', pink: 'pink', green: 'green', blue: 'blue', distilled: 'yellow' };
+const ZONE_COLORS = ['yellow', 'pink', 'green', 'blue'];
+const CANVAS = readCanvasTokens();
+const GRID = CANVAS.grid;
+const snap = (v) => Math.round(v / GRID) * GRID;
+
+const ZONE_TYPES = [
+  { label: 'Ideas', iconType: 'lightbulb' },
+  { label: 'Strategy', iconType: 'target' },
+  { label: 'Insights', iconType: 'search' },
+  { label: 'Frameworks', iconType: 'grid' },
+  { label: 'Tensions', iconType: 'zap' },
+  { label: 'Signals', iconType: 'radio' },
+  { label: 'Provocations', iconType: 'flame' },
+  { label: 'Guard Rails', iconType: 'shield' },
+];
+
+const NODE_TYPES_MENU = [
+  { label: 'Brand Reference', iconType: 'bookmark', defaultText: 'Add brand reference...' },
+  { label: 'Audience Note', iconType: 'users', defaultText: 'Define target audience...' },
+  { label: 'Constraint', iconType: 'lock', defaultText: 'Add constraint or boundary...' },
+  { label: 'Question', iconType: 'help', defaultText: 'What question needs answering?' },
+  { label: 'Reference Link', iconType: 'link', defaultText: 'Paste reference URL...' },
+];
+
+const FIT_VIEW_PADDING = CANVAS.fitViewPadding;
+const nodeSize = (type) => getNodeSize(type);
+
+function Icon({ type, size = 14 }) {
+  const props = {
+    viewBox: '0 0 24 24',
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeWidth: '2',
+    strokeLinecap: 'round',
+    strokeLinejoin: 'round',
+    style: { width: size, height: size },
+  };
+  switch (type) {
+    case 'lightbulb': return <svg {...props}><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>;
+    case 'target': return <svg {...props}><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>;
+    case 'search': return <svg {...props}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>;
+    case 'grid': return <svg {...props}><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>;
+    case 'zap': return <svg {...props}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>;
+    case 'radio': return <svg {...props}><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M13.06 7.9a14.88 14.88 0 0 1 4 2.68"/><path d="M12 12a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/><path d="M2 16.1A5 5 0 0 1 5.9 20M5.9 12.1a9 9 0 0 1 6 3.4"/></svg>;
+    case 'flame': return <svg {...props}><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>;
+    case 'shield': return <svg {...props}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>;
+    case 'bookmark': return <svg {...props}><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>;
+    case 'users': return <svg {...props}><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>;
+    case 'lock': return <svg {...props}><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>;
+    case 'help': return <svg {...props}><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>;
+    case 'link': return <svg {...props}><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>;
+    case 'user': return <svg {...props}><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;
+    case 'plus': return <svg {...props}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>;
+    case 'cube': return <svg {...props}><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>;
+    case 'sun': return <svg {...props}><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>;
+    case 'moon': return <svg {...props}><path d="M21 12.79A9 9 0 1 1 11.21 3A7 7 0 0 0 21 12.79z"/></svg>;
+    case 'sparkles': return <svg {...props}><path d="M12 3l1.45 4.35L18 9l-4.55 1.65L12 15l-1.45-4.35L6 9l4.55-1.65L12 3z"/></svg>;
+    case 'trash': return <svg {...props}><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>;
+    case 'edit': return <svg {...props}><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>;
+    case 'copy': return <svg {...props}><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>;
+    case 'layers': return <svg {...props}><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>;
+    case 'move': return <svg {...props}><polyline points="5 9 2 12 5 15"/><polyline points="9 5 12 2 15 5"/><polyline points="15 19 12 22 9 19"/><polyline points="19 9 22 12 19 15"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/></svg>;
+    case 'star-filled': return <svg {...props} fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>;
+    case 'corner-right-down': return <svg {...props}><polyline points="10 15 15 20 20 15"/><path d="M4 4h7a4 4 0 0 1 4 4v12"/></svg>;
+    case 'palette': return <svg {...props}><circle cx="13.5" cy="6.5" r="0.5" fill="currentColor" stroke="none"/><circle cx="17.5" cy="10.5" r="0.5" fill="currentColor" stroke="none"/><circle cx="8.5" cy="7.5" r="0.5" fill="currentColor" stroke="none"/><circle cx="6.5" cy="12" r="0.5" fill="currentColor" stroke="none"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.93 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.04-.23-.29-.38-.63-.38-1.02 0-.83.67-1.5 1.5-1.5H16c3.31 0 6-2.69 6-6 0-5.17-4.49-9-10-9z"/></svg>;
+    default: return null;
+  }
+}
+
+const SAMPLE_CARDS = [
+  { type: 'tension', text: 'Gen Z craves authenticity but engages most with highly produced content. The brands that win will make production feel effortless.' },
+  { type: 'signal', text: 'De-influencing is not anti-consumption. It is a demand for specificity. People want to know why this, not just what.' },
+  { type: 'direction', text: 'Position as ingredient-literate beauty. Not clean, not clinical, just honest. Let the formula be the personality.' },
+  { type: 'idea', text: 'A formula card shipped with every product. Ingredient breakdown designed to be photographed and shared.' },
+  { type: 'provocation', text: 'What if we never claimed clean or natural? Those are the words of brands with something to hide.' },
+  { type: 'guard rail', text: 'Never use aspirational lifestyle imagery. Show the product, the texture, the formula. Substance over vibes.' },
+  { type: 'idea', text: 'Launch with a what is actually in this campaign that makes competitor labels look evasive by comparison.' },
+  { type: 'tension', text: 'Transparency as a brand position is crowded. The unlock is making transparency feel generous, not preachy.' },
+  { type: 'signal', text: 'TikTok skincare routines now perform better when they explain why each step matters, not just what to use.' },
+  { type: 'direction', text: 'Own the formula-forward space. Let ingredients drive the brand story instead of lifestyle imagery.' },
+  { type: 'idea', text: 'Interactive ingredient explorer on the site. Tap any ingredient to see source, function, and why it is there.' },
+  { type: 'provocation', text: 'What if the packaging had no front? Every side is equally information-dense and equally beautiful.' },
+];
+
+const SAMPLE_ZONES = [
+  { label: 'Cultural Landscape', color: 'yellow' },
+  { label: 'Strategic Direction', color: 'pink' },
+  { label: 'Creative Ideas', color: 'green' },
+  { label: 'Guard Rails', color: 'blue' },
+];
+
+const ContextMenuContext = React.createContext();
+
+function ContextMenuProvider({ children }) {
+  const [menu, setMenu] = React.useState(null);
+  React.useEffect(() => {
+    const close = () => setMenu(null);
+    document.addEventListener('click', close);
+    document.addEventListener('contextmenu', close);
+    return () => {
+      document.removeEventListener('click', close);
+      document.removeEventListener('contextmenu', close);
+    };
+  }, []);
+  return (
+    <ContextMenuContext.Provider value={{ menu, setMenu }}>
+      {children}
+      {menu && (
+        <div className="context-menu" style={{ left: menu.x, top: menu.y }} onClick={(e) => e.stopPropagation()}>
+          {menu.items.map((item, index) => {
+            if (item.divider) return <div key={index} className="context-menu-divider" />;
+            return (
+              <button key={index} className={`context-menu-item ${item.danger ? 'danger' : ''}`} onClick={() => { item.action(); setMenu(null); }}>
+                {item.icon && <Icon type={item.icon} size={13} />}
+                {item.label}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </ContextMenuContext.Provider>
+  );
+}
+
+function PostItNode({ data, id }) {
+  const { setNodes } = useReactFlow();
+  const { setMenu } = React.useContext(ContextMenuContext);
+
+  const handleReject = (e) => {
+    if (e) e.stopPropagation();
+    const el = document.querySelector(`[data-id="${id}"] .postit-node`);
+    if (el) el.classList.add('rejecting');
+    setTimeout(() => {
+      setNodes((nds) => nds.filter((n) => n.id !== id));
+      showToast('rejected');
+    }, 200);
+  };
+
+  const handleStar = (e) => {
+    if (e) e.stopPropagation();
+    setNodes((nds) => nds.map((n) => n.id === id ? { ...n, data: { ...n.data, starred: !n.data.starred } } : n));
+    showToast(data.starred ? 'unstarred' : 'starred');
+  };
+
+  const handleRiff = (e) => {
+    if (e) e.stopPropagation();
+    showToast('riffing...');
+  };
+
+  const handleDuplicate = () => {
+    setNodes((nds) => {
+      const orig = nds.find((n) => n.id === id);
+      if (!orig) return nds;
+      return [...nds, { ...orig, id: `card-dup-${Date.now()}`, position: { x: orig.position.x + GRID, y: orig.position.y + GRID }, data: { ...orig.data } }];
+    });
+    showToast('duplicated');
+  };
+
+  const handleDistill = (e) => {
+    if (e) e.stopPropagation();
+    const el = document.querySelector(`[data-id="${id}"] .postit-node`);
+    if (el) el.classList.add('distilling');
+    setTimeout(() => { if (el) el.classList.remove('distilling'); }, 300);
+    setNodes((nds) => {
+      const distilledZone = nds.find((n) => n.id === 'zone-distilled');
+      if (!distilledZone) return nds;
+      const childrenInZone = nds.filter((n) => n.parentId === 'zone-distilled');
+      const ci = childrenInZone.length;
+      const cx = snap(CANVAS.zoneCardOffsetX + (ci % CANVAS.zoneCardColumns) * (CANVAS.cardSize + CANVAS.cardGap));
+      const cy = snap(CANVAS.zoneCardOffsetY + Math.floor(ci / CANVAS.zoneCardColumns) * (CANVAS.cardSize + CANVAS.cardGap));
+      const newCard = {
+        id: `distill-${Date.now()}`,
+        type: 'postit',
+        position: { x: cx, y: cy },
+        parentId: 'zone-distilled',
+        extent: 'parent',
+        data: { ...data, color: data.color, starred: true },
+        draggable: true,
+      };
+      return [...nds, newCard];
+    });
+    showToast('distilled');
+  };
+
+  const onContextMenu = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setMenu({
+      x: e.clientX,
+      y: e.clientY,
+      items: [
+        { label: 'Riff on this', icon: 'corner-right-down', action: handleRiff },
+        { label: data.starred ? 'Remove star' : 'Star', icon: 'star-filled', action: handleStar },
+        { label: 'Duplicate', icon: 'copy', action: handleDuplicate },
+        { label: 'Distill', icon: 'corner-right-down', action: handleDistill },
+        { label: 'Move to zone...', icon: 'move', action: () => showToast('move to zone...') },
+        { divider: true },
+        { label: 'Reject', icon: 'trash', action: handleReject, danger: true },
+      ],
+    });
+  };
+
+  return (
+    <div className="postit-node" data-color={data.color} onContextMenu={onContextMenu}>
+      {data.starred && <div className="postit-star-badge">{'\u2605'}</div>}
+      <div className="postit-type">{data.type}</div>
+      <div className="postit-text">{data.text}</div>
+      <div className="postit-actions">
+        <button className="postit-action reject" onClick={handleReject} title="Reject">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="11" height="11"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+        <button className="postit-action star" onClick={handleStar} title="Star">{data.starred ? '\u2605' : '\u2606'}</button>
+        <button className="postit-action riff" onClick={handleRiff} title="Riff">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="11" height="11"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+        </button>
+        <button className="postit-distill nodrag" onClick={handleDistill} title="Distill">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="11" height="11" strokeLinecap="round" strokeLinejoin="round"><polyline points="10 15 15 20 20 15"/><path d="M4 4h7a4 4 0 0 1 4 4v12"/></svg>
+        </button>
+      </div>
+      <Handle type="target" position={Position.Top} id="top" />
+      <Handle type="source" position={Position.Bottom} id="bottom" />
+      <Handle type="target" position={Position.Left} id="left" />
+      <Handle type="source" position={Position.Right} id="right" />
+    </div>
+  );
+}
+
+function ZoneNode({ data, id }) {
+  const { setNodes, getNodes, getNode, getViewport } = useReactFlow();
+  const { setMenu } = React.useContext(ContextMenuContext);
+
+  const handleAddCard = (e) => { e.stopPropagation(); showToast('add card'); };
+  const handleGenerate = (e) => { e.stopPropagation(); showToast('generating...'); };
+  const handleDelete = (e) => {
+    e.stopPropagation();
+    setNodes((nds) => nds.filter((n) => n.id !== id && n.parentId !== id));
+    showToast('zone removed');
+  };
+
+  const onContextMenu = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setMenu({
+      x: e.clientX,
+      y: e.clientY,
+      items: [
+        { label: 'Add card', icon: 'plus', action: () => showToast('add card') },
+        { label: 'Generate ideas', icon: 'sparkles', action: () => showToast('generating...') },
+        { label: 'Rename zone', icon: 'edit', action: () => showToast('rename') },
+        { divider: true },
+        { label: 'Delete zone', icon: 'trash', action: () => { setNodes((nds) => nds.filter((n) => n.id !== id && n.parentId !== id)); showToast('zone removed'); }, danger: true },
+      ],
+    });
+  };
+
+  const GUTTER = CANVAS.gutter;
+  const makeResizeHandler = React.useCallback((corner) => (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setNodes((nds) => nds.map((n) => n.id === id ? { ...n, draggable: false } : n));
+    const node = getNode(id);
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const startW = parseFloat((node && node.style && node.style.width) || CANVAS.zoneWidth);
+    const startH = parseFloat((node && node.style && node.style.height) || CANVAS.zoneHeight);
+    const startPosX = node.position.x;
+    const startPosY = node.position.y;
+    const allNodes = getNodes();
+    const siblingStarts = {};
+
+    allNodes.forEach((n) => {
+      if (n.id !== id && !n.parentId) {
+        siblingStarts[n.id] = {
+          x: n.position.x,
+          y: n.position.y,
+          w: parseFloat((n.style && n.style.width) || nodeSize(n.type).width),
+          h: parseFloat((n.style && n.style.height) || nodeSize(n.type).height),
+        };
+      }
+    });
+
+    const onMove = (ev) => {
+      ev.preventDefault();
+      const vp = getViewport();
+      const z = vp.zoom || 1;
+      const dx = (ev.clientX - startX) / z;
+      const dy = (ev.clientY - startY) / z;
+      let newW = startW;
+      let newH = startH;
+      let newX = startPosX;
+      let newY = startPosY;
+
+      if (corner === 'br' || corner === 'r' || corner === 'tr') newW = Math.max(CANVAS.zoneMinWidth, startW + dx);
+      if (corner === 'bl' || corner === 'l' || corner === 'tl') {
+        newW = Math.max(CANVAS.zoneMinWidth, startW - dx);
+        newX = startPosX + (startW - newW);
+      }
+      if (corner === 'br' || corner === 'b' || corner === 'bl') newH = Math.max(CANVAS.zoneMinHeight, startH + dy);
+      if (corner === 'tl' || corner === 't' || corner === 'tr') {
+        newH = Math.max(CANVAS.zoneMinHeight, startH - dy);
+        newY = startPosY + (startH - newH);
+      }
+
+      newW = snap(newW);
+      newH = snap(newH);
+      newX = snap(newX);
+      newY = snap(newY);
+
+      const growsRight = corner === 'br' || corner === 'r' || corner === 'tr';
+      const growsLeft = corner === 'bl' || corner === 'l' || corner === 'tl';
+      const growsDown = corner === 'br' || corner === 'b' || corner === 'bl';
+      const growsUp = corner === 'tl' || corner === 't' || corner === 'tr';
+
+      setNodes((nds) => nds.map((n) => {
+        if (n.id === id) {
+          return { ...n, position: { x: newX, y: newY }, draggable: false, style: { ...n.style, width: newW, height: newH } };
+        }
+        if (n.parentId) return n;
+
+        const s = siblingStarts[n.id];
+        if (!s) return n;
+
+        const nW = s.w;
+        const nH = s.h;
+        let nX = n.position.x;
+        let nY = n.position.y;
+
+        if (growsRight || growsLeft) {
+          const vertOverlap = newY < s.y + nH && newY + newH > s.y;
+          if (vertOverlap) {
+            if (growsRight && s.x >= startPosX + startW) {
+              const targetX = snap(newX + newW + GUTTER);
+              if (targetX > nX) nX = targetX;
+            }
+            if (growsLeft && s.x + s.w <= startPosX) {
+              const targetX = snap(newX - GUTTER - s.w);
+              if (targetX < nX) nX = targetX;
+            }
+          }
+        }
+
+        if (growsDown || growsUp) {
+          const horizOverlap = newX < s.x + nW && newX + newW > s.x;
+          if (horizOverlap) {
+            if (growsDown && s.y >= startPosY + startH) {
+              const targetY = snap(newY + newH + GUTTER);
+              if (targetY > nY) nY = targetY;
+            }
+            if (growsUp && s.y + s.h <= startPosY) {
+              const targetY = snap(newY - GUTTER - s.h);
+              if (targetY < nY) nY = targetY;
+            }
+          }
+        }
+
+        if (nX === n.position.x && nY === n.position.y) return n;
+        return { ...n, position: { x: nX, y: nY } };
+      }));
+    };
+
+    const onUp = () => {
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+      setNodes((nds) => nds.map((n) => n.id === id ? { ...n, draggable: true } : n));
+    };
+
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+  }, [id, getNode, getNodes, setNodes, getViewport]);
+
+  return (
+    <div className="zone-node" data-zone-color={data.color} onContextMenu={onContextMenu}>
+      <div className="zone-header">
+        <span className="zone-label">{data.label}</span>
+        <div className="zone-actions">
+          <button className="zone-action-btn" onClick={handleAddCard} title="Add card">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+          <button className="zone-action-btn" onClick={handleGenerate} title="Generate">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 3l1.45 4.35L18 9l-4.55 1.65L12 15l-1.45-4.35L6 9l4.55-1.65L12 3z"/></svg>
+          </button>
+          <button className="zone-action-btn" onClick={handleDelete} title="Delete zone">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          </button>
+        </div>
+      </div>
+      <div className="zone-resize-handle-corner zone-resize-corner-tl nodrag" onPointerDown={makeResizeHandler('tl')} />
+      <div className="zone-resize-handle-corner zone-resize-corner-tr nodrag" onPointerDown={makeResizeHandler('tr')} />
+      <div className="zone-resize-handle-corner zone-resize-corner-bl nodrag" onPointerDown={makeResizeHandler('bl')} />
+      <div className="zone-resize-handle-corner zone-resize-corner-br nodrag" onPointerDown={makeResizeHandler('br')} />
+      <div className="zone-resize-handle-edge zone-resize-edge-t nodrag" onPointerDown={makeResizeHandler('t')} />
+      <div className="zone-resize-handle-edge zone-resize-edge-b nodrag" onPointerDown={makeResizeHandler('b')} />
+      <div className="zone-resize-handle-edge zone-resize-edge-l nodrag" onPointerDown={makeResizeHandler('l')} />
+      <div className="zone-resize-handle-edge zone-resize-edge-r nodrag" onPointerDown={makeResizeHandler('r')} />
+      <Handle type="target" position={Position.Top} id="zone-top" />
+      <Handle type="target" position={Position.Left} id="zone-left" />
+      <Handle type="source" position={Position.Bottom} id="zone-bottom" className="handle-hidden" />
+      <Handle type="source" position={Position.Right} id="zone-right" className="handle-hidden" />
+    </div>
+  );
+}
+
+function BriefNode({ data }) {
+  return (
+    <div className="brief-node">
+      <div className="brief-node-label">Brief</div>
+      <div className="brief-node-text">{data.text}</div>
+      <div className="brief-node-meta">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        {data.timestamp}
+      </div>
+      <Handle type="source" position={Position.Right} id="brief-out" />
+    </div>
+  );
+}
+
+function ModifierNode({ data }) {
+  return (
+    <div className="modifier-node">
+      <div className="modifier-node-label"><Icon type={data.iconType} size={11} />{data.label}</div>
+      <div className="modifier-node-text">{data.text}</div>
+      <Handle type="target" position={Position.Top} />
+      <Handle type="source" position={Position.Bottom} />
+      <Handle type="target" position={Position.Left} id="left" />
+      <Handle type="source" position={Position.Right} id="right" />
+    </div>
+  );
+}
+
+const SAMPLE_QUESTIONS = [
+  {
+    text: 'What should this launch feel like most?',
+    options: [
+      { key: 'A', text: 'Discovered in the wild' },
+      { key: 'B', text: 'Decoded by insiders' },
+      { key: 'C', text: 'Witnessed by everyone' },
+      { key: 'D', text: 'Announced with force' },
+    ],
+  },
+  {
+    text: 'How should the brand talk about ingredients?',
+    options: [
+      { key: 'A', text: 'Like a chemistry teacher who makes it fun' },
+      { key: 'B', text: 'Like a friend who just knows stuff' },
+      { key: 'C', text: 'Like a label you actually want to read' },
+      { key: 'D', text: 'Like a recipe — here is what is in it and why' },
+    ],
+  },
+  {
+    text: 'What is the first thing people should share?',
+    options: [
+      { key: 'A', text: 'An ingredient breakdown card' },
+      { key: 'B', text: 'A what is really in yours comparison' },
+      { key: 'C', text: 'A formula quiz result' },
+      { key: 'D', text: 'A behind-the-lab video' },
+    ],
+  },
+  {
+    text: 'What should the packaging make you feel?',
+    options: [
+      { key: 'A', text: 'Like you are holding something clinical and precise' },
+      { key: 'B', text: 'Like it came from a farmers market' },
+      { key: 'C', text: 'Like streetwear for your shelf' },
+      { key: 'D', text: 'Like a textbook you actually want to open' },
+    ],
+  },
+];
+
+function QuestionNode({ data }) {
+  const [currentQ, setCurrentQ] = React.useState(0);
+  const [answers, setAnswers] = React.useState({});
+  const [customInputs, setCustomInputs] = React.useState({});
+  const [revealed, setRevealed] = React.useState(1);
+  const questions = data.questions || SAMPLE_QUESTIONS;
+  const allDone = Object.keys(answers).length >= questions.length;
+
+  const advance = (qIdx) => {
+    setTimeout(() => {
+      if (qIdx + 1 < questions.length) {
+        setRevealed((r) => Math.max(r, qIdx + 2));
+        setCurrentQ(qIdx + 1);
+      } else {
+        setCurrentQ(questions.length);
+      }
+    }, 400);
+  };
+
+  const selectOption = (qIdx, value) => {
+    setAnswers((prev) => ({ ...prev, [qIdx]: value }));
+    advance(qIdx);
+  };
+
+  const submitCustom = (qIdx) => {
+    const val = (customInputs[qIdx] || '').trim();
+    if (!val) return;
+    selectOption(qIdx, val);
+  };
+
+  const skipQuestion = () => {
+    setAnswers((prev) => ({ ...prev, [currentQ]: 'Skipped' }));
+    advance(currentQ);
+  };
+
+  return (
+    <div className="question-node">
+      <div className="question-node-header">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span>Questions</span>
+        <span className="question-progress">{Object.keys(answers).length}/{questions.length}</span>
+      </div>
+      <Handle type="target" position={Position.Left} id="q-in" />
+      <Handle type="source" position={Position.Right} id="q-out" />
+
+      {questions.slice(0, revealed).map((q, qi) => {
+        if (qi >= currentQ || !answers[qi]) return null;
+        return (
+          <div key={qi} className="question-answered">
+            <span className="question-answered-q">Q{qi + 1}. {q.text}</span>
+            <span className={`question-answered-a${answers[qi] === 'Skipped' ? ' skipped' : ''}`}>{answers[qi]}</span>
+          </div>
+        );
+      })}
+
+      {!allDone && currentQ < questions.length && (
+        <div className={`question-current${currentQ > 0 ? ' has-history' : ''}`}>
+          <div className="question-text">{currentQ + 1}. {questions[currentQ].text}</div>
+          <div className="question-options">
+            {questions[currentQ].options.map((opt) => (
+              <button key={opt.key} className={`question-option nodrag ${answers[currentQ] === opt.text ? 'selected' : ''}`} onClick={() => selectOption(currentQ, opt.text)}>
+                <span className="question-option-key">{opt.key}</span>
+                <span className="question-option-text">{opt.text}</span>
+              </button>
+            ))}
+            <div className="question-option-custom nodrag">
+              <span className="question-option-key">E</span>
+              <input
+                className="question-custom-input"
+                type="text"
+                placeholder="Type your own answer..."
+                value={customInputs[currentQ] || ''}
+                onChange={(e) => setCustomInputs((prev) => ({ ...prev, [currentQ]: e.target.value }))}
+                onKeyDown={(e) => { if (e.key === 'Enter') submitCustom(currentQ); }}
+              />
+            </div>
+          </div>
+          <button className="question-skip nodrag" onClick={skipQuestion}>Skip</button>
+        </div>
+      )}
+
+      {allDone && (
+        <div className="question-complete">
+          <span className="question-complete-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 6L9 17l-5-5"/></svg>
+          </span>
+          <span className="question-complete-text">All questions answered — ready to generate</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function GenerateNode() {
+  const { setNodes, setEdges, getNodes } = useReactFlow();
+  const options = ['+ more ideas', '+ tensions', '+ challenge direction', '+ surprise me'];
+
+  const spawnQuestionNode = React.useCallback(() => {
+    const nodes = getNodes();
+    const briefNode = nodes.find((n) => n.id === 'brief-node');
+    if (!briefNode) {
+      showToast('generating...');
+      return;
+    }
+    if (nodes.find((n) => n.type === 'question')) {
+      showToast('questions already active');
+      return;
+    }
+    const qx = snap(briefNode.position.x + nodeSize('brief').width + (3 * GRID));
+    const qy = snap(briefNode.position.y - (2 * GRID));
+    const qId = `question-${Date.now()}`;
+    setNodes((nds) => [...nds, {
+      id: qId,
+      type: 'question',
+      position: { x: qx, y: qy },
+      data: { questions: SAMPLE_QUESTIONS },
+      style: { width: snap(CANVAS.questionWidth) },
+      draggable: true,
+    }]);
+    setEdges((eds) => [...eds, {
+      id: `e-brief-${qId}`,
+      source: 'brief-node',
+      sourceHandle: 'brief-out',
+      target: qId,
+      targetHandle: 'q-in',
+      type: 'smoothstep',
+      animated: true,
+    }]);
+    showToast('questions loaded');
+  }, [getNodes, setNodes, setEdges]);
+
+  return (
+    <div className="generate-node">
+      <div className="generate-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 3v18M3 12h18"/></svg>
+        Generate
+      </div>
+      {options.map((opt, i) => (
+        <button key={i} className="generate-btn" onClick={i === 0 ? spawnQuestionNode : () => showToast('generating...')}>{opt}</button>
+      ))}
+      <Handle type="source" position={Position.Left} id="gen-out" />
+      <Handle type="source" position={Position.Bottom} id="gen-out-bottom" />
+      <Handle type="target" position={Position.Top} />
+      <Handle type="target" position={Position.Right} id="gen-right" />
+    </div>
+  );
+}
+
+function ZoneSummaryNode({ data, id }) {
+  const { setNodes } = useReactFlow();
+  const textRef = React.useRef(null);
+  const handleBlur = () => {
+    const text = textRef.current?.textContent || '';
+    setNodes((nds) => nds.map((n) => n.id === id ? { ...n, data: { ...n.data, text } } : n));
+  };
+  const handleGenerate = (e) => {
+    e.stopPropagation();
+    showToast('generating summary...');
+  };
+
+  return (
+    <div className="zone-summary-node">
+      <div className="zone-summary-header">
+        <span className="zone-summary-label">Summary</span>
+        {data.zoneName && <span className="zone-summary-zone-name" data-color={data.zoneColor}>{data.zoneName}</span>}
+      </div>
+      <div className="zone-summary-text" contentEditable suppressContentEditableWarning ref={textRef} onBlur={handleBlur}>
+        {data.text}
+      </div>
+      <div className="zone-summary-actions">
+        <button className="zone-summary-action nodrag" onClick={handleGenerate} title="Auto-generate summary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 3l1.45 4.35L18 9l-4.55 1.65L12 15l-1.45-4.35L6 9l4.55-1.65L12 3z"/></svg>
+        </button>
+      </div>
+      <Handle type="source" position={Position.Bottom} id="summary-bottom" />
+      <Handle type="target" position={Position.Left} id="summary-left" />
+      <Handle type="source" position={Position.Right} id="summary-right" />
+    </div>
+  );
+}
+
+const nodeTypes = {
+  postit: PostItNode,
+  zone: ZoneNode,
+  generate: GenerateNode,
+  brief: BriefNode,
+  modifier: ModifierNode,
+  zoneSummary: ZoneSummaryNode,
+  question: QuestionNode,
+};
+
+let toastTimeout;
+function showToast(msg) {
+  let el = document.getElementById('toast');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'toast';
+    el.className = 'toast';
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => el.classList.remove('show'), 1500);
+}
+
+function buildInitialNodes() {
+  const nodes = [];
+  const ZONE_W = CANVAS.zoneWidth;
+  const ZONE_H = CANVAS.zoneHeight;
+  const ZONE_GAP = CANVAS.zoneGap;
+  const CARD_SIZE = CANVAS.cardSize;
+  const CARD_GAP = CANVAS.cardGap;
+  const COLS = CANVAS.zoneCardColumns;
+  const SUMMARY_H = CANVAS.summaryHeight;
+  const SUMMARY_GAP = CANVAS.summaryGap;
+  const ROW_H = SUMMARY_H + SUMMARY_GAP + ZONE_H + ZONE_GAP;
+  const briefSize = nodeSize('brief');
+  const modifierSize = nodeSize('modifier');
+  const summarySize = nodeSize('zoneSummary');
+  const questionSize = nodeSize('question');
+
+  nodes.push({
+    id: 'brief-node',
+    type: 'brief',
+    position: { x: snap(-16 * GRID), y: snap(SUMMARY_H + SUMMARY_GAP + (5 * GRID)) },
+    data: { text: 'Skincare launch — ingredient-forward brand for Gen Z. Position around transparency and formula literacy rather than aspirational lifestyle.', timestamp: 'Just now' },
+    style: { width: snap(briefSize.width), height: snap(briefSize.height) },
+    draggable: true,
+  });
+
+  nodes.push({
+    id: 'modifier-audience',
+    type: 'modifier',
+    position: { x: snap(-16 * GRID), y: snap(SUMMARY_H + SUMMARY_GAP + (19 * GRID)) },
+    data: { label: 'Audience', iconType: 'users', text: 'Gen Z, 18-25, skincare-curious, values transparency over aesthetic' },
+    style: { width: snap(modifierSize.width), height: snap(modifierSize.height) },
+    draggable: true,
+  });
+
+  nodes.push({
+    id: 'modifier-constraint',
+    type: 'modifier',
+    position: { x: snap(-16 * GRID), y: snap(SUMMARY_H + SUMMARY_GAP + (26 * GRID)) },
+    data: { label: 'Constraint', iconType: 'lock', text: 'No clean beauty claims. No lifestyle aspiration imagery.' },
+    style: { width: snap(modifierSize.width), height: snap(modifierSize.height) },
+    draggable: true,
+  });
+
+  const zoneSummaryTexts = [
+    'Gen Z wants authenticity but rewards production value. The opportunity is making craft feel effortless.',
+    'Lead with ingredient literacy. Not clean beauty but formula-forward — make the science the story.',
+    'Formula cards as shareable assets, interactive ingredient explorer, information-dense packaging.',
+    'No clean or natural claims, no lifestyle aspiration, no generic beauty imagery. Educate at every touchpoint.',
+  ];
+
+  SAMPLE_ZONES.forEach((zone, zi) => {
+    const col = zi % 2;
+    const row = Math.floor(zi / 2);
+    const zx = snap(col * (ZONE_W + ZONE_GAP));
+    const summaryY = snap(row * ROW_H);
+    const zy = snap(row * ROW_H + SUMMARY_H + SUMMARY_GAP);
+    const zoneId = `zone-${zi}`;
+
+    nodes.push({
+      id: `summary-${zi}`,
+      type: 'zoneSummary',
+      position: { x: zx, y: summaryY },
+      data: { text: zoneSummaryTexts[zi], zoneName: zone.label, zoneColor: zone.color, cardCount: 3 },
+      style: { width: snap(summarySize.width), height: snap(summarySize.height) },
+      draggable: true,
+    });
+
+    nodes.push({
+      id: zoneId,
+      type: 'zone',
+      position: { x: zx, y: zy },
+      data: { label: zone.label, color: zone.color },
+      style: { width: snap(ZONE_W), height: snap(ZONE_H) },
+      draggable: true,
+      selectable: true,
+    });
+
+    const zoneCards = SAMPLE_CARDS.slice(zi * 3, zi * 3 + 3);
+    zoneCards.forEach((card, ci) => {
+      nodes.push({
+        id: `card-${zi}-${ci}`,
+        type: 'postit',
+        position: {
+          x: snap(CANVAS.zoneCardOffsetX + (ci % COLS) * (CARD_SIZE + CARD_GAP)),
+          y: snap(CANVAS.zoneCardOffsetY + Math.floor(ci / COLS) * (CARD_SIZE + CARD_GAP)),
+        },
+        parentId: zoneId,
+        extent: 'parent',
+        data: { ...card, color: ZONE_TO_POSTIT[zone.color], starred: false },
+        draggable: true,
+      });
+    });
+  });
+
+  const distilledX = snap(2 * (ZONE_W + ZONE_GAP) + (CANVAS.gutter * 2));
+  const distilledY = snap(SUMMARY_H + SUMMARY_GAP);
+
+  nodes.push({
+    id: 'summary-distilled',
+    type: 'zoneSummary',
+    position: { x: distilledX, y: 0 },
+    data: { text: '', zoneName: 'Distilled', zoneColor: 'distilled', cardCount: 0 },
+    style: { width: snap(summarySize.width), height: snap(summarySize.height) },
+    draggable: true,
+  });
+
+  nodes.push({
+    id: 'zone-distilled',
+    type: 'zone',
+    position: { x: distilledX, y: distilledY },
+    data: { label: 'Distilled', color: 'distilled' },
+    style: { width: snap(ZONE_W), height: snap(ZONE_H * 2 + ZONE_GAP) },
+    draggable: true,
+    selectable: true,
+  });
+
+  nodes.push({
+    id: 'generate-standalone',
+    type: 'generate',
+    position: { x: snap(distilledX + ZONE_W + CANVAS.gutter + GRID), y: snap(CANVAS.cardSize) },
+    data: { zoneLabel: 'Canvas' },
+    draggable: true,
+  });
+
+  nodes.push({
+    id: 'question-1',
+    type: 'question',
+    position: { x: snap((-16 * GRID) + (14 * GRID)), y: snap(SUMMARY_H + SUMMARY_GAP + (3 * GRID)) },
+    data: { questions: SAMPLE_QUESTIONS },
+    style: { width: snap(questionSize.width) },
+    draggable: true,
+  });
+
+  return nodes;
+}
+
+function buildInitialEdges() {
+  return [
+    { id: 'e-brief-zone0', source: 'brief-node', sourceHandle: 'brief-out', target: 'zone-0', targetHandle: 'zone-left', type: 'smoothstep', animated: false },
+    { id: 'e-brief-question', source: 'brief-node', sourceHandle: 'brief-out', target: 'question-1', targetHandle: 'q-in', type: 'smoothstep', animated: true },
+    { id: 'e-mod-zone2', source: 'modifier-audience', sourceHandle: 'right', target: 'zone-2', targetHandle: 'zone-left', type: 'smoothstep', animated: false },
+    { id: 'e-sum0-z0', source: 'summary-0', sourceHandle: 'summary-bottom', target: 'zone-0', targetHandle: 'zone-top', type: 'smoothstep', animated: false },
+    { id: 'e-sum1-z1', source: 'summary-1', sourceHandle: 'summary-bottom', target: 'zone-1', targetHandle: 'zone-top', type: 'smoothstep', animated: false },
+    { id: 'e-sum2-z2', source: 'summary-2', sourceHandle: 'summary-bottom', target: 'zone-2', targetHandle: 'zone-top', type: 'smoothstep', animated: false },
+    { id: 'e-sum3-z3', source: 'summary-3', sourceHandle: 'summary-bottom', target: 'zone-3', targetHandle: 'zone-top', type: 'smoothstep', animated: false },
+  ];
+}
+
+function App() {
+  const [nodes, setNodes, onNodesChange] = useNodesState(buildInitialNodes());
+  const [edges, setEdges, onEdgesChange] = useEdgesState(buildInitialEdges());
+  const [tool, setTool] = React.useState('select');
+  const [zoom, setZoom] = React.useState(1);
+  const [showNewBlock, setShowNewBlock] = React.useState(false);
+  const [showNewNode, setShowNewNode] = React.useState(false);
+  const [showThemePicker, setShowThemePicker] = React.useState(false);
+  const [darkMode, setDarkMode] = React.useState(true);
+  const [colorway, setColorway] = React.useState('gruvbox');
+  const reactFlowInstance = useReactFlow();
+  const { setMenu } = React.useContext(ContextMenuContext);
+
+  React.useEffect(() => {
+    document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
+    if (colorway !== 'gruvbox') {
+      document.documentElement.setAttribute('data-colorway', colorway);
+    } else {
+      document.documentElement.removeAttribute('data-colorway');
+    }
+  }, [darkMode, colorway]);
+
+  const onMoveEnd = React.useCallback((_, vp) => setZoom(vp.zoom), []);
+  const onConnect = React.useCallback((params) => {
+    setEdges((eds) => addEdge({ ...params, ...defaultEdgeOptions, animated: false }, eds));
+  }, [setEdges]);
+
+  const onPaneContextMenu = React.useCallback((e) => {
+    e.preventDefault();
+    const selectedNodes = nodes.filter((n) => n.selected);
+    const items = [];
+    if (selectedNodes.length > 1) {
+      items.push({ label: `Group ${selectedNodes.length} nodes`, icon: 'layers', action: () => showToast('grouping...') });
+      items.push({ divider: true });
+    }
+    items.push({
+      label: 'Add zone here',
+      icon: 'plus',
+      action: () => {
+        const vp = reactFlowInstance.getViewport();
+        const x = snap((e.clientX - vp.x) / vp.zoom);
+        const y = snap((e.clientY - vp.y) / vp.zoom);
+        const color = ZONE_COLORS[Math.floor(Math.random() * ZONE_COLORS.length)];
+        setNodes((nds) => [...nds, {
+          id: `zone-new-${Date.now()}`,
+          type: 'zone',
+          position: { x: snap(x - (CANVAS.zoneWidth / 2)), y: snap(y - (CANVAS.zoneHeight / 2)) },
+          data: { label: 'New Zone', color },
+          style: { width: CANVAS.zoneWidth, height: CANVAS.zoneHeight },
+          draggable: true,
+          selectable: true,
+        }]);
+        showToast('zone added');
+      },
+    });
+    items.push({ label: 'Fit view', icon: 'search', action: () => reactFlowInstance.fitView({ duration: 200, padding: FIT_VIEW_PADDING }) });
+    setMenu({ x: e.clientX, y: e.clientY, items });
+  }, [nodes, reactFlowInstance, setNodes, setMenu]);
+
+  const addZone = React.useCallback((zoneType) => {
+    const vp = reactFlowInstance.getViewport();
+    const cx = (-vp.x + window.innerWidth / 2) / vp.zoom;
+    const cy = (-vp.y + window.innerHeight / 2) / vp.zoom;
+    const color = ZONE_COLORS[Math.floor(Math.random() * ZONE_COLORS.length)];
+    setNodes((nds) => [...nds, {
+      id: `zone-new-${Date.now()}`,
+      type: 'zone',
+      position: { x: snap(cx - (CANVAS.zoneWidth / 2)), y: snap(cy - (CANVAS.zoneHeight / 2)) },
+      data: { label: zoneType.label, color },
+      style: { width: CANVAS.zoneWidth, height: CANVAS.zoneHeight },
+      draggable: true,
+      selectable: true,
+    }]);
+    setShowNewBlock(false);
+    showToast(`added ${zoneType.label}`);
+  }, [reactFlowInstance, setNodes]);
+
+  const addModifierNode = React.useCallback((nodeInfo) => {
+    const vp = reactFlowInstance.getViewport();
+    const cx = (-vp.x + window.innerWidth / 2) / vp.zoom;
+    const cy = (-vp.y + window.innerHeight / 2) / vp.zoom;
+    const modifierSize = nodeSize('modifier');
+    setNodes((nds) => [...nds, {
+      id: `modifier-${Date.now()}`,
+      type: 'modifier',
+      position: { x: snap(cx - (modifierSize.width / 2)), y: snap(cy - (modifierSize.height / 2)) },
+      data: { label: nodeInfo.label, iconType: nodeInfo.iconType, text: nodeInfo.defaultText },
+      style: { width: modifierSize.width, height: modifierSize.height },
+      draggable: true,
+    }]);
+    setShowNewNode(false);
+    showToast(`added ${nodeInfo.label}`);
+  }, [reactFlowInstance, setNodes]);
+
+  React.useEffect(() => {
+    const handler = (e) => {
+      if (!e.target.closest('.new-block-btn') && !e.target.closest('.dropdown-menu')) {
+        setShowNewBlock(false);
+        setShowNewNode(false);
+      }
+      if (!e.target.closest('.theme-picker-wrapper')) {
+        setShowThemePicker(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  return (
+    <>
+      <div className="logo-fixed">Seeds</div>
+
+      <div className="top-right-bar">
+        <div className="btn-icon-group">
+          <button className="btn-icon" onClick={() => setDarkMode(!darkMode)} title={darkMode ? 'Light mode' : 'Dark mode'}>
+            {darkMode ? <Icon type="sun" size={14} /> : <Icon type="moon" size={14} />}
+          </button>
+          <div className="theme-picker-wrapper">
+            <button className="btn-icon theme-picker-btn" onClick={() => setShowThemePicker(!showThemePicker)} title="Theme">
+              <Icon type="palette" size={14} />
+            </button>
+            {showThemePicker && (
+              <div className="theme-picker-dropdown">
+                <div className="dropdown-section-label dropdown-section-label--compact">Color</div>
+                {COLORWAYS.filter((c) => c.group === 'color').map((cw) => (
+                  <button key={cw.id} className={`theme-picker-item ${colorway === cw.id ? 'active' : ''}`} onClick={() => { setColorway(cw.id); setShowThemePicker(false); }}>
+                    <div className="theme-picker-swatch" data-colorway={cw.id} />
+                    {cw.label}
+                  </button>
+                ))}
+                <div className="theme-picker-divider" />
+                <div className="dropdown-section-label dropdown-section-label--compact">Mono</div>
+                {COLORWAYS.filter((c) => c.group === 'mono').map((cw) => (
+                  <button key={cw.id} className={`theme-picker-item ${colorway === cw.id ? 'active' : ''}`} onClick={() => { setColorway(cw.id); setShowThemePicker(false); }}>
+                    <div className="theme-picker-swatch" data-colorway={cw.id} />
+                    {cw.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          <button className="btn-icon chrome-avatar-btn" title="Account">
+            <Icon type="user" size={15} />
+          </button>
+        </div>
+      </div>
+
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        onConnect={onConnect}
+        nodeTypes={nodeTypes}
+        onMoveEnd={onMoveEnd}
+        onPaneContextMenu={onPaneContextMenu}
+        panOnDrag={tool === 'hand' ? true : [1, 2]}
+        selectionOnDrag={tool === 'select'}
+        fitView
+        fitViewOptions={{ padding: FIT_VIEW_PADDING }}
+        minZoom={CANVAS.zoomMin}
+        maxZoom={CANVAS.zoomMax}
+        snapToGrid
+        snapGrid={[GRID, GRID]}
+        defaultEdgeOptions={defaultEdgeOptions}
+        proOptions={{ hideAttribution: true }}
+        connectionLineStyle={connectionLineStyle}
+      >
+        <Background variant="dots" color="var(--dot-color)" gap={CANVAS.dotGap} size={CANVAS.dotSize} />
+      </ReactFlow>
+
+      <div className="floating-toolbar">
+        <button className={`toolbar-btn ${tool === 'select' ? 'active' : ''}`} onClick={() => setTool('select')} title="Select">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/></svg>
+        </button>
+        <button className={`toolbar-btn ${tool === 'hand' ? 'active' : ''}`} onClick={() => setTool('hand')} title="Pan">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M18 11V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2v1M14 10V4a2 2 0 0 0-2-2a2 2 0 0 0-2 2v6M10 10.5V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2v8"/>
+            <path d="M18 8a2 2 0 0 1 2 2v7.4a4 4 0 0 1-.68 2.22L16.8 23.1a1 1 0 0 1-.85.47H8.73a1 1 0 0 1-.79-.39l-3.6-4.68A2 2 0 0 1 4 17.5a2 2 0 0 1 2-2h.59"/>
+          </svg>
+        </button>
+        <div className="toolbar-divider"></div>
+        <div className="toolbar-menu-anchor">
+          <button className="new-block-btn" onClick={() => { setShowNewBlock(!showNewBlock); setShowNewNode(false); }}>
+            <Icon type="plus" size={14} /> Block
+          </button>
+          {showNewBlock && (
+            <div className="dropdown-menu">
+              {ZONE_TYPES.map((zt, i) => (
+                <button key={i} className="dropdown-item" onClick={() => addZone(zt)}><Icon type={zt.iconType} size={13} />{zt.label}</button>
+              ))}
+            </div>
+          )}
+        </div>
+        <div className="toolbar-menu-anchor">
+          <button className="new-block-btn" onClick={() => { setShowNewNode(!showNewNode); setShowNewBlock(false); }}>
+            <Icon type="cube" size={14} /> Node
+          </button>
+          {showNewNode && (
+            <div className="dropdown-menu">
+              <div className="dropdown-section-label">Modifiers</div>
+              {NODE_TYPES_MENU.map((nt, i) => (
+                <button key={i} className="dropdown-item" onClick={() => addModifierNode(nt)}><Icon type={nt.iconType} size={13} />{nt.label}</button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="zoom-controls">
+        <button className="zoom-btn" onClick={() => reactFlowInstance.zoomIn({ duration: 150 })}>+</button>
+        <div className="zoom-level">{Math.round(zoom * 100)}%</div>
+        <button className="zoom-btn" onClick={() => reactFlowInstance.zoomOut({ duration: 150 })}>{'\u2212'}</button>
+        <button className="zoom-btn zoom-btn-fit" onClick={() => reactFlowInstance.fitView({ duration: 200, padding: FIT_VIEW_PADDING })} title="Fit view">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="12" height="12"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+        </button>
+      </div>
+    </>
+  );
+}
+
+function Root() {
+  return (
+    <ContextMenuProvider>
+      <ReactFlowProvider>
+        <App />
+      </ReactFlowProvider>
+    </ContextMenuProvider>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<Root />);
+</script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-# Seeds Design System — Valencia
+# Seeds Design System
 
 A geometric, token-driven design system built on the Gruvbox palette with 9 colorway variants. Zero border-radius, IBM Plex Mono + Inter typography, 20px grid foundation.
 
@@ -13,6 +13,7 @@ A geometric, token-driven design system built on the Gruvbox palette with 9 colo
 ```
 design-system/
   index.css              # Entry point — imports all modules
+  foundations.js         # Shared JS exports for canvas tokens + colorway registry
   reset.css              # CSS reset
   tokens.css             # All design tokens (primitives + semantic + state)
   index.html             # Live component showcase
@@ -74,6 +75,7 @@ The 20px grid is the foundational primitive. Everything derives from it.
 | Zone size | 600×500 | 30×25 |
 | Summary | 600×80 | 30×4 |
 | Brief | 260×200 | 13×10 |
+| Modifier | 220×100 | 11×5 |
 | Question width | 360 | 18× |
 
 **Rule**: Every dimension on canvas must be a GRID multiple. This makes snap-to-grid feel inevitable.
@@ -150,6 +152,10 @@ Derived from semantic tokens using `color-mix()`:
 |-------|-------|
 | `--space-0` through `--space-24` | 0, 1, 2, 3, 4, 6, 8, 10, 12, 14, 16, 20, 24px |
 
+### Canvas Tokens
+
+`tokens.css` also defines shared canvas geometry tokens such as `--grid`, `--zone-width`, `--zone-height`, `--summary-height`, `--card-size`, `--modifier-width`, and zoom/fit-view values. JS consumers should read these through `foundations.js` instead of duplicating numeric constants.
+
 ### Border & Geometry Tokens
 
 | Token | Value | Notes |
@@ -193,6 +199,8 @@ Toggle via attributes on `<html>`:
 - `data-colorway="name"` (default is gruvbox)
 
 Every colorway overrides the same semantic token set, so components are colorway-agnostic.
+
+`foundations.js` also exposes the colorway registry and swatch metadata for theme pickers, previews, and other JS consumers.
 
 ---
 
@@ -448,13 +456,13 @@ All interactive elements support `focus-visible` outline for keyboard navigation
 
 ---
 
-## 10. Migration Guide — Old System → Valencia
+## 10. Migration Guide — Old System → seeds-design-system
 
-This section maps the old Seeds CSS system (the `globals.css` monolith) to the new Valencia design system, and documents deliberate departures.
+This section maps the old Seeds CSS system (the `globals.css` monolith) to `seeds-design-system`, and documents deliberate departures.
 
 ### 10.1 Philosophy Differences
 
-| Aspect | Old System | Valencia |
+| Aspect | Old System | seeds-design-system |
 |--------|-----------|----------|
 | **File structure** | Single 4000+ line `globals.css` | 15 modular CSS files |
 | **Naming** | BEM-ish (`.studio-card-node`, `.vessel-card`) | Flat, semantic (`.postit-node`, `.zone-node`) |
@@ -471,27 +479,27 @@ This section maps the old Seeds CSS system (the `globals.css` monolith) to the n
 
 ### 10.2 Deliberate Departures — Do NOT Migrate Back
 
-These are intentional design decisions. Prefer the Valencia approach:
+These are intentional design decisions. Prefer the `seeds-design-system` approach:
 
 1. **Zero border-radius**: The old system's rounded corners (12-14px) are replaced by sharp geometry everywhere. This is the core aesthetic. Do not add `border-radius` back.
 
-2. **No shadows**: The old system uses layered `box-shadow` for depth. Valencia uses borders and background color for depth hierarchy. Do not add shadows.
+2. **No shadows**: The old system uses layered `box-shadow` for depth. `seeds-design-system` uses borders and background color for depth hierarchy. Do not add shadows.
 
-3. **No pill-shaped buttons**: Old system uses `border-radius: 999px`. Valencia buttons are rectangular with `--radius: 0`.
+3. **No pill-shaped buttons**: Old system uses `border-radius: 999px`. `seeds-design-system` buttons are rectangular with `--radius: 0`.
 
-4. **IBM Plex Mono over system mono**: The old system uses system monospace. Valencia uses IBM Plex Mono for its geometric character that matches the aesthetic.
+4. **IBM Plex Mono over system mono**: The old system uses system monospace. `seeds-design-system` uses IBM Plex Mono for its geometric character that matches the aesthetic.
 
 5. **Blue selection over purple**: The old `--sel-border: #eac1f5` (purple) is replaced by `--select: var(--postit-blue)`. Blue is thematically appropriate and doesn't signal "delete" like red/accent colors.
 
 6. **Dashed skeleton over shimmer**: The old shimmer gradient is replaced by dashed outlines + opacity pulse. This matches the geometric aesthetic and feels more "blueprint-like."
 
-7. **Colorway system**: The old system has one light/dark palette. Valencia has 9 colorways. Components must use semantic tokens (`--fg`, `--bg`, `--border`) not hardcoded hex values.
+7. **Colorway system**: The old system has one light/dark palette. `seeds-design-system` has 9 colorways. Components must use semantic tokens (`--fg`, `--bg`, `--border`) not hardcoded hex values.
 
 ### 10.3 Token Mapping
 
 #### Colors
 
-| Old Token | Valencia Token | Notes |
+| Old Token | seeds-design-system Token | Notes |
 |-----------|---------------|-------|
 | `--bg` / `#f4f4f2` | `--bg` | Same concept, different value |
 | `--surface` / `#ffffff` | `--surface` | Same concept |
@@ -513,7 +521,7 @@ These are intentional design decisions. Prefer the Valencia approach:
 
 #### Status colors
 
-| Old Pattern | Valencia Token |
+| Old Pattern | seeds-design-system Token |
 |-------------|---------------|
 | Orange for "steered/comment" | `--postit-orange` |
 | Red for "rejected" | `--accent` (red) with `--disabled-opacity` |
@@ -523,7 +531,7 @@ These are intentional design decisions. Prefer the Valencia approach:
 
 #### Typography
 
-| Old Value | Valencia Token |
+| Old Value | seeds-design-system Token |
 |-----------|---------------|
 | `24-30px` / `700` (page title) | `--text-xl` + `--weight-semibold` (smaller scale) |
 | `16-18px` / `600` (section heading) | `--text-xl` + `--weight-semibold` |
@@ -532,11 +540,11 @@ These are intentional design decisions. Prefer the Valencia approach:
 | `9-10px` / `600` (small caps) | `--text-xs` + `--weight-medium` + `--tracking-widest` |
 | `13px` / `700` (button text) | `--text-md` + `--weight-semibold` |
 
-Note: Valencia's type scale is intentionally smaller and more compact. The old system's 24-30px titles don't exist — the largest token is `--text-xl: 14px`. This fits the dense, tool-like aesthetic.
+Note: `seeds-design-system`'s type scale is intentionally smaller and more compact. The old system's 24-30px titles don't exist — the largest token is `--text-xl: 14px`. This fits the dense, tool-like aesthetic.
 
 #### Spacing
 
-| Old Value | Valencia Token |
+| Old Value | seeds-design-system Token |
 |-----------|---------------|
 | `4px` | `--space-4` |
 | `6px` | `--space-6` |
@@ -551,7 +559,7 @@ Note: Valencia's type scale is intentionally smaller and more compact. The old s
 
 #### Transitions
 
-| Old Value | Valencia Token |
+| Old Value | seeds-design-system Token |
 |-----------|---------------|
 | `120ms` (color) | `--transition-medium` (0.12s) |
 | `180ms` (transform) | `--transition-slow` (0.15s) |
@@ -563,7 +571,7 @@ Note: Valencia's type scale is intentionally smaller and more compact. The old s
 
 #### Buttons
 
-| Old Class | Valencia Class |
+| Old Class | seeds-design-system Class |
 |-----------|---------------|
 | `.studio-prompt-button`, `.studio-grow-button` | `.btn-primary` |
 | `.studio-secondary-button` | `.btn-ghost` |
@@ -572,7 +580,7 @@ Note: Valencia's type scale is intentionally smaller and more compact. The old s
 
 #### Cards
 
-| Old Class | Valencia Class |
+| Old Class | seeds-design-system Class |
 |-----------|---------------|
 | `.studio-card-node` | `.postit-node[data-color]` |
 | `.studio-card-node.is-selected` | `.postit-node.selected` or `.node-base.selected` |
@@ -583,7 +591,7 @@ Note: Valencia's type scale is intentionally smaller and more compact. The old s
 
 #### Layout
 
-| Old Class | Valencia Class |
+| Old Class | seeds-design-system Class |
 |-----------|---------------|
 | Header with glass morphism | `.top-bar` (solid, no blur) |
 | `.studio-form-field` / `.field` | `.form-group` |
@@ -593,7 +601,7 @@ Note: Valencia's type scale is intentionally smaller and more compact. The old s
 
 #### Loading States
 
-| Old Class | Valencia Class |
+| Old Class | seeds-design-system Class |
 |-----------|---------------|
 | `.is-skeleton` | `.skeleton` |
 | `.studio-skeleton-line` | `.skeleton-block` |
@@ -604,7 +612,7 @@ Note: Valencia's type scale is intentionally smaller and more compact. The old s
 
 #### Hover effects
 
-| Old | Valencia |
+| Old | seeds-design-system |
 |-----|---------|
 | `translateY(-1px)` on hover | No translate — border color change only |
 | `scale(0.98)` on active | No scale — opacity change only |
@@ -612,7 +620,7 @@ Note: Valencia's type scale is intentionally smaller and more compact. The old s
 
 #### Animation enter effects
 
-| Old | Valencia |
+| Old | seeds-design-system |
 |-----|---------|
 | `blur(2px)→0` on card enter | No blur — `scale(0.92)→1` + fade |
 | `scale(0.97)→1` on card enter | `scale(0.92)→1` on node appear |
@@ -620,7 +628,7 @@ Note: Valencia's type scale is intentionally smaller and more compact. The old s
 
 #### Form validation
 
-The old system has no client-side validation UI. Valencia provides:
+The old system has no client-side validation UI. `seeds-design-system` provides:
 - `.form-input:focus` border change
 - `.brief-attachment.error` state with `--danger` border
 - `.brief-attachment-progress` for upload feedback
@@ -629,14 +637,14 @@ This is still CSS-only — the React component layer should add `FormField` with
 
 ### 10.6 Migration Steps
 
-1. **Install Valencia**: Copy `design-system/` into your project, or import from `@seeds/ui` when the package is ready.
+1. **Install `seeds-design-system`**: Copy `design-system/` into your project, or import from `@seeds/ui` when the package is ready.
 
 2. **Add CSS import**: Import `design-system/index.css` alongside (not replacing) your existing `globals.css`.
 
 3. **Set colorway attributes**: Add `data-theme` and `data-colorway` to your `<html>` element.
 
 4. **Migrate component by component**: For each component:
-   - Replace old class names with Valencia classes
+   - Replace old class names with `seeds-design-system` classes
    - Remove corresponding CSS from `globals.css`
    - Verify in all 9 colorways + light/dark
 
@@ -648,10 +656,10 @@ This is still CSS-only — the React component layer should add `FormField` with
 
 During migration, old and new CSS will coexist. To prevent conflicts:
 
-- Valencia uses flat, semantic names (`.postit-node`, `.zone-node`) — these don't collide with the old BEM namespace (`.studio-card-node`, `.vessel-card`)
-- Valencia's `reset.css` should be loaded first but won't break existing styles
-- If using CSS layers, wrap Valencia in `@layer valencia { }` for clean cascade control
-- Token names (`--fg`, `--bg`, `--border`) may overlap — if the old system uses the same names, scope Valencia tokens under a container class or rename the old ones during migration
+- `seeds-design-system` uses flat, semantic names (`.postit-node`, `.zone-node`) — these don't collide with the old BEM namespace (`.studio-card-node`, `.vessel-card`)
+- `seeds-design-system`'s `reset.css` should be loaded first but won't break existing styles
+- If using CSS layers, wrap `seeds-design-system` in `@layer seeds-design-system { }` for clean cascade control
+- Token names (`--fg`, `--bg`, `--border`) may overlap — if the old system uses the same names, scope `seeds-design-system` tokens under a container class or rename the old ones during migration
 
 ### 10.8 What NOT to Migrate
 
@@ -672,7 +680,7 @@ Some old patterns should be dropped entirely:
 
 ## 11. Future — React Component Layer
 
-Valencia is currently CSS-only. When building the React component layer (`@seeds/ui`):
+`seeds-design-system` is currently CSS-only. When building the React component layer (`@seeds/ui`):
 
 ### Recommended patterns
 

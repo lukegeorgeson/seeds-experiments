@@ -1,5 +1,5 @@
 /* ── Design Tokens ── */
-/* Gruvbox-based design system with colorway variants */
+/* seeds-design-system tokens with colorway variants */
 
 :root {
   /* ── Gruvbox Light (default) ── */
@@ -99,6 +99,46 @@
   --transition-slow: 0.15s;
   --transition-toast: 0.2s;
   --transition-anim: 0.25s;
+
+  /* ── Canvas geometry ── */
+  --grid: 20px;
+  --gutter: 40px;
+  --canvas-dot-gap: 20px;
+  --canvas-dot-size: 2px;
+  --card-size: 180px;
+  --card-gap: 20px;
+  --zone-width: 600px;
+  --zone-height: 500px;
+  --zone-gap: 40px;
+  --zone-min-width: 400px;
+  --zone-min-height: 300px;
+  --summary-height: 80px;
+  --summary-gap: 12px;
+  --brief-width: 260px;
+  --brief-height: 200px;
+  --modifier-width: 220px;
+  --modifier-height: 100px;
+  --question-width: 360px;
+  --question-height: 400px;
+  --generate-width: 200px;
+  --generate-height: 160px;
+  --zone-card-offset-x: 20px;
+  --zone-card-offset-y: 44px;
+  --zone-card-columns: 2;
+  --fit-view-padding: 0.15;
+  --zoom-min: 0.1;
+  --zoom-max: 3;
+
+  /* ── Colorway registry ── */
+  --colorway-swatch-gruvbox: #fabd2f;
+  --colorway-swatch-andromeda: #8aadf4;
+  --colorway-swatch-rosepine: #ebbcba;
+  --colorway-swatch-nord: #88c0d0;
+  --colorway-swatch-solarized: #268bd2;
+  --colorway-swatch-flexoki: #d0a215;
+  --colorway-swatch-ink: #b0b0b0;
+  --colorway-swatch-ash: #8e8e94;
+  --colorway-swatch-bone: #d8d3cb;
 
   /* ── State tokens ── */
   --disabled-opacity: 0.4;

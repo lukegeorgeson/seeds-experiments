@@ -1,5 +1,5 @@
 /* ── Seeds Design System ── */
-/* Gruvbox-based component system */
+/* seeds-design-system component entrypoint */
 
 @import 'reset.css';
 @import 'tokens.css';
