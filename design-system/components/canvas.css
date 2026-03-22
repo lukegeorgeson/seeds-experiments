@@ -1,5 +1,17 @@
 /* ── Canvas (React Flow overrides) ── */
 
+body.canvas-page,
+body.canvas-page #root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
+}
+
 .react-flow__background { background: var(--bg) !important; }
 .react-flow__minimap { display: none; }
 .react-flow__attribution { display: none !important; }
@@ -76,6 +88,11 @@
   opacity: 1;
   background: var(--handle-color);
   border-color: var(--bg);
+}
+
+.react-flow__handle.handle-hidden {
+  opacity: 0 !important;
+  pointer-events: none;
 }
 
 /* ── Generate node ── */
@@ -156,6 +173,14 @@
 .toast.show {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
+}
+
+.toolbar-menu-anchor {
+  position: relative;
+}
+
+.zoom-btn-fit {
+  font-size: 11px;
 }
 
 /* ── Responsive ── */

@@ -35,6 +35,14 @@
   color: var(--fg-3);
 }
 
+.question-current {
+  margin-top: 0;
+}
+
+.question-current.has-history {
+  margin-top: var(--space-8);
+}
+
 .question-text {
   font-size: 14px;
   line-height: 1.5;
@@ -206,6 +214,11 @@
 }
 
 .question-complete-icon { color: var(--fg-3); }
+
+.question-complete-icon svg {
+  width: 16px;
+  height: 16px;
+}
 
 .question-complete-text {
   font-family: var(--mono);

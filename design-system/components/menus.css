@@ -88,6 +88,10 @@
   padding: 6px 12px 3px;
 }
 
+.dropdown-section-label--compact {
+  padding-top: 5px;
+}
+
 .dropdown-item {
   font-family: var(--font);
   font-size: 12px;
@@ -130,6 +134,10 @@
 /* ── Theme Picker ── */
 
 .theme-picker-wrapper { position: relative; }
+
+.btn-icon-group .theme-picker-wrapper {
+  margin-left: -1px;
+}
 
 .theme-picker-btn {
   width: 32px;
@@ -192,6 +200,16 @@
   border: var(--border-width) solid var(--border);
   flex-shrink: 0;
 }
+
+.theme-picker-swatch[data-colorway="gruvbox"] { background: var(--colorway-swatch-gruvbox); }
+.theme-picker-swatch[data-colorway="andromeda"] { background: var(--colorway-swatch-andromeda); }
+.theme-picker-swatch[data-colorway="rosepine"] { background: var(--colorway-swatch-rosepine); }
+.theme-picker-swatch[data-colorway="nord"] { background: var(--colorway-swatch-nord); }
+.theme-picker-swatch[data-colorway="solarized"] { background: var(--colorway-swatch-solarized); }
+.theme-picker-swatch[data-colorway="flexoki"] { background: var(--colorway-swatch-flexoki); }
+.theme-picker-swatch[data-colorway="ink"] { background: var(--colorway-swatch-ink); }
+.theme-picker-swatch[data-colorway="ash"] { background: var(--colorway-swatch-ash); }
+.theme-picker-swatch[data-colorway="bone"] { background: var(--colorway-swatch-bone); }
 
 .theme-picker-divider {
   height: 1px;

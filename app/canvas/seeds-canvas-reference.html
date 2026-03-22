@@ -9,85 +9,15 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../../design-system/index.css">
 <link href="https://unpkg.com/reactflow@11.11.4/dist/style.css" rel="stylesheet">
-<style>
-  html, body, #root {
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    overflow: hidden;
-    background: var(--bg);
-    color: var(--fg);
-    font-family: var(--font);
-    -webkit-font-smoothing: antialiased;
-  }
-
-  .modifier-node {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    padding: 14px;
-    width: 100%;
-    min-height: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .modifier-node-label {
-    font-family: var(--mono);
-    font-size: 9px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: var(--fg-3);
-    display: flex;
-    align-items: center;
-    gap: 5px;
-  }
-
-  .modifier-node-label svg {
-    width: 11px;
-    height: 11px;
-  }
-
-  .modifier-node-text {
-    font-size: 12px;
-    line-height: 1.5;
-    color: var(--fg-2);
-  }
-
-  .user-avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 0;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    margin-left: -1px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--fg-2);
-    cursor: pointer;
-    transition: background var(--transition-fast), color var(--transition-fast);
-  }
-
-  .user-avatar:hover {
-    background: var(--fg);
-    color: var(--bg);
-  }
-
-  .user-avatar svg {
-    width: 15px;
-    height: 15px;
-  }
-</style>
 </head>
-<body>
+<body class="canvas-page">
 <div id="root"></div>
 
 <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <script src="https://unpkg.com/reactflow@11.11.4/dist/umd/index.js"></script>
+<script src="../../design-system/foundations.js"></script>
 
 <script type="text/babel">
 const {
@@ -101,23 +31,19 @@ const {
   Handle,
   Position,
 } = window.ReactFlow || window.reactflow;
+const {
+  colorways: COLORWAYS,
+  readCanvasTokens,
+  getNodeSize,
+  connectionLineStyle,
+  defaultEdgeOptions,
+} = window.SeedsDesignSystem;
 
 const ZONE_TO_POSTIT = { yellow: 'yellow', pink: 'pink', green: 'green', blue: 'blue', distilled: 'yellow' };
 const ZONE_COLORS = ['yellow', 'pink', 'green', 'blue'];
-const GRID = 20;
+const CANVAS = readCanvasTokens();
+const GRID = CANVAS.grid;
 const snap = (v) => Math.round(v / GRID) * GRID;
-
-const COLORWAYS = [
-  { id: 'gruvbox', label: 'Gruvbox', swatch: '#fabd2f', group: 'color' },
-  { id: 'andromeda', label: 'Andromeda', swatch: '#8aadf4', group: 'color' },
-  { id: 'rosepine', label: 'Rose Pine', swatch: '#ebbcba', group: 'color' },
-  { id: 'nord', label: 'Nord', swatch: '#88c0d0', group: 'color' },
-  { id: 'solarized', label: 'Solarized', swatch: '#268bd2', group: 'color' },
-  { id: 'flexoki', label: 'Flexoki', swatch: '#d0a215', group: 'color' },
-  { id: 'ink', label: 'Ink', swatch: '#b0b0b0', group: 'mono' },
-  { id: 'ash', label: 'Ash', swatch: '#8e8e94', group: 'mono' },
-  { id: 'bone', label: 'Bone', swatch: '#d8d3cb', group: 'mono' },
-];
 
 const ZONE_TYPES = [
   { label: 'Ideas', iconType: 'lightbulb' },
@@ -137,6 +63,9 @@ const NODE_TYPES_MENU = [
   { label: 'Question', iconType: 'help', defaultText: 'What question needs answering?' },
   { label: 'Reference Link', iconType: 'link', defaultText: 'Paste reference URL...' },
 ];
+
+const FIT_VIEW_PADDING = CANVAS.fitViewPadding;
+const nodeSize = (type) => getNodeSize(type);
 
 function Icon({ type, size = 14 }) {
   const props = {
@@ -264,7 +193,7 @@ function PostItNode({ data, id }) {
     setNodes((nds) => {
       const orig = nds.find((n) => n.id === id);
       if (!orig) return nds;
-      return [...nds, { ...orig, id: `card-dup-${Date.now()}`, position: { x: orig.position.x + 20, y: orig.position.y + 20 }, data: { ...orig.data } }];
+      return [...nds, { ...orig, id: `card-dup-${Date.now()}`, position: { x: orig.position.x + GRID, y: orig.position.y + GRID }, data: { ...orig.data } }];
     });
     showToast('duplicated');
   };
@@ -278,12 +207,9 @@ function PostItNode({ data, id }) {
       const distilledZone = nds.find((n) => n.id === 'zone-distilled');
       if (!distilledZone) return nds;
       const childrenInZone = nds.filter((n) => n.parentId === 'zone-distilled');
-      const CARD_SIZE = 180;
-      const CARD_GAP = 20;
-      const COLS = 2;
       const ci = childrenInZone.length;
-      const cx = snap(20 + (ci % COLS) * (CARD_SIZE + CARD_GAP));
-      const cy = snap(44 + Math.floor(ci / COLS) * (CARD_SIZE + CARD_GAP));
+      const cx = snap(CANVAS.zoneCardOffsetX + (ci % CANVAS.zoneCardColumns) * (CANVAS.cardSize + CANVAS.cardGap));
+      const cy = snap(CANVAS.zoneCardOffsetY + Math.floor(ci / CANVAS.zoneCardColumns) * (CANVAS.cardSize + CANVAS.cardGap));
       const newCard = {
         id: `distill-${Date.now()}`,
         type: 'postit',
@@ -369,7 +295,7 @@ function ZoneNode({ data, id }) {
     });
   };
 
-  const GUTTER = 40;
+  const GUTTER = CANVAS.gutter;
   const makeResizeHandler = React.useCallback((corner) => (e) => {
     e.stopPropagation();
     e.preventDefault();
@@ -377,8 +303,8 @@ function ZoneNode({ data, id }) {
     const node = getNode(id);
     const startX = e.clientX;
     const startY = e.clientY;
-    const startW = parseFloat((node && node.style && node.style.width) || 600);
-    const startH = parseFloat((node && node.style && node.style.height) || 500);
+    const startW = parseFloat((node && node.style && node.style.width) || CANVAS.zoneWidth);
+    const startH = parseFloat((node && node.style && node.style.height) || CANVAS.zoneHeight);
     const startPosX = node.position.x;
     const startPosY = node.position.y;
     const allNodes = getNodes();
@@ -389,8 +315,8 @@ function ZoneNode({ data, id }) {
         siblingStarts[n.id] = {
           x: n.position.x,
           y: n.position.y,
-          w: parseFloat((n.style && n.style.width) || (n.type === 'postit' ? 180 : n.type === 'generate' ? 200 : n.type === 'modifier' ? 220 : n.type === 'brief' ? 260 : n.type === 'question' ? 360 : 600)),
-          h: parseFloat((n.style && n.style.height) || (n.type === 'postit' ? 180 : n.type === 'generate' ? 160 : n.type === 'modifier' ? 100 : n.type === 'brief' ? 200 : n.type === 'question' ? 400 : 500)),
+          w: parseFloat((n.style && n.style.width) || nodeSize(n.type).width),
+          h: parseFloat((n.style && n.style.height) || nodeSize(n.type).height),
         };
       }
     });
@@ -406,14 +332,14 @@ function ZoneNode({ data, id }) {
       let newX = startPosX;
       let newY = startPosY;
 
-      if (corner === 'br' || corner === 'r' || corner === 'tr') newW = Math.max(400, startW + dx);
+      if (corner === 'br' || corner === 'r' || corner === 'tr') newW = Math.max(CANVAS.zoneMinWidth, startW + dx);
       if (corner === 'bl' || corner === 'l' || corner === 'tl') {
-        newW = Math.max(400, startW - dx);
+        newW = Math.max(CANVAS.zoneMinWidth, startW - dx);
         newX = startPosX + (startW - newW);
       }
-      if (corner === 'br' || corner === 'b' || corner === 'bl') newH = Math.max(300, startH + dy);
+      if (corner === 'br' || corner === 'b' || corner === 'bl') newH = Math.max(CANVAS.zoneMinHeight, startH + dy);
       if (corner === 'tl' || corner === 't' || corner === 'tr') {
-        newH = Math.max(300, startH - dy);
+        newH = Math.max(CANVAS.zoneMinHeight, startH - dy);
         newY = startPosY + (startH - newH);
       }
 
@@ -510,8 +436,8 @@ function ZoneNode({ data, id }) {
       <div className="zone-resize-handle-edge zone-resize-edge-r nodrag" onPointerDown={makeResizeHandler('r')} />
       <Handle type="target" position={Position.Top} id="zone-top" />
       <Handle type="target" position={Position.Left} id="zone-left" />
-      <Handle type="source" position={Position.Bottom} id="zone-bottom" style={{ opacity: 0 }} />
-      <Handle type="source" position={Position.Right} id="zone-right" style={{ opacity: 0 }} />
+      <Handle type="source" position={Position.Bottom} id="zone-bottom" className="handle-hidden" />
+      <Handle type="source" position={Position.Right} id="zone-right" className="handle-hidden" />
     </div>
   );
 }
@@ -622,7 +548,7 @@ function QuestionNode({ data }) {
       <div className="question-node-header">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
         <span>Questions</span>
-        <span style={{ marginLeft: 'auto', fontSize: '10px', color: 'var(--fg-3)' }}>{Object.keys(answers).length}/{questions.length}</span>
+        <span className="question-progress">{Object.keys(answers).length}/{questions.length}</span>
       </div>
       <Handle type="target" position={Position.Left} id="q-in" />
       <Handle type="source" position={Position.Right} id="q-out" />
@@ -638,7 +564,7 @@ function QuestionNode({ data }) {
       })}
 
       {!allDone && currentQ < questions.length && (
-        <div style={{ marginTop: currentQ > 0 ? 8 : 0 }}>
+        <div className={`question-current${currentQ > 0 ? ' has-history' : ''}`}>
           <div className="question-text">{currentQ + 1}. {questions[currentQ].text}</div>
           <div className="question-options">
             {questions[currentQ].options.map((opt) => (
@@ -666,7 +592,7 @@ function QuestionNode({ data }) {
       {allDone && (
         <div className="question-complete">
           <span className="question-complete-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: 16, height: 16 }}><path d="M20 6L9 17l-5-5"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 6L9 17l-5-5"/></svg>
           </span>
           <span className="question-complete-text">All questions answered — ready to generate</span>
         </div>
@@ -690,15 +616,15 @@ function GenerateNode() {
       showToast('questions already active');
       return;
     }
-    const qx = snap(briefNode.position.x + 320);
-    const qy = snap(briefNode.position.y - 40);
+    const qx = snap(briefNode.position.x + nodeSize('brief').width + (3 * GRID));
+    const qy = snap(briefNode.position.y - (2 * GRID));
     const qId = `question-${Date.now()}`;
     setNodes((nds) => [...nds, {
       id: qId,
       type: 'question',
       position: { x: qx, y: qy },
       data: { questions: SAMPLE_QUESTIONS },
-      style: { width: snap(360) },
+      style: { width: snap(CANVAS.questionWidth) },
       draggable: true,
     }]);
     setEdges((eds) => [...eds, {
@@ -790,40 +716,44 @@ function showToast(msg) {
 
 function buildInitialNodes() {
   const nodes = [];
-  const ZONE_W = 600;
-  const ZONE_H = 500;
-  const ZONE_GAP = 40;
-  const CARD_SIZE = 180;
-  const CARD_GAP = 20;
-  const COLS = 2;
-  const SUMMARY_H = 80;
-  const SUMMARY_GAP = 12;
+  const ZONE_W = CANVAS.zoneWidth;
+  const ZONE_H = CANVAS.zoneHeight;
+  const ZONE_GAP = CANVAS.zoneGap;
+  const CARD_SIZE = CANVAS.cardSize;
+  const CARD_GAP = CANVAS.cardGap;
+  const COLS = CANVAS.zoneCardColumns;
+  const SUMMARY_H = CANVAS.summaryHeight;
+  const SUMMARY_GAP = CANVAS.summaryGap;
   const ROW_H = SUMMARY_H + SUMMARY_GAP + ZONE_H + ZONE_GAP;
+  const briefSize = nodeSize('brief');
+  const modifierSize = nodeSize('modifier');
+  const summarySize = nodeSize('zoneSummary');
+  const questionSize = nodeSize('question');
 
   nodes.push({
     id: 'brief-node',
     type: 'brief',
-    position: { x: snap(-320), y: snap(SUMMARY_H + SUMMARY_GAP + 100) },
+    position: { x: snap(-16 * GRID), y: snap(SUMMARY_H + SUMMARY_GAP + (5 * GRID)) },
     data: { text: 'Skincare launch — ingredient-forward brand for Gen Z. Position around transparency and formula literacy rather than aspirational lifestyle.', timestamp: 'Just now' },
-    style: { width: snap(260), height: snap(200) },
+    style: { width: snap(briefSize.width), height: snap(briefSize.height) },
     draggable: true,
   });
 
   nodes.push({
     id: 'modifier-audience',
     type: 'modifier',
-    position: { x: snap(-320), y: snap(SUMMARY_H + SUMMARY_GAP + 380) },
+    position: { x: snap(-16 * GRID), y: snap(SUMMARY_H + SUMMARY_GAP + (19 * GRID)) },
     data: { label: 'Audience', iconType: 'users', text: 'Gen Z, 18-25, skincare-curious, values transparency over aesthetic' },
-    style: { width: snap(220), height: snap(100) },
+    style: { width: snap(modifierSize.width), height: snap(modifierSize.height) },
     draggable: true,
   });
 
   nodes.push({
     id: 'modifier-constraint',
     type: 'modifier',
-    position: { x: snap(-320), y: snap(SUMMARY_H + SUMMARY_GAP + 520) },
+    position: { x: snap(-16 * GRID), y: snap(SUMMARY_H + SUMMARY_GAP + (26 * GRID)) },
     data: { label: 'Constraint', iconType: 'lock', text: 'No clean beauty claims. No lifestyle aspiration imagery.' },
-    style: { width: snap(220), height: snap(100) },
+    style: { width: snap(modifierSize.width), height: snap(modifierSize.height) },
     draggable: true,
   });
 
@@ -847,7 +777,7 @@ function buildInitialNodes() {
       type: 'zoneSummary',
       position: { x: zx, y: summaryY },
       data: { text: zoneSummaryTexts[zi], zoneName: zone.label, zoneColor: zone.color, cardCount: 3 },
-      style: { width: snap(ZONE_W), height: snap(SUMMARY_H) },
+      style: { width: snap(summarySize.width), height: snap(summarySize.height) },
       draggable: true,
     });
 
@@ -866,7 +796,10 @@ function buildInitialNodes() {
       nodes.push({
         id: `card-${zi}-${ci}`,
         type: 'postit',
-        position: { x: snap(20 + (ci % COLS) * (CARD_SIZE + CARD_GAP)), y: snap(44 + Math.floor(ci / COLS) * (CARD_SIZE + CARD_GAP)) },
+        position: {
+          x: snap(CANVAS.zoneCardOffsetX + (ci % COLS) * (CARD_SIZE + CARD_GAP)),
+          y: snap(CANVAS.zoneCardOffsetY + Math.floor(ci / COLS) * (CARD_SIZE + CARD_GAP)),
+        },
         parentId: zoneId,
         extent: 'parent',
         data: { ...card, color: ZONE_TO_POSTIT[zone.color], starred: false },
@@ -875,7 +808,7 @@ function buildInitialNodes() {
     });
   });
 
-  const distilledX = snap(2 * (ZONE_W + ZONE_GAP) + 80);
+  const distilledX = snap(2 * (ZONE_W + ZONE_GAP) + (CANVAS.gutter * 2));
   const distilledY = snap(SUMMARY_H + SUMMARY_GAP);
 
   nodes.push({
@@ -883,7 +816,7 @@ function buildInitialNodes() {
     type: 'zoneSummary',
     position: { x: distilledX, y: 0 },
     data: { text: '', zoneName: 'Distilled', zoneColor: 'distilled', cardCount: 0 },
-    style: { width: snap(ZONE_W), height: snap(SUMMARY_H) },
+    style: { width: snap(summarySize.width), height: snap(summarySize.height) },
     draggable: true,
   });
 
@@ -900,7 +833,7 @@ function buildInitialNodes() {
   nodes.push({
     id: 'generate-standalone',
     type: 'generate',
-    position: { x: snap(distilledX + ZONE_W + 60), y: snap(180) },
+    position: { x: snap(distilledX + ZONE_W + CANVAS.gutter + GRID), y: snap(CANVAS.cardSize) },
     data: { zoneLabel: 'Canvas' },
     draggable: true,
   });
@@ -908,9 +841,9 @@ function buildInitialNodes() {
   nodes.push({
     id: 'question-1',
     type: 'question',
-    position: { x: snap(-320 + 280), y: snap(SUMMARY_H + SUMMARY_GAP + 60) },
+    position: { x: snap((-16 * GRID) + (14 * GRID)), y: snap(SUMMARY_H + SUMMARY_GAP + (3 * GRID)) },
     data: { questions: SAMPLE_QUESTIONS },
-    style: { width: snap(360) },
+    style: { width: snap(questionSize.width) },
     draggable: true,
   });
 
@@ -953,7 +886,7 @@ function App() {
 
   const onMoveEnd = React.useCallback((_, vp) => setZoom(vp.zoom), []);
   const onConnect = React.useCallback((params) => {
-    setEdges((eds) => addEdge({ ...params, type: 'smoothstep', animated: false }, eds));
+    setEdges((eds) => addEdge({ ...params, ...defaultEdgeOptions, animated: false }, eds));
   }, [setEdges]);
 
   const onPaneContextMenu = React.useCallback((e) => {
@@ -975,16 +908,16 @@ function App() {
         setNodes((nds) => [...nds, {
           id: `zone-new-${Date.now()}`,
           type: 'zone',
-          position: { x: snap(x - 300), y: snap(y - 250) },
+          position: { x: snap(x - (CANVAS.zoneWidth / 2)), y: snap(y - (CANVAS.zoneHeight / 2)) },
           data: { label: 'New Zone', color },
-          style: { width: 600, height: 500 },
+          style: { width: CANVAS.zoneWidth, height: CANVAS.zoneHeight },
           draggable: true,
           selectable: true,
         }]);
         showToast('zone added');
       },
     });
-    items.push({ label: 'Fit view', icon: 'search', action: () => reactFlowInstance.fitView({ duration: 200, padding: 0.15 }) });
+    items.push({ label: 'Fit view', icon: 'search', action: () => reactFlowInstance.fitView({ duration: 200, padding: FIT_VIEW_PADDING }) });
     setMenu({ x: e.clientX, y: e.clientY, items });
   }, [nodes, reactFlowInstance, setNodes, setMenu]);
 
@@ -996,9 +929,9 @@ function App() {
     setNodes((nds) => [...nds, {
       id: `zone-new-${Date.now()}`,
       type: 'zone',
-      position: { x: cx - 300, y: cy - 250 },
+      position: { x: snap(cx - (CANVAS.zoneWidth / 2)), y: snap(cy - (CANVAS.zoneHeight / 2)) },
       data: { label: zoneType.label, color },
-      style: { width: 600, height: 500 },
+      style: { width: CANVAS.zoneWidth, height: CANVAS.zoneHeight },
       draggable: true,
       selectable: true,
     }]);
@@ -1010,12 +943,13 @@ function App() {
     const vp = reactFlowInstance.getViewport();
     const cx = (-vp.x + window.innerWidth / 2) / vp.zoom;
     const cy = (-vp.y + window.innerHeight / 2) / vp.zoom;
+    const modifierSize = nodeSize('modifier');
     setNodes((nds) => [...nds, {
       id: `modifier-${Date.now()}`,
       type: 'modifier',
-      position: { x: cx - 90, y: cy - 50 },
+      position: { x: snap(cx - (modifierSize.width / 2)), y: snap(cy - (modifierSize.height / 2)) },
       data: { label: nodeInfo.label, iconType: nodeInfo.iconType, text: nodeInfo.defaultText },
-      style: { width: 180, height: 100 },
+      style: { width: modifierSize.width, height: modifierSize.height },
       draggable: true,
     }]);
     setShowNewNode(false);
@@ -1041,34 +975,38 @@ function App() {
       <div className="logo-fixed">Seeds</div>
 
       <div className="top-right-bar">
-        <button className="btn-icon" onClick={() => setDarkMode(!darkMode)} title={darkMode ? 'Light mode' : 'Dark mode'}>
-          {darkMode ? <Icon type="sun" size={14} /> : <Icon type="moon" size={14} />}
-        </button>
-        <div className="theme-picker-wrapper">
-          <button className="theme-picker-btn" onClick={() => setShowThemePicker(!showThemePicker)} title="Theme">
-            <Icon type="palette" size={14} />
+        <div className="btn-icon-group">
+          <button className="btn-icon" onClick={() => setDarkMode(!darkMode)} title={darkMode ? 'Light mode' : 'Dark mode'}>
+            {darkMode ? <Icon type="sun" size={14} /> : <Icon type="moon" size={14} />}
           </button>
-          {showThemePicker && (
-            <div className="theme-picker-dropdown">
-              <div className="dropdown-section-label" style={{ padding: '5px 12px 3px' }}>Color</div>
-              {COLORWAYS.filter((c) => c.group === 'color').map((cw) => (
-                <button key={cw.id} className={`theme-picker-item ${colorway === cw.id ? 'active' : ''}`} onClick={() => { setColorway(cw.id); setShowThemePicker(false); }}>
-                  <div className="theme-picker-swatch" style={{ background: cw.swatch }} />
-                  {cw.label}
-                </button>
-              ))}
-              <div className="theme-picker-divider" />
-              <div className="dropdown-section-label" style={{ padding: '5px 12px 3px' }}>Mono</div>
-              {COLORWAYS.filter((c) => c.group === 'mono').map((cw) => (
-                <button key={cw.id} className={`theme-picker-item ${colorway === cw.id ? 'active' : ''}`} onClick={() => { setColorway(cw.id); setShowThemePicker(false); }}>
-                  <div className="theme-picker-swatch" style={{ background: cw.swatch }} />
-                  {cw.label}
-                </button>
-              ))}
-            </div>
-          )}
+          <div className="theme-picker-wrapper">
+            <button className="btn-icon theme-picker-btn" onClick={() => setShowThemePicker(!showThemePicker)} title="Theme">
+              <Icon type="palette" size={14} />
+            </button>
+            {showThemePicker && (
+              <div className="theme-picker-dropdown">
+                <div className="dropdown-section-label dropdown-section-label--compact">Color</div>
+                {COLORWAYS.filter((c) => c.group === 'color').map((cw) => (
+                  <button key={cw.id} className={`theme-picker-item ${colorway === cw.id ? 'active' : ''}`} onClick={() => { setColorway(cw.id); setShowThemePicker(false); }}>
+                    <div className="theme-picker-swatch" data-colorway={cw.id} />
+                    {cw.label}
+                  </button>
+                ))}
+                <div className="theme-picker-divider" />
+                <div className="dropdown-section-label dropdown-section-label--compact">Mono</div>
+                {COLORWAYS.filter((c) => c.group === 'mono').map((cw) => (
+                  <button key={cw.id} className={`theme-picker-item ${colorway === cw.id ? 'active' : ''}`} onClick={() => { setColorway(cw.id); setShowThemePicker(false); }}>
+                    <div className="theme-picker-swatch" data-colorway={cw.id} />
+                    {cw.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          <button className="btn-icon chrome-avatar-btn" title="Account">
+            <Icon type="user" size={15} />
+          </button>
         </div>
-        <div className="user-avatar" title="Account"><Icon type="user" size={15} /></div>
       </div>
 
       <ReactFlow
@@ -1083,16 +1021,16 @@ function App() {
         panOnDrag={tool === 'hand' ? true : [1, 2]}
         selectionOnDrag={tool === 'select'}
         fitView
-        fitViewOptions={{ padding: 0.15 }}
-        minZoom={0.1}
-        maxZoom={3}
+        fitViewOptions={{ padding: FIT_VIEW_PADDING }}
+        minZoom={CANVAS.zoomMin}
+        maxZoom={CANVAS.zoomMax}
         snapToGrid
         snapGrid={[GRID, GRID]}
-        defaultEdgeOptions={{ type: 'smoothstep' }}
+        defaultEdgeOptions={defaultEdgeOptions}
         proOptions={{ hideAttribution: true }}
-        connectionLineStyle={{ stroke: 'var(--connection)', strokeWidth: 1.5, strokeDasharray: '6 3' }}
+        connectionLineStyle={connectionLineStyle}
       >
-        <Background variant="dots" color="var(--dot-color)" gap={20} size={2} />
+        <Background variant="dots" color="var(--dot-color)" gap={CANVAS.dotGap} size={CANVAS.dotSize} />
       </ReactFlow>
 
       <div className="floating-toolbar">
@@ -1106,7 +1044,7 @@ function App() {
           </svg>
         </button>
         <div className="toolbar-divider"></div>
-        <div style={{ position: 'relative' }}>
+        <div className="toolbar-menu-anchor">
           <button className="new-block-btn" onClick={() => { setShowNewBlock(!showNewBlock); setShowNewNode(false); }}>
             <Icon type="plus" size={14} /> Block
           </button>
@@ -1118,7 +1056,7 @@ function App() {
             </div>
           )}
         </div>
-        <div style={{ position: 'relative' }}>
+        <div className="toolbar-menu-anchor">
           <button className="new-block-btn" onClick={() => { setShowNewNode(!showNewNode); setShowNewBlock(false); }}>
             <Icon type="cube" size={14} /> Node
           </button>
@@ -1137,7 +1075,7 @@ function App() {
         <button className="zoom-btn" onClick={() => reactFlowInstance.zoomIn({ duration: 150 })}>+</button>
         <div className="zoom-level">{Math.round(zoom * 100)}%</div>
         <button className="zoom-btn" onClick={() => reactFlowInstance.zoomOut({ duration: 150 })}>{'\u2212'}</button>
-        <button className="zoom-btn" onClick={() => reactFlowInstance.fitView({ duration: 200, padding: 0.15 })} title="Fit view" style={{ fontSize: '11px' }}>
+        <button className="zoom-btn zoom-btn-fit" onClick={() => reactFlowInstance.fitView({ duration: 200, padding: FIT_VIEW_PADDING })} title="Fit view">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="12" height="12"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
         </button>
       </div>

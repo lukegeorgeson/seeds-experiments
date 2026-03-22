@@ -154,6 +154,15 @@
   margin-left: -1px;
 }
 
+.chrome-avatar-btn {
+  margin-left: -1px;
+}
+
+.chrome-avatar-btn svg {
+  width: 15px;
+  height: 15px;
+}
+
 /* Toolbar button */
 .toolbar-btn {
   width: 32px;
