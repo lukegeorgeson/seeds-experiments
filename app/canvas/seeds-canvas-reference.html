@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,1180 +8,1154 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../../design-system/index.css">
+<link href="https://unpkg.com/reactflow@11.11.4/dist/style.css" rel="stylesheet">
 <style>
-  html, body {
+  html, body, #root {
     width: 100%;
     height: 100%;
     margin: 0;
+    overflow: hidden;
     background: var(--bg);
     color: var(--fg);
-    overflow: hidden;
-  }
-
-  body {
     font-family: var(--font);
     -webkit-font-smoothing: antialiased;
   }
 
-  .reference-sidebar-header {
-    padding: 0 16px 16px;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 12px;
-  }
-
-  .reference-sidebar-kicker,
-  .reference-sidebar-copy,
-  .reference-chip,
-  .reference-stage-kicker,
-  .reference-zone-count,
-  .reference-stage-note,
-  .reference-legend-label {
-    font-family: var(--mono);
-  }
-
-  .reference-sidebar-kicker {
-    font-size: 9px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--fg-3);
-    margin-bottom: 10px;
-  }
-
-  .reference-sidebar-copy {
-    font-size: 11px;
-    line-height: 1.7;
-    color: var(--fg-2);
-    letter-spacing: 0.04em;
-  }
-
-  .reference-sidebar-section {
-    padding: 0 16px 16px;
-  }
-
-  .reference-sidebar-section + .reference-sidebar-section {
-    border-top: 1px solid var(--border);
-    padding-top: 16px;
-  }
-
-  .reference-chip-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-top: 10px;
-  }
-
-  .reference-chip {
-    font-size: 9px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+  .modifier-node {
+    background: var(--surface);
     border: 1px solid var(--border);
-    padding: 4px 8px;
-    color: var(--fg-2);
-    background: var(--bg);
-  }
-
-  .reference-canvas-shell {
-    position: relative;
-    flex: 1;
-    overflow: auto;
-    background:
-      linear-gradient(to right, color-mix(in srgb, var(--dot-color) 35%, transparent) 1px, transparent 1px),
-      linear-gradient(to bottom, color-mix(in srgb, var(--dot-color) 35%, transparent) 1px, transparent 1px),
-      var(--bg);
-    background-size: 20px 20px, 20px 20px, auto;
-  }
-
-  .reference-canvas-shell::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-
-  .reference-canvas-shell::-webkit-scrollbar-thumb {
-    background: var(--border);
-  }
-
-  .reference-canvas {
-    position: relative;
-    width: 1960px;
-    min-height: 1480px;
-    padding: 72px 72px 220px;
-  }
-
-  .reference-stage-kicker {
-    position: absolute;
-    top: 28px;
-    left: 72px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 9px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--fg-3);
-  }
-
-  .reference-stage-kicker strong {
-    color: var(--fg);
-    font-weight: var(--weight-semibold);
-  }
-
-  .reference-stage-note {
-    position: absolute;
-    top: 28px;
-    right: 72px;
-    max-width: 320px;
-    font-size: 9px;
-    line-height: 1.7;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--fg-3);
-    text-align: right;
-  }
-
-  .reference-panel {
-    position: absolute;
-  }
-
-  .reference-brief {
-    top: 96px;
-    left: 72px;
-    width: 380px;
-  }
-
-  .reference-question {
-    top: 112px;
-    left: 510px;
-    width: 380px;
-  }
-
-  .reference-generate {
-    top: 140px;
-    left: 950px;
-  }
-
-  .reference-mini-note {
-    top: 112px;
-    left: 1220px;
-    width: 300px;
-    padding: 18px;
-  }
-
-  .reference-mini-note .node-header {
-    margin-bottom: 12px;
-  }
-
-  .reference-mini-note-copy {
-    font-size: 12px;
-    line-height: 1.6;
-    color: var(--fg-2);
-  }
-
-  .reference-mini-note-list {
-    margin-top: 16px;
+    padding: 14px;
+    width: 100%;
+    min-height: 100%;
     display: flex;
     flex-direction: column;
     gap: 8px;
   }
 
-  .reference-mini-note-list div {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+  .modifier-node-label {
     font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--fg-3);
-  }
-
-  .reference-mini-note-swatch {
-    width: 10px;
-    height: 10px;
-    background: var(--fg);
-  }
-
-  .reference-zone-shell {
-    position: absolute;
-    width: 600px;
-  }
-
-  .reference-zone-shell .zone-summary-node {
-    width: 600px;
-    margin-bottom: 10px;
-  }
-
-  .reference-zone-shell .zone-node {
-    width: 600px;
-    height: 500px;
-  }
-
-  .reference-zone-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 180px);
-    gap: 20px;
-    margin-top: 28px;
-    align-content: start;
-  }
-
-  .reference-zone-grid .postit-node {
-    width: 180px;
-    height: 180px;
-  }
-
-  .reference-zone-caption {
-    position: absolute;
-    top: 18px;
-    right: 20px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
     font-size: 9px;
-    letter-spacing: 0.08em;
+    font-weight: 500;
     text-transform: uppercase;
-    color: var(--fg-3);
-  }
-
-  .reference-zone-count {
-    opacity: 0.7;
-  }
-
-  .reference-legend {
-    position: absolute;
-    right: 72px;
-    top: 890px;
-    width: 280px;
-    padding: 18px;
-  }
-
-  .reference-legend-label {
-    font-size: 9px;
     letter-spacing: 0.12em;
-    text-transform: uppercase;
     color: var(--fg-3);
-    margin-bottom: 12px;
-  }
-
-  .reference-legend-list {
     display: flex;
-    flex-direction: column;
-    gap: 10px;
+    align-items: center;
+    gap: 5px;
   }
 
-  .reference-legend-item {
-    display: grid;
-    grid-template-columns: 72px 1fr;
-    gap: 12px;
-    align-items: start;
+  .modifier-node-label svg {
+    width: 11px;
+    height: 11px;
   }
 
-  .reference-legend-key {
-    font-family: var(--mono);
-    font-size: 9px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--fg-3);
-  }
-
-  .reference-legend-value {
+  .modifier-node-text {
     font-size: 12px;
-    line-height: 1.55;
+    line-height: 1.5;
     color: var(--fg-2);
   }
 
-  .reference-selection-box {
-    left: 1130px;
-    top: 660px;
-    width: 410px;
-    height: 220px;
-  }
-
-  .reference-context-menu {
-    position: absolute;
-    left: 1390px;
-    top: 610px;
-    z-index: 30;
-  }
-
-  .reference-edges {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .reference-edges path,
-  .reference-edges line {
-    fill: none;
-    stroke: var(--connection);
-    stroke-width: 1.5;
-    stroke-dasharray: 6 3;
-  }
-
-  .reference-edges text {
-    fill: var(--fg-3);
-    font-family: var(--mono);
-    font-size: 9px;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-  }
-
-  .reference-toolbar-stack {
-    position: fixed;
-    left: 50%;
-    bottom: 24px;
-    transform: translateX(-50%);
-    z-index: 80;
-  }
-
-  .reference-toolbar-stack .floating-toolbar {
-    position: static;
-    left: auto;
-    bottom: auto;
-    transform: none;
-  }
-
-  .reference-toolbar-stack .new-node-dropdown {
-    left: 72px;
-  }
-
-  .reference-empty-state {
-    display: none;
-  }
-
-  .reference-top-right {
-    display: flex;
-    align-items: center;
-    gap: 0;
-  }
-
-  .reference-user-badge {
+  .user-avatar {
     width: 32px;
     height: 32px;
-    border: 1px solid var(--border);
+    border-radius: 0;
     background: var(--surface);
+    border: 1px solid var(--border);
+    margin-left: -1px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: var(--fg-2);
-    margin-left: -1px;
     cursor: pointer;
     transition: background var(--transition-fast), color var(--transition-fast);
   }
 
-  .reference-user-badge:hover {
+  .user-avatar:hover {
     background: var(--fg);
     color: var(--bg);
   }
 
-  .reference-user-badge svg {
-    width: 14px;
-    height: 14px;
-  }
-
-  .reference-kpi {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 0 10px;
-    height: 32px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--fg-2);
-  }
-
-  .reference-kpi strong {
-    color: var(--fg);
-    font-weight: var(--weight-semibold);
-  }
-
-  .reference-lower-note {
-    position: absolute;
-    left: 72px;
-    top: 1290px;
-    width: 600px;
-    padding: 18px;
-  }
-
-  .reference-lower-note p {
-    margin: 0;
-    font-size: 12px;
-    line-height: 1.65;
-    color: var(--fg-2);
-  }
-
-  @media (max-width: 1100px) {
-    .reference-canvas {
-      width: 1840px;
-      min-height: 1520px;
-    }
-  }
-
-  @media (max-width: 700px) {
-    .reference-stage-kicker,
-    .reference-stage-note {
-      position: static;
-      max-width: none;
-      text-align: left;
-      margin-bottom: 12px;
-    }
-
-    .reference-canvas {
-      padding: 20px 20px 180px;
-    }
-
-    .reference-toolbar-stack {
-      bottom: 12px;
-    }
+  .user-avatar svg {
+    width: 15px;
+    height: 15px;
   }
 </style>
 </head>
 <body>
-<div class="app">
-  <div class="top-bar">
-    <div class="top-bar-left">
-      <a class="logo" href="#">Seeds</a>
-      <div class="btn-icon-group">
-        <button class="btn-icon" title="Canvas View">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="3" width="18" height="18"></rect>
-          </svg>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://unpkg.com/reactflow@11.11.4/dist/umd/index.js"></script>
+
+<script type="text/babel">
+const {
+  default: ReactFlow,
+  Background,
+  useNodesState,
+  useEdgesState,
+  addEdge,
+  useReactFlow,
+  ReactFlowProvider,
+  Handle,
+  Position,
+} = window.ReactFlow || window.reactflow;
+
+const ZONE_TO_POSTIT = { yellow: 'yellow', pink: 'pink', green: 'green', blue: 'blue', distilled: 'yellow' };
+const ZONE_COLORS = ['yellow', 'pink', 'green', 'blue'];
+const GRID = 20;
+const snap = (v) => Math.round(v / GRID) * GRID;
+
+const COLORWAYS = [
+  { id: 'gruvbox', label: 'Gruvbox', swatch: '#fabd2f', group: 'color' },
+  { id: 'andromeda', label: 'Andromeda', swatch: '#8aadf4', group: 'color' },
+  { id: 'rosepine', label: 'Rose Pine', swatch: '#ebbcba', group: 'color' },
+  { id: 'nord', label: 'Nord', swatch: '#88c0d0', group: 'color' },
+  { id: 'solarized', label: 'Solarized', swatch: '#268bd2', group: 'color' },
+  { id: 'flexoki', label: 'Flexoki', swatch: '#d0a215', group: 'color' },
+  { id: 'ink', label: 'Ink', swatch: '#b0b0b0', group: 'mono' },
+  { id: 'ash', label: 'Ash', swatch: '#8e8e94', group: 'mono' },
+  { id: 'bone', label: 'Bone', swatch: '#d8d3cb', group: 'mono' },
+];
+
+const ZONE_TYPES = [
+  { label: 'Ideas', iconType: 'lightbulb' },
+  { label: 'Strategy', iconType: 'target' },
+  { label: 'Insights', iconType: 'search' },
+  { label: 'Frameworks', iconType: 'grid' },
+  { label: 'Tensions', iconType: 'zap' },
+  { label: 'Signals', iconType: 'radio' },
+  { label: 'Provocations', iconType: 'flame' },
+  { label: 'Guard Rails', iconType: 'shield' },
+];
+
+const NODE_TYPES_MENU = [
+  { label: 'Brand Reference', iconType: 'bookmark', defaultText: 'Add brand reference...' },
+  { label: 'Audience Note', iconType: 'users', defaultText: 'Define target audience...' },
+  { label: 'Constraint', iconType: 'lock', defaultText: 'Add constraint or boundary...' },
+  { label: 'Question', iconType: 'help', defaultText: 'What question needs answering?' },
+  { label: 'Reference Link', iconType: 'link', defaultText: 'Paste reference URL...' },
+];
+
+function Icon({ type, size = 14 }) {
+  const props = {
+    viewBox: '0 0 24 24',
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeWidth: '2',
+    strokeLinecap: 'round',
+    strokeLinejoin: 'round',
+    style: { width: size, height: size },
+  };
+  switch (type) {
+    case 'lightbulb': return <svg {...props}><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>;
+    case 'target': return <svg {...props}><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>;
+    case 'search': return <svg {...props}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>;
+    case 'grid': return <svg {...props}><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>;
+    case 'zap': return <svg {...props}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>;
+    case 'radio': return <svg {...props}><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M13.06 7.9a14.88 14.88 0 0 1 4 2.68"/><path d="M12 12a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/><path d="M2 16.1A5 5 0 0 1 5.9 20M5.9 12.1a9 9 0 0 1 6 3.4"/></svg>;
+    case 'flame': return <svg {...props}><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>;
+    case 'shield': return <svg {...props}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>;
+    case 'bookmark': return <svg {...props}><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>;
+    case 'users': return <svg {...props}><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>;
+    case 'lock': return <svg {...props}><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>;
+    case 'help': return <svg {...props}><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>;
+    case 'link': return <svg {...props}><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>;
+    case 'user': return <svg {...props}><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;
+    case 'plus': return <svg {...props}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>;
+    case 'cube': return <svg {...props}><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>;
+    case 'sun': return <svg {...props}><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>;
+    case 'moon': return <svg {...props}><path d="M21 12.79A9 9 0 1 1 11.21 3A7 7 0 0 0 21 12.79z"/></svg>;
+    case 'sparkles': return <svg {...props}><path d="M12 3l1.45 4.35L18 9l-4.55 1.65L12 15l-1.45-4.35L6 9l4.55-1.65L12 3z"/></svg>;
+    case 'trash': return <svg {...props}><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>;
+    case 'edit': return <svg {...props}><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>;
+    case 'copy': return <svg {...props}><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>;
+    case 'layers': return <svg {...props}><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>;
+    case 'move': return <svg {...props}><polyline points="5 9 2 12 5 15"/><polyline points="9 5 12 2 15 5"/><polyline points="15 19 12 22 9 19"/><polyline points="19 9 22 12 19 15"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/></svg>;
+    case 'star-filled': return <svg {...props} fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>;
+    case 'corner-right-down': return <svg {...props}><polyline points="10 15 15 20 20 15"/><path d="M4 4h7a4 4 0 0 1 4 4v12"/></svg>;
+    case 'palette': return <svg {...props}><circle cx="13.5" cy="6.5" r="0.5" fill="currentColor" stroke="none"/><circle cx="17.5" cy="10.5" r="0.5" fill="currentColor" stroke="none"/><circle cx="8.5" cy="7.5" r="0.5" fill="currentColor" stroke="none"/><circle cx="6.5" cy="12" r="0.5" fill="currentColor" stroke="none"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.93 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.04-.23-.29-.38-.63-.38-1.02 0-.83.67-1.5 1.5-1.5H16c3.31 0 6-2.69 6-6 0-5.17-4.49-9-10-9z"/></svg>;
+    default: return null;
+  }
+}
+
+const SAMPLE_CARDS = [
+  { type: 'tension', text: 'Gen Z craves authenticity but engages most with highly produced content. The brands that win will make production feel effortless.' },
+  { type: 'signal', text: 'De-influencing is not anti-consumption. It is a demand for specificity. People want to know why this, not just what.' },
+  { type: 'direction', text: 'Position as ingredient-literate beauty. Not clean, not clinical, just honest. Let the formula be the personality.' },
+  { type: 'idea', text: 'A formula card shipped with every product. Ingredient breakdown designed to be photographed and shared.' },
+  { type: 'provocation', text: 'What if we never claimed clean or natural? Those are the words of brands with something to hide.' },
+  { type: 'guard rail', text: 'Never use aspirational lifestyle imagery. Show the product, the texture, the formula. Substance over vibes.' },
+  { type: 'idea', text: 'Launch with a what is actually in this campaign that makes competitor labels look evasive by comparison.' },
+  { type: 'tension', text: 'Transparency as a brand position is crowded. The unlock is making transparency feel generous, not preachy.' },
+  { type: 'signal', text: 'TikTok skincare routines now perform better when they explain why each step matters, not just what to use.' },
+  { type: 'direction', text: 'Own the formula-forward space. Let ingredients drive the brand story instead of lifestyle imagery.' },
+  { type: 'idea', text: 'Interactive ingredient explorer on the site. Tap any ingredient to see source, function, and why it is there.' },
+  { type: 'provocation', text: 'What if the packaging had no front? Every side is equally information-dense and equally beautiful.' },
+];
+
+const SAMPLE_ZONES = [
+  { label: 'Cultural Landscape', color: 'yellow' },
+  { label: 'Strategic Direction', color: 'pink' },
+  { label: 'Creative Ideas', color: 'green' },
+  { label: 'Guard Rails', color: 'blue' },
+];
+
+const ContextMenuContext = React.createContext();
+
+function ContextMenuProvider({ children }) {
+  const [menu, setMenu] = React.useState(null);
+  React.useEffect(() => {
+    const close = () => setMenu(null);
+    document.addEventListener('click', close);
+    document.addEventListener('contextmenu', close);
+    return () => {
+      document.removeEventListener('click', close);
+      document.removeEventListener('contextmenu', close);
+    };
+  }, []);
+  return (
+    <ContextMenuContext.Provider value={{ menu, setMenu }}>
+      {children}
+      {menu && (
+        <div className="context-menu" style={{ left: menu.x, top: menu.y }} onClick={(e) => e.stopPropagation()}>
+          {menu.items.map((item, index) => {
+            if (item.divider) return <div key={index} className="context-menu-divider" />;
+            return (
+              <button key={index} className={`context-menu-item ${item.danger ? 'danger' : ''}`} onClick={() => { item.action(); setMenu(null); }}>
+                {item.icon && <Icon type={item.icon} size={13} />}
+                {item.label}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </ContextMenuContext.Provider>
+  );
+}
+
+function PostItNode({ data, id }) {
+  const { setNodes } = useReactFlow();
+  const { setMenu } = React.useContext(ContextMenuContext);
+
+  const handleReject = (e) => {
+    if (e) e.stopPropagation();
+    const el = document.querySelector(`[data-id="${id}"] .postit-node`);
+    if (el) el.classList.add('rejecting');
+    setTimeout(() => {
+      setNodes((nds) => nds.filter((n) => n.id !== id));
+      showToast('rejected');
+    }, 200);
+  };
+
+  const handleStar = (e) => {
+    if (e) e.stopPropagation();
+    setNodes((nds) => nds.map((n) => n.id === id ? { ...n, data: { ...n.data, starred: !n.data.starred } } : n));
+    showToast(data.starred ? 'unstarred' : 'starred');
+  };
+
+  const handleRiff = (e) => {
+    if (e) e.stopPropagation();
+    showToast('riffing...');
+  };
+
+  const handleDuplicate = () => {
+    setNodes((nds) => {
+      const orig = nds.find((n) => n.id === id);
+      if (!orig) return nds;
+      return [...nds, { ...orig, id: `card-dup-${Date.now()}`, position: { x: orig.position.x + 20, y: orig.position.y + 20 }, data: { ...orig.data } }];
+    });
+    showToast('duplicated');
+  };
+
+  const handleDistill = (e) => {
+    if (e) e.stopPropagation();
+    const el = document.querySelector(`[data-id="${id}"] .postit-node`);
+    if (el) el.classList.add('distilling');
+    setTimeout(() => { if (el) el.classList.remove('distilling'); }, 300);
+    setNodes((nds) => {
+      const distilledZone = nds.find((n) => n.id === 'zone-distilled');
+      if (!distilledZone) return nds;
+      const childrenInZone = nds.filter((n) => n.parentId === 'zone-distilled');
+      const CARD_SIZE = 180;
+      const CARD_GAP = 20;
+      const COLS = 2;
+      const ci = childrenInZone.length;
+      const cx = snap(20 + (ci % COLS) * (CARD_SIZE + CARD_GAP));
+      const cy = snap(44 + Math.floor(ci / COLS) * (CARD_SIZE + CARD_GAP));
+      const newCard = {
+        id: `distill-${Date.now()}`,
+        type: 'postit',
+        position: { x: cx, y: cy },
+        parentId: 'zone-distilled',
+        extent: 'parent',
+        data: { ...data, color: data.color, starred: true },
+        draggable: true,
+      };
+      return [...nds, newCard];
+    });
+    showToast('distilled');
+  };
+
+  const onContextMenu = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setMenu({
+      x: e.clientX,
+      y: e.clientY,
+      items: [
+        { label: 'Riff on this', icon: 'corner-right-down', action: handleRiff },
+        { label: data.starred ? 'Remove star' : 'Star', icon: 'star-filled', action: handleStar },
+        { label: 'Duplicate', icon: 'copy', action: handleDuplicate },
+        { label: 'Distill', icon: 'corner-right-down', action: handleDistill },
+        { label: 'Move to zone...', icon: 'move', action: () => showToast('move to zone...') },
+        { divider: true },
+        { label: 'Reject', icon: 'trash', action: handleReject, danger: true },
+      ],
+    });
+  };
+
+  return (
+    <div className="postit-node" data-color={data.color} onContextMenu={onContextMenu}>
+      {data.starred && <div className="postit-star-badge">{'\u2605'}</div>}
+      <div className="postit-type">{data.type}</div>
+      <div className="postit-text">{data.text}</div>
+      <div className="postit-actions">
+        <button className="postit-action reject" onClick={handleReject} title="Reject">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="11" height="11"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
-        <button class="btn-icon" title="Board View">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="4" width="7" height="7"></rect>
-            <rect x="14" y="4" width="7" height="7"></rect>
-            <rect x="3" y="14" width="7" height="7"></rect>
-            <rect x="14" y="14" width="7" height="7"></rect>
-          </svg>
+        <button className="postit-action star" onClick={handleStar} title="Star">{data.starred ? '\u2605' : '\u2606'}</button>
+        <button className="postit-action riff" onClick={handleRiff} title="Riff">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="11" height="11"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+        </button>
+        <button className="postit-distill nodrag" onClick={handleDistill} title="Distill">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="11" height="11" strokeLinecap="round" strokeLinejoin="round"><polyline points="10 15 15 20 20 15"/><path d="M4 4h7a4 4 0 0 1 4 4v12"/></svg>
         </button>
       </div>
+      <Handle type="target" position={Position.Top} id="top" />
+      <Handle type="source" position={Position.Bottom} id="bottom" />
+      <Handle type="target" position={Position.Left} id="left" />
+      <Handle type="source" position={Position.Right} id="right" />
     </div>
-    <div class="top-bar-center">Seeds Canvas Reference</div>
-    <div class="top-bar-right reference-top-right">
-      <div class="reference-kpi"><strong>14</strong> active cards</div>
-      <button class="btn-icon" id="themeToggle" title="Toggle theme">
-        <svg id="sunIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="5"></circle>
-          <line x1="12" y1="1" x2="12" y2="3"></line>
-          <line x1="12" y1="21" x2="12" y2="23"></line>
-          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-          <line x1="1" y1="12" x2="3" y2="12"></line>
-          <line x1="21" y1="12" x2="23" y2="12"></line>
-          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-        </svg>
-        <svg id="moonIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3A7 7 0 0 0 21 12.79z"></path>
-        </svg>
-      </button>
-      <div class="theme-picker-wrapper">
-        <button class="btn-icon" id="colorwayToggle" title="Change colorway">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="13.5" cy="6.5" r="0.5" fill="currentColor" stroke="none"></circle>
-            <circle cx="17.5" cy="10.5" r="0.5" fill="currentColor" stroke="none"></circle>
-            <circle cx="8.5" cy="7.5" r="0.5" fill="currentColor" stroke="none"></circle>
-            <circle cx="6.5" cy="12" r="0.5" fill="currentColor" stroke="none"></circle>
-            <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.93 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.04-.23-.29-.38-.63-.38-1.02 0-.83.67-1.5 1.5-1.5H16c3.31 0 6-2.69 6-6 0-5.17-4.49-9-10-9z"></path>
-          </svg>
-        </button>
-        <div class="theme-picker-dropdown" id="colorwayDropdown" style="display:none;">
-          <div class="dropdown-section-label">Color</div>
-          <button class="theme-picker-item active" data-colorway="gruvbox"><span class="theme-picker-swatch" style="background:#fabd2f;"></span>Gruvbox</button>
-          <button class="theme-picker-item" data-colorway="andromeda"><span class="theme-picker-swatch" style="background:#8aadf4;"></span>Andromeda</button>
-          <button class="theme-picker-item" data-colorway="rosepine"><span class="theme-picker-swatch" style="background:#ebbcba;"></span>Rose Pine</button>
-          <button class="theme-picker-item" data-colorway="nord"><span class="theme-picker-swatch" style="background:#88c0d0;"></span>Nord</button>
-          <button class="theme-picker-item" data-colorway="solarized"><span class="theme-picker-swatch" style="background:#268bd2;"></span>Solarized</button>
-          <button class="theme-picker-item" data-colorway="flexoki"><span class="theme-picker-swatch" style="background:#d0a215;"></span>Flexoki</button>
-          <div class="theme-picker-divider"></div>
-          <div class="dropdown-section-label">Mono</div>
-          <button class="theme-picker-item" data-colorway="ink"><span class="theme-picker-swatch" style="background:#b0b0b0;"></span>Ink</button>
-          <button class="theme-picker-item" data-colorway="ash"><span class="theme-picker-swatch" style="background:#8e8e94;"></span>Ash</button>
-          <button class="theme-picker-item" data-colorway="bone"><span class="theme-picker-swatch" style="background:#d8d3cb;"></span>Bone</button>
+  );
+}
+
+function ZoneNode({ data, id }) {
+  const { setNodes, getNodes, getNode, getViewport } = useReactFlow();
+  const { setMenu } = React.useContext(ContextMenuContext);
+
+  const handleAddCard = (e) => { e.stopPropagation(); showToast('add card'); };
+  const handleGenerate = (e) => { e.stopPropagation(); showToast('generating...'); };
+  const handleDelete = (e) => {
+    e.stopPropagation();
+    setNodes((nds) => nds.filter((n) => n.id !== id && n.parentId !== id));
+    showToast('zone removed');
+  };
+
+  const onContextMenu = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setMenu({
+      x: e.clientX,
+      y: e.clientY,
+      items: [
+        { label: 'Add card', icon: 'plus', action: () => showToast('add card') },
+        { label: 'Generate ideas', icon: 'sparkles', action: () => showToast('generating...') },
+        { label: 'Rename zone', icon: 'edit', action: () => showToast('rename') },
+        { divider: true },
+        { label: 'Delete zone', icon: 'trash', action: () => { setNodes((nds) => nds.filter((n) => n.id !== id && n.parentId !== id)); showToast('zone removed'); }, danger: true },
+      ],
+    });
+  };
+
+  const GUTTER = 40;
+  const makeResizeHandler = React.useCallback((corner) => (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setNodes((nds) => nds.map((n) => n.id === id ? { ...n, draggable: false } : n));
+    const node = getNode(id);
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const startW = parseFloat((node && node.style && node.style.width) || 600);
+    const startH = parseFloat((node && node.style && node.style.height) || 500);
+    const startPosX = node.position.x;
+    const startPosY = node.position.y;
+    const allNodes = getNodes();
+    const siblingStarts = {};
+
+    allNodes.forEach((n) => {
+      if (n.id !== id && !n.parentId) {
+        siblingStarts[n.id] = {
+          x: n.position.x,
+          y: n.position.y,
+          w: parseFloat((n.style && n.style.width) || (n.type === 'postit' ? 180 : n.type === 'generate' ? 200 : n.type === 'modifier' ? 220 : n.type === 'brief' ? 260 : n.type === 'question' ? 360 : 600)),
+          h: parseFloat((n.style && n.style.height) || (n.type === 'postit' ? 180 : n.type === 'generate' ? 160 : n.type === 'modifier' ? 100 : n.type === 'brief' ? 200 : n.type === 'question' ? 400 : 500)),
+        };
+      }
+    });
+
+    const onMove = (ev) => {
+      ev.preventDefault();
+      const vp = getViewport();
+      const z = vp.zoom || 1;
+      const dx = (ev.clientX - startX) / z;
+      const dy = (ev.clientY - startY) / z;
+      let newW = startW;
+      let newH = startH;
+      let newX = startPosX;
+      let newY = startPosY;
+
+      if (corner === 'br' || corner === 'r' || corner === 'tr') newW = Math.max(400, startW + dx);
+      if (corner === 'bl' || corner === 'l' || corner === 'tl') {
+        newW = Math.max(400, startW - dx);
+        newX = startPosX + (startW - newW);
+      }
+      if (corner === 'br' || corner === 'b' || corner === 'bl') newH = Math.max(300, startH + dy);
+      if (corner === 'tl' || corner === 't' || corner === 'tr') {
+        newH = Math.max(300, startH - dy);
+        newY = startPosY + (startH - newH);
+      }
+
+      newW = snap(newW);
+      newH = snap(newH);
+      newX = snap(newX);
+      newY = snap(newY);
+
+      const growsRight = corner === 'br' || corner === 'r' || corner === 'tr';
+      const growsLeft = corner === 'bl' || corner === 'l' || corner === 'tl';
+      const growsDown = corner === 'br' || corner === 'b' || corner === 'bl';
+      const growsUp = corner === 'tl' || corner === 't' || corner === 'tr';
+
+      setNodes((nds) => nds.map((n) => {
+        if (n.id === id) {
+          return { ...n, position: { x: newX, y: newY }, draggable: false, style: { ...n.style, width: newW, height: newH } };
+        }
+        if (n.parentId) return n;
+
+        const s = siblingStarts[n.id];
+        if (!s) return n;
+
+        const nW = s.w;
+        const nH = s.h;
+        let nX = n.position.x;
+        let nY = n.position.y;
+
+        if (growsRight || growsLeft) {
+          const vertOverlap = newY < s.y + nH && newY + newH > s.y;
+          if (vertOverlap) {
+            if (growsRight && s.x >= startPosX + startW) {
+              const targetX = snap(newX + newW + GUTTER);
+              if (targetX > nX) nX = targetX;
+            }
+            if (growsLeft && s.x + s.w <= startPosX) {
+              const targetX = snap(newX - GUTTER - s.w);
+              if (targetX < nX) nX = targetX;
+            }
+          }
+        }
+
+        if (growsDown || growsUp) {
+          const horizOverlap = newX < s.x + nW && newX + newW > s.x;
+          if (horizOverlap) {
+            if (growsDown && s.y >= startPosY + startH) {
+              const targetY = snap(newY + newH + GUTTER);
+              if (targetY > nY) nY = targetY;
+            }
+            if (growsUp && s.y + s.h <= startPosY) {
+              const targetY = snap(newY - GUTTER - s.h);
+              if (targetY < nY) nY = targetY;
+            }
+          }
+        }
+
+        if (nX === n.position.x && nY === n.position.y) return n;
+        return { ...n, position: { x: nX, y: nY } };
+      }));
+    };
+
+    const onUp = () => {
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+      setNodes((nds) => nds.map((n) => n.id === id ? { ...n, draggable: true } : n));
+    };
+
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+  }, [id, getNode, getNodes, setNodes, getViewport]);
+
+  return (
+    <div className="zone-node" data-zone-color={data.color} onContextMenu={onContextMenu}>
+      <div className="zone-header">
+        <span className="zone-label">{data.label}</span>
+        <div className="zone-actions">
+          <button className="zone-action-btn" onClick={handleAddCard} title="Add card">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+          <button className="zone-action-btn" onClick={handleGenerate} title="Generate">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 3l1.45 4.35L18 9l-4.55 1.65L12 15l-1.45-4.35L6 9l4.55-1.65L12 3z"/></svg>
+          </button>
+          <button className="zone-action-btn" onClick={handleDelete} title="Delete zone">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          </button>
         </div>
       </div>
-      <button class="reference-user-badge" title="User">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-          <circle cx="12" cy="7" r="4"></circle>
-        </svg>
-      </button>
+      <div className="zone-resize-handle-corner zone-resize-corner-tl nodrag" onPointerDown={makeResizeHandler('tl')} />
+      <div className="zone-resize-handle-corner zone-resize-corner-tr nodrag" onPointerDown={makeResizeHandler('tr')} />
+      <div className="zone-resize-handle-corner zone-resize-corner-bl nodrag" onPointerDown={makeResizeHandler('bl')} />
+      <div className="zone-resize-handle-corner zone-resize-corner-br nodrag" onPointerDown={makeResizeHandler('br')} />
+      <div className="zone-resize-handle-edge zone-resize-edge-t nodrag" onPointerDown={makeResizeHandler('t')} />
+      <div className="zone-resize-handle-edge zone-resize-edge-b nodrag" onPointerDown={makeResizeHandler('b')} />
+      <div className="zone-resize-handle-edge zone-resize-edge-l nodrag" onPointerDown={makeResizeHandler('l')} />
+      <div className="zone-resize-handle-edge zone-resize-edge-r nodrag" onPointerDown={makeResizeHandler('r')} />
+      <Handle type="target" position={Position.Top} id="zone-top" />
+      <Handle type="target" position={Position.Left} id="zone-left" />
+      <Handle type="source" position={Position.Bottom} id="zone-bottom" style={{ opacity: 0 }} />
+      <Handle type="source" position={Position.Right} id="zone-right" style={{ opacity: 0 }} />
     </div>
-  </div>
+  );
+}
 
-  <div class="body">
-    <aside class="sidebar">
-      <div class="reference-sidebar-header">
-        <div class="reference-sidebar-kicker">Reference Intent</div>
-        <div class="reference-sidebar-copy">
-          This file is the design-system rebuild of the original hardcoded post-it canvas. Use it as the visual and structural source of truth when translating the board into the real app.
-        </div>
+function BriefNode({ data }) {
+  return (
+    <div className="brief-node">
+      <div className="brief-node-label">Brief</div>
+      <div className="brief-node-text">{data.text}</div>
+      <div className="brief-node-meta">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        {data.timestamp}
       </div>
+      <Handle type="source" position={Position.Right} id="brief-out" />
+    </div>
+  );
+}
 
-      <nav class="sidebar-nav">
-        <button class="nav-item active">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18"></rect></svg>
-          Canvas
-        </button>
-        <button class="nav-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5V4.5"></path><path d="M10 19.5V10"></path><path d="M16 19.5V7"></path><path d="M22 19.5V13"></path></svg>
-          Distill
-        </button>
-        <button class="nav-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-          Search
-        </button>
-        <button class="nav-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.45 4.35L18 9l-4.55 1.65L12 15l-1.45-4.35L6 9l4.55-1.65L12 3z"></path></svg>
-          Prompts
-        </button>
-      </nav>
+function ModifierNode({ data }) {
+  return (
+    <div className="modifier-node">
+      <div className="modifier-node-label"><Icon type={data.iconType} size={11} />{data.label}</div>
+      <div className="modifier-node-text">{data.text}</div>
+      <Handle type="target" position={Position.Top} />
+      <Handle type="source" position={Position.Bottom} />
+      <Handle type="target" position={Position.Left} id="left" />
+      <Handle type="source" position={Position.Right} id="right" />
+    </div>
+  );
+}
 
-      <div class="reference-sidebar-section">
-        <div class="reference-sidebar-kicker">System Coverage</div>
-        <div class="reference-chip-row">
-          <span class="reference-chip">brief</span>
-          <span class="reference-chip">questions</span>
-          <span class="reference-chip">zones</span>
-          <span class="reference-chip">post-its</span>
-          <span class="reference-chip">ai bubble</span>
-          <span class="reference-chip">toolbar</span>
-        </div>
+const SAMPLE_QUESTIONS = [
+  {
+    text: 'What should this launch feel like most?',
+    options: [
+      { key: 'A', text: 'Discovered in the wild' },
+      { key: 'B', text: 'Decoded by insiders' },
+      { key: 'C', text: 'Witnessed by everyone' },
+      { key: 'D', text: 'Announced with force' },
+    ],
+  },
+  {
+    text: 'How should the brand talk about ingredients?',
+    options: [
+      { key: 'A', text: 'Like a chemistry teacher who makes it fun' },
+      { key: 'B', text: 'Like a friend who just knows stuff' },
+      { key: 'C', text: 'Like a label you actually want to read' },
+      { key: 'D', text: 'Like a recipe — here is what is in it and why' },
+    ],
+  },
+  {
+    text: 'What is the first thing people should share?',
+    options: [
+      { key: 'A', text: 'An ingredient breakdown card' },
+      { key: 'B', text: 'A what is really in yours comparison' },
+      { key: 'C', text: 'A formula quiz result' },
+      { key: 'D', text: 'A behind-the-lab video' },
+    ],
+  },
+  {
+    text: 'What should the packaging make you feel?',
+    options: [
+      { key: 'A', text: 'Like you are holding something clinical and precise' },
+      { key: 'B', text: 'Like it came from a farmers market' },
+      { key: 'C', text: 'Like streetwear for your shelf' },
+      { key: 'D', text: 'Like a textbook you actually want to open' },
+    ],
+  },
+];
+
+function QuestionNode({ data }) {
+  const [currentQ, setCurrentQ] = React.useState(0);
+  const [answers, setAnswers] = React.useState({});
+  const [customInputs, setCustomInputs] = React.useState({});
+  const [revealed, setRevealed] = React.useState(1);
+  const questions = data.questions || SAMPLE_QUESTIONS;
+  const allDone = Object.keys(answers).length >= questions.length;
+
+  const advance = (qIdx) => {
+    setTimeout(() => {
+      if (qIdx + 1 < questions.length) {
+        setRevealed((r) => Math.max(r, qIdx + 2));
+        setCurrentQ(qIdx + 1);
+      } else {
+        setCurrentQ(questions.length);
+      }
+    }, 400);
+  };
+
+  const selectOption = (qIdx, value) => {
+    setAnswers((prev) => ({ ...prev, [qIdx]: value }));
+    advance(qIdx);
+  };
+
+  const submitCustom = (qIdx) => {
+    const val = (customInputs[qIdx] || '').trim();
+    if (!val) return;
+    selectOption(qIdx, val);
+  };
+
+  const skipQuestion = () => {
+    setAnswers((prev) => ({ ...prev, [currentQ]: 'Skipped' }));
+    advance(currentQ);
+  };
+
+  return (
+    <div className="question-node">
+      <div className="question-node-header">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span>Questions</span>
+        <span style={{ marginLeft: 'auto', fontSize: '10px', color: 'var(--fg-3)' }}>{Object.keys(answers).length}/{questions.length}</span>
       </div>
+      <Handle type="target" position={Position.Left} id="q-in" />
+      <Handle type="source" position={Position.Right} id="q-out" />
 
-      <div class="sidebar-bottom">
-        <button class="nav-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-          Upload
-        </button>
-        <button class="nav-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-6 0v4"></path><rect x="4" y="9" width="16" height="11"></rect></svg>
-          Guard Rails
-        </button>
-      </div>
-    </aside>
-
-    <main class="main">
-      <div class="action-bar">
-        <div class="search-wrapper">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
-          <input class="search-input" value="ingredient transparency" readonly>
-        </div>
-        <div class="sort-select-wrapper">
-          <select class="sort-select">
-            <option>Round 2</option>
-            <option>Round 1</option>
-          </select>
-        </div>
-        <div class="sort-select-wrapper">
-          <select class="sort-select">
-            <option>Prompting View</option>
-            <option>Editing View</option>
-          </select>
-        </div>
-        <div class="spacer"></div>
-        <button class="btn-secondary">Export</button>
-        <button class="btn-primary">Grow Round</button>
-      </div>
-
-      <div class="reference-canvas-shell canvas-pointer-mode">
-        <div class="reference-canvas">
-          <svg class="reference-edges" viewBox="0 0 1960 1480" preserveAspectRatio="none" aria-hidden="true">
-            <path d="M 460 228 C 520 260, 570 300, 620 350"></path>
-            <path d="M 865 286 C 980 320, 1080 336, 1220 356"></path>
-            <path d="M 905 302 C 830 392, 790 482, 736 586"></path>
-            <path d="M 905 302 C 1020 400, 1100 510, 1235 584"></path>
-            <path d="M 1230 900 C 1360 950, 1480 990, 1630 1030"></path>
-            <text x="752" y="556">brief drives framing</text>
-            <text x="1132" y="548">answers steer priority</text>
-            <text x="1460" y="998">distill for next round</text>
-          </svg>
-
-          <div class="reference-stage-kicker">
-            <span>Design-system rebuild</span>
-            <strong>quiet, sharp, premium</strong>
+      {questions.slice(0, revealed).map((q, qi) => {
+        if (qi >= currentQ || !answers[qi]) return null;
+        return (
+          <div key={qi} className="question-answered">
+            <span className="question-answered-q">Q{qi + 1}. {q.text}</span>
+            <span className={`question-answered-a${answers[qi] === 'Skipped' ? ' skipped' : ''}`}>{answers[qi]}</span>
           </div>
-          <div class="reference-stage-note">
-            Same working surface as the original canvas, but every visible element now comes from the system primitives instead of one-off CSS.
+        );
+      })}
+
+      {!allDone && currentQ < questions.length && (
+        <div style={{ marginTop: currentQ > 0 ? 8 : 0 }}>
+          <div className="question-text">{currentQ + 1}. {questions[currentQ].text}</div>
+          <div className="question-options">
+            {questions[currentQ].options.map((opt) => (
+              <button key={opt.key} className={`question-option nodrag ${answers[currentQ] === opt.text ? 'selected' : ''}`} onClick={() => selectOption(currentQ, opt.text)}>
+                <span className="question-option-key">{opt.key}</span>
+                <span className="question-option-text">{opt.text}</span>
+              </button>
+            ))}
+            <div className="question-option-custom nodrag">
+              <span className="question-option-key">E</span>
+              <input
+                className="question-custom-input"
+                type="text"
+                placeholder="Type your own answer..."
+                value={customInputs[currentQ] || ''}
+                onChange={(e) => setCustomInputs((prev) => ({ ...prev, [currentQ]: e.target.value }))}
+                onKeyDown={(e) => { if (e.key === 'Enter') submitCustom(currentQ); }}
+              />
+            </div>
           </div>
-
-          <section class="reference-panel reference-brief">
-            <div class="node-base brief-node-input">
-              <div class="node-header">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                  <polyline points="14 2 14 8 20 8"></polyline>
-                </svg>
-                <span>Brief</span>
-              </div>
-
-              <textarea class="brief-input-text" rows="5">Position a new skincare line for Gen Z around ingredient literacy, visible proof, and a tone that feels lucid rather than clinical.</textarea>
-
-              <div class="brief-suggestions-divider"></div>
-              <div class="brief-suggestions">
-                <div class="brief-suggestions-label">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 3l1.45 4.35L18 9l-4.55 1.65L12 15l-1.45-4.35L6 9l4.55-1.65L12 3z"></path>
-                  </svg>
-                  Suggested prompts
-                </div>
-                <div class="brief-suggestion-chips">
-                  <button class="brief-suggestion">Define what transparency should feel like in-language</button>
-                  <button class="brief-suggestion">List 3 category cliches to reject outright</button>
-                </div>
-              </div>
-
-              <div class="brief-drop-zone">
-                <div class="brief-drop-zone-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="17 8 12 3 7 8"></polyline>
-                    <line x1="12" y1="3" x2="12" y2="15"></line>
-                  </svg>
-                </div>
-                <div class="brief-drop-zone-text">Drop references or click to upload</div>
-                <div class="brief-drop-zone-hint">PDF, decks, screenshots, research notes</div>
-              </div>
-
-              <div class="brief-attachments">
-                <div class="brief-attachment">
-                  <div class="brief-attachment-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                      <polyline points="14 2 14 8 20 8"></polyline>
-                    </svg>
-                  </div>
-                  <div class="brief-attachment-info">
-                    <div class="brief-attachment-name">founder-interview.pdf</div>
-                    <div class="brief-attachment-size">3.2 MB</div>
-                  </div>
-                </div>
-                <div class="brief-attachment uploading">
-                  <div class="brief-attachment-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <rect x="3" y="3" width="18" height="18"></rect>
-                      <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                      <polyline points="21 15 16 10 5 21"></polyline>
-                    </svg>
-                  </div>
-                  <div class="brief-attachment-progress">
-                    <div class="brief-attachment-name">category-grid.png</div>
-                    <div class="brief-attachment-progress-bar">
-                      <div class="brief-attachment-progress-fill" style="width:72%;"></div>
-                    </div>
-                    <div class="brief-attachment-progress-text">72% - uploading</div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="brief-input-footer">
-                <span class="brief-char-count">139 / 2000</span>
-                <div class="spacer"></div>
-                <button class="btn-ghost" style="padding:5px 8px; font-size:9px;">Reset</button>
-                <button class="btn-primary" style="padding:5px 10px; font-size:9px;">Save Brief</button>
-              </div>
-            </div>
-          </section>
-
-          <section class="reference-panel reference-question">
-            <div class="question-node">
-              <div class="question-node-header">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                </svg>
-                <span>Question</span>
-                <span class="question-progress">2 / 4</span>
-              </div>
-              <div class="question-text">What tone should ingredient transparency take so it feels generous, not corrective?</div>
-              <div class="question-options">
-                <button class="question-option selected">
-                  <span class="question-option-key">A</span>
-                  <span class="question-option-text">Calm editorial language that explains without scolding</span>
-                </button>
-                <button class="question-option">
-                  <span class="question-option-key">B</span>
-                  <span class="question-option-text">Clinical precision with stronger proof points and citations</span>
-                </button>
-                <label class="question-option-custom">
-                  <span class="question-option-key">C</span>
-                  <input class="question-custom-input" value="Use the brand as an interpreter, not an expert." readonly>
-                </label>
-              </div>
-              <button class="question-skip">Skip for now</button>
-            </div>
-          </section>
-
-          <section class="reference-panel reference-generate">
-            <div class="generate-node results-in">
-              <div class="generate-title">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M12 3l1.45 4.35L18 9l-4.55 1.65L12 15l-1.45-4.35L6 9l4.55-1.65L12 3z"></path>
-                </svg>
-                Generate
-              </div>
-              <button class="generate-btn">Find tensions</button>
-              <button class="generate-btn">Propose directions</button>
-              <button class="generate-btn">Distill carry-forward</button>
-            </div>
-          </section>
-
-          <section class="reference-panel reference-mini-note node-base">
-            <div class="node-header">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="3" width="18" height="18"></rect>
-              </svg>
-              <span>Reference Rules</span>
-            </div>
-            <div class="reference-mini-note-copy">
-              The real app should preserve editorial calm: restrained chrome, compact mono labels, and color reserved for notes, zones, and important state changes.
-            </div>
-            <div class="reference-mini-note-list">
-              <div><span class="reference-mini-note-swatch"></span> zero radius everywhere</div>
-              <div><span class="reference-mini-note-swatch"></span> zone colors carry meaning</div>
-              <div><span class="reference-mini-note-swatch"></span> selection uses blue, not accent red</div>
-            </div>
-          </section>
-
-          <section class="reference-zone-shell" style="left:520px; top:360px;">
-            <div class="zone-summary-node">
-              <div class="zone-summary-header">
-                <span class="zone-summary-label">Summary</span>
-                <span class="zone-summary-zone-name" data-color="yellow">Cultural Landscape</span>
-              </div>
-              <div class="zone-summary-text">People do not want purity theater. They want plainspoken evidence, visible texture, and language that respects how much they already know.</div>
-            </div>
-            <div class="zone-node" data-zone-color="yellow">
-              <div class="zone-header">
-                <span class="zone-label">Cultural Landscape</span>
-                <div class="zone-actions">
-                  <button class="zone-action-btn">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>
-                  </button>
-                </div>
-              </div>
-              <div class="reference-zone-caption"><span class="reference-zone-count">4 cards</span></div>
-              <div class="reference-zone-grid">
-                <div class="postit-node" data-color="yellow">
-                  <div class="postit-type">Tension</div>
-                  <div class="postit-text">Ingredient transparency has become expected, but most brands still present it like legal fine print.</div>
-                </div>
-                <div class="postit-node" data-color="yellow">
-                  <div class="postit-type">Signal</div>
-                  <div class="postit-text">Routine videos perform better when creators explain what each ingredient is doing to the skin.</div>
-                </div>
-                <div class="postit-node" data-color="orange">
-                  <div class="postit-type">Provocation</div>
-                  <div class="postit-text">What if the package copy read like museum labels: factual, short, and unexpectedly beautiful?</div>
-                </div>
-                <div class="postit-node" data-color="yellow">
-                  <div class="postit-type">Signal</div>
-                  <div class="postit-text">Consumers reward brands that explain formulation tradeoffs instead of pretending every choice is perfect.</div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <section class="reference-zone-shell" style="left:1180px; top:360px;">
-            <div class="zone-summary-node">
-              <div class="zone-summary-header">
-                <span class="zone-summary-label">Summary</span>
-                <span class="zone-summary-zone-name" data-color="pink">Strategic Direction</span>
-              </div>
-              <div class="zone-summary-text">The strongest route is formula-forward generosity: information-dense, emotionally calm, and specific enough to feel earned.</div>
-            </div>
-            <div class="zone-node multi-selected" data-zone-color="pink">
-              <div class="zone-header">
-                <span class="zone-label">Strategic Direction</span>
-                <div class="zone-actions">
-                  <button class="zone-action-btn">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16"></rect></svg>
-                  </button>
-                  <button class="zone-action-btn">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18"></path><path d="M6 6l12 12"></path></svg>
-                  </button>
-                </div>
-              </div>
-              <div class="reference-zone-caption"><span class="reference-zone-count">4 cards</span></div>
-              <div class="reference-zone-grid">
-                <div class="postit-node multi-selected" data-color="pink">
-                  <div class="postit-type">Direction</div>
-                  <div class="postit-text">Frame the brand as an interpreter of formulas, not a moral judge of what other brands are doing.</div>
-                </div>
-                <div class="postit-node multi-selected" data-color="pink">
-                  <div class="postit-type">Direction</div>
-                  <div class="postit-text">Use short editorial labels that translate ingredient function into a concrete benefit with zero fluff.</div>
-                </div>
-                <div class="postit-node" data-color="purple">
-                  <div class="postit-type">Direction</div>
-                  <div class="postit-text">Build brand confidence through legibility: typography, structure, and proof before lifestyle imagery.</div>
-                </div>
-                <div class="postit-node" data-color="pink">
-                  <div class="postit-type">Guard Rail</div>
-                  <div class="postit-text">Avoid purity claims, overpromising, and "clean girl" codes that flatten the intelligence of the audience.</div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <section class="reference-zone-shell" style="left:520px; top:960px;">
-            <div class="zone-summary-node">
-              <div class="zone-summary-header">
-                <span class="zone-summary-label">Summary</span>
-                <span class="zone-summary-zone-name" data-color="green">Creative Ideas</span>
-              </div>
-              <div class="zone-summary-text">Execution should make explanation desirable: tactile, scannable, and composed like a printed reference sheet rather than an ad.</div>
-            </div>
-            <div class="zone-node" data-zone-color="green">
-              <div class="zone-header">
-                <span class="zone-label">Creative Ideas</span>
-              </div>
-              <div class="reference-zone-caption"><span class="reference-zone-count">4 cards</span></div>
-              <div class="reference-zone-grid">
-                <div class="postit-node" data-color="green">
-                  <div class="postit-type">Idea</div>
-                  <div class="postit-text">Ship a printed formula card with each product so the packaging feels like the beginning of the story, not the whole story.</div>
-                </div>
-                <div class="postit-node" data-color="blue">
-                  <div class="postit-type">Idea</div>
-                  <div class="postit-text">Let customers tap any ingredient online to reveal role, texture, and why it is present in that exact percentage band.</div>
-                </div>
-                <div class="postit-node" data-color="green">
-                  <div class="postit-type">Idea</div>
-                  <div class="postit-text">Use studio-light macro photography of textures with annotation lines instead of generic lifestyle stills.</div>
-                </div>
-                <div class="postit-node" data-color="orange">
-                  <div class="postit-type">Prompt</div>
-                  <div class="postit-text">How could the formula become the brand mark rather than just the proof behind the brand?</div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <section class="reference-zone-shell" style="left:1180px; top:960px;">
-            <div class="zone-summary-node">
-              <div class="zone-summary-header">
-                <span class="zone-summary-label">Summary</span>
-                <span class="zone-summary-zone-name" data-color="distilled">Carry Forward</span>
-              </div>
-              <div class="zone-summary-text">The winning material is concise, interpretable, and specific enough to survive the next round without losing texture.</div>
-            </div>
-            <div class="zone-node" data-zone-color="distilled">
-              <div class="zone-header">
-                <span class="zone-label">Carry Forward</span>
-              </div>
-              <div class="reference-zone-caption"><span class="reference-zone-count">3 distilled cards</span></div>
-              <div class="reference-zone-grid">
-                <div class="postit-node" data-color="blue">
-                  <div class="postit-star-badge">&#9733;</div>
-                  <div class="postit-type">Distilled</div>
-                  <div class="postit-text">Formula-forward generosity should be the system-level north star for messaging, layout, and proof.</div>
-                </div>
-                <div class="postit-node" data-color="green">
-                  <div class="postit-star-badge">&#9733;</div>
-                  <div class="postit-type">Distilled</div>
-                  <div class="postit-text">Turn ingredient explanation into a compositional strength, not a compliance block tucked into the corner.</div>
-                </div>
-                <div class="postit-node" data-color="yellow">
-                  <div class="postit-star-badge">&#9733;</div>
-                  <div class="postit-type">Distilled</div>
-                  <div class="postit-text">Design for clarity first: labels, structured rhythm, and visible hierarchy should do more work than decoration.</div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <div class="selection-box reference-selection-box"></div>
-
-          <div class="context-menu reference-context-menu">
-            <button class="context-menu-item">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.45 4.35L18 9l-4.55 1.65L12 15l-1.45-4.35L6 9l4.55-1.65L12 3z"></path></svg>
-              Distill selection
-            </button>
-            <button class="context-menu-item">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-              Duplicate
-            </button>
-            <div class="context-menu-divider"></div>
-            <button class="context-menu-item danger">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path></svg>
-              Reject
-            </button>
-          </div>
-
-          <section class="reference-panel reference-legend node-base">
-            <div class="reference-legend-label">What To Mirror In Product Code</div>
-            <div class="reference-legend-list">
-              <div class="reference-legend-item">
-                <div class="reference-legend-key">Chrome</div>
-                <div class="reference-legend-value">Use the system shell: top bar, sidebar, action bar, toolbar, and zoom controls without inventing new container patterns.</div>
-              </div>
-              <div class="reference-legend-item">
-                <div class="reference-legend-key">Nodes</div>
-                <div class="reference-legend-value">Brief, questions, summaries, zones, generate blocks, and post-its should be straight mappings to the shared classes and component APIs.</div>
-              </div>
-              <div class="reference-legend-item">
-                <div class="reference-legend-key">State</div>
-                <div class="reference-legend-value">Selection, context menu, AI prompts, and carry-forward behavior should all feel like system states, not canvas-specific visual exceptions.</div>
-              </div>
-            </div>
-          </section>
-
-          <section class="reference-panel reference-lower-note node-base">
-            <div class="node-header">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M3 12h18"></path>
-                <path d="M3 6h18"></path>
-                <path d="M3 18h18"></path>
-              </svg>
-              <span>Implementation Note</span>
-            </div>
-            <p>
-              The geometry here should map 1:1 into React Flow: zone summaries sit above their zones, the prompt layer sits outside the grid, and the distilled area behaves like a deliberate carry-forward pocket rather than a generic archive.
-            </p>
-          </section>
+          <button className="question-skip nodrag" onClick={skipQuestion}>Skip</button>
         </div>
-      </div>
-    </main>
-  </div>
-</div>
+      )}
 
-<div class="selection-count">
-  <span><span class="selection-count-number">4</span> selected</span>
-  <div class="selection-count-actions">
-    <button class="btn-ghost" style="padding:4px 8px; font-size:9px;">Group</button>
-    <button class="btn-ghost" style="padding:4px 8px; font-size:9px;">Distill</button>
-  </div>
-</div>
-
-<div class="reference-toolbar-stack">
-  <div class="new-node-dropdown" id="newNodeDropdown" style="display:none;">
-    <button class="new-node-item">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.45 4.35L18 9l-4.55 1.65L12 15l-1.45-4.35L6 9l4.55-1.65L12 3z"></path></svg>
-      Zone
-      <span class="new-node-item-desc">thinking area</span>
-    </button>
-    <button class="new-node-item">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18"></rect></svg>
-      Post-it
-      <span class="new-node-item-desc">180 x 180</span>
-    </button>
-    <button class="new-node-item">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle></svg>
-      Question
-      <span class="new-node-item-desc">decision prompt</span>
-    </button>
-  </div>
-  <div class="floating-toolbar">
-    <button class="toolbar-btn active" id="pointerMode" title="Pointer">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"></path>
-        <path d="M13 13l6 6"></path>
-      </svg>
-    </button>
-    <button class="toolbar-btn" id="nodeMode" title="Place Node">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M12 5v14"></path>
-        <path d="M5 12h14"></path>
-      </svg>
-    </button>
-    <div class="toolbar-divider"></div>
-    <button class="new-block-btn" id="newNodeToggle">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M12 5v14"></path>
-        <path d="M5 12h14"></path>
-      </svg>
-      <span>Node</span>
-    </button>
-    <button class="new-block-btn">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <rect x="3" y="3" width="18" height="18"></rect>
-      </svg>
-      <span>Summary</span>
-    </button>
-  </div>
-</div>
-
-<div class="zoom-controls">
-  <button class="zoom-btn">+</button>
-  <div class="zoom-level">100%</div>
-  <button class="zoom-btn">-</button>
-</div>
-
-<div class="ai-bubble" id="aiBubble">
-  <div class="ai-bubble-card" id="aiBubbleCard" style="display:flex;">
-    <div class="ai-bubble-card-header">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M12 3l1.45 4.35L18 9l-4.55 1.65L12 15l-1.45-4.35L6 9l4.55-1.65L12 3z"></path>
-      </svg>
-      <span>Suggestion</span>
-      <span class="ai-bubble-card-count" id="aiBubbleCount">1 / 3</span>
+      {allDone && (
+        <div className="question-complete">
+          <span className="question-complete-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: 16, height: 16 }}><path d="M20 6L9 17l-5-5"/></svg>
+          </span>
+          <span className="question-complete-text">All questions answered — ready to generate</span>
+        </div>
+      )}
     </div>
-    <div class="ai-bubble-card-text" id="aiBubbleText">The strongest cards already point toward formula-forward generosity. Distill those before generating more.</div>
-    <div class="ai-bubble-card-actions" id="aiBubbleActions">
-      <button class="ai-bubble-action">
-        <span class="ai-bubble-action-key">A</span>
-        Distill 3 cards
-      </button>
-      <button class="ai-bubble-action">
-        <span class="ai-bubble-action-key">B</span>
-        Show tensions
-      </button>
-    </div>
-    <button class="ai-bubble-later" id="aiBubbleLater">Later</button>
-  </div>
-  <button class="ai-bubble-trigger has-suggestion" id="aiBubbleTrigger" title="AI Suggestions">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M12 3l1.45 4.35L18 9l-4.55 1.65L12 15l-1.45-4.35L6 9l4.55-1.65L12 3z"></path>
-    </svg>
-  </button>
-</div>
+  );
+}
 
-<div class="toast" id="toast">updated</div>
+function GenerateNode() {
+  const { setNodes, setEdges, getNodes } = useReactFlow();
+  const options = ['+ more ideas', '+ tensions', '+ challenge direction', '+ surprise me'];
 
-<script>
-  const root = document.documentElement;
-  const themeToggle = document.getElementById('themeToggle');
-  const sunIcon = document.getElementById('sunIcon');
-  const moonIcon = document.getElementById('moonIcon');
-  const colorwayToggle = document.getElementById('colorwayToggle');
-  const colorwayDropdown = document.getElementById('colorwayDropdown');
-  const colorwayItems = Array.from(document.querySelectorAll('.theme-picker-item'));
-  const newNodeToggle = document.getElementById('newNodeToggle');
-  const newNodeDropdown = document.getElementById('newNodeDropdown');
-  const pointerMode = document.getElementById('pointerMode');
-  const nodeMode = document.getElementById('nodeMode');
-  const canvasShell = document.querySelector('.reference-canvas-shell');
-  const toast = document.getElementById('toast');
-  const aiBubbleTrigger = document.getElementById('aiBubbleTrigger');
-  const aiBubbleCard = document.getElementById('aiBubbleCard');
-  const aiBubbleText = document.getElementById('aiBubbleText');
-  const aiBubbleCount = document.getElementById('aiBubbleCount');
-  const aiBubbleActions = document.getElementById('aiBubbleActions');
-  const aiBubbleLater = document.getElementById('aiBubbleLater');
-
-  const aiSuggestions = [
-    {
-      text: 'The strongest cards already point toward formula-forward generosity. Distill those before generating more.',
-      actions: ['Distill 3 cards', 'Show tensions']
-    },
-    {
-      text: 'Creative Ideas are strong, but the carry-forward pocket is still slightly broad. Tighten the language before the next round.',
-      actions: ['Tighten wording', 'Find duplicates']
-    },
-    {
-      text: 'The board has enough evidence to turn one direction into a sharper proposition. Ask one more question, then commit.',
-      actions: ['Ask next question', 'Promote direction']
+  const spawnQuestionNode = React.useCallback(() => {
+    const nodes = getNodes();
+    const briefNode = nodes.find((n) => n.id === 'brief-node');
+    if (!briefNode) {
+      showToast('generating...');
+      return;
     }
+    if (nodes.find((n) => n.type === 'question')) {
+      showToast('questions already active');
+      return;
+    }
+    const qx = snap(briefNode.position.x + 320);
+    const qy = snap(briefNode.position.y - 40);
+    const qId = `question-${Date.now()}`;
+    setNodes((nds) => [...nds, {
+      id: qId,
+      type: 'question',
+      position: { x: qx, y: qy },
+      data: { questions: SAMPLE_QUESTIONS },
+      style: { width: snap(360) },
+      draggable: true,
+    }]);
+    setEdges((eds) => [...eds, {
+      id: `e-brief-${qId}`,
+      source: 'brief-node',
+      sourceHandle: 'brief-out',
+      target: qId,
+      targetHandle: 'q-in',
+      type: 'smoothstep',
+      animated: true,
+    }]);
+    showToast('questions loaded');
+  }, [getNodes, setNodes, setEdges]);
+
+  return (
+    <div className="generate-node">
+      <div className="generate-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 3v18M3 12h18"/></svg>
+        Generate
+      </div>
+      {options.map((opt, i) => (
+        <button key={i} className="generate-btn" onClick={i === 0 ? spawnQuestionNode : () => showToast('generating...')}>{opt}</button>
+      ))}
+      <Handle type="source" position={Position.Left} id="gen-out" />
+      <Handle type="source" position={Position.Bottom} id="gen-out-bottom" />
+      <Handle type="target" position={Position.Top} />
+      <Handle type="target" position={Position.Right} id="gen-right" />
+    </div>
+  );
+}
+
+function ZoneSummaryNode({ data, id }) {
+  const { setNodes } = useReactFlow();
+  const textRef = React.useRef(null);
+  const handleBlur = () => {
+    const text = textRef.current?.textContent || '';
+    setNodes((nds) => nds.map((n) => n.id === id ? { ...n, data: { ...n.data, text } } : n));
+  };
+  const handleGenerate = (e) => {
+    e.stopPropagation();
+    showToast('generating summary...');
+  };
+
+  return (
+    <div className="zone-summary-node">
+      <div className="zone-summary-header">
+        <span className="zone-summary-label">Summary</span>
+        {data.zoneName && <span className="zone-summary-zone-name" data-color={data.zoneColor}>{data.zoneName}</span>}
+      </div>
+      <div className="zone-summary-text" contentEditable suppressContentEditableWarning ref={textRef} onBlur={handleBlur}>
+        {data.text}
+      </div>
+      <div className="zone-summary-actions">
+        <button className="zone-summary-action nodrag" onClick={handleGenerate} title="Auto-generate summary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 3l1.45 4.35L18 9l-4.55 1.65L12 15l-1.45-4.35L6 9l4.55-1.65L12 3z"/></svg>
+        </button>
+      </div>
+      <Handle type="source" position={Position.Bottom} id="summary-bottom" />
+      <Handle type="target" position={Position.Left} id="summary-left" />
+      <Handle type="source" position={Position.Right} id="summary-right" />
+    </div>
+  );
+}
+
+const nodeTypes = {
+  postit: PostItNode,
+  zone: ZoneNode,
+  generate: GenerateNode,
+  brief: BriefNode,
+  modifier: ModifierNode,
+  zoneSummary: ZoneSummaryNode,
+  question: QuestionNode,
+};
+
+let toastTimeout;
+function showToast(msg) {
+  let el = document.getElementById('toast');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'toast';
+    el.className = 'toast';
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => el.classList.remove('show'), 1500);
+}
+
+function buildInitialNodes() {
+  const nodes = [];
+  const ZONE_W = 600;
+  const ZONE_H = 500;
+  const ZONE_GAP = 40;
+  const CARD_SIZE = 180;
+  const CARD_GAP = 20;
+  const COLS = 2;
+  const SUMMARY_H = 80;
+  const SUMMARY_GAP = 12;
+  const ROW_H = SUMMARY_H + SUMMARY_GAP + ZONE_H + ZONE_GAP;
+
+  nodes.push({
+    id: 'brief-node',
+    type: 'brief',
+    position: { x: snap(-320), y: snap(SUMMARY_H + SUMMARY_GAP + 100) },
+    data: { text: 'Skincare launch — ingredient-forward brand for Gen Z. Position around transparency and formula literacy rather than aspirational lifestyle.', timestamp: 'Just now' },
+    style: { width: snap(260), height: snap(200) },
+    draggable: true,
+  });
+
+  nodes.push({
+    id: 'modifier-audience',
+    type: 'modifier',
+    position: { x: snap(-320), y: snap(SUMMARY_H + SUMMARY_GAP + 380) },
+    data: { label: 'Audience', iconType: 'users', text: 'Gen Z, 18-25, skincare-curious, values transparency over aesthetic' },
+    style: { width: snap(220), height: snap(100) },
+    draggable: true,
+  });
+
+  nodes.push({
+    id: 'modifier-constraint',
+    type: 'modifier',
+    position: { x: snap(-320), y: snap(SUMMARY_H + SUMMARY_GAP + 520) },
+    data: { label: 'Constraint', iconType: 'lock', text: 'No clean beauty claims. No lifestyle aspiration imagery.' },
+    style: { width: snap(220), height: snap(100) },
+    draggable: true,
+  });
+
+  const zoneSummaryTexts = [
+    'Gen Z wants authenticity but rewards production value. The opportunity is making craft feel effortless.',
+    'Lead with ingredient literacy. Not clean beauty but formula-forward — make the science the story.',
+    'Formula cards as shareable assets, interactive ingredient explorer, information-dense packaging.',
+    'No clean or natural claims, no lifestyle aspiration, no generic beauty imagery. Educate at every touchpoint.',
   ];
 
-  let aiIndex = 0;
+  SAMPLE_ZONES.forEach((zone, zi) => {
+    const col = zi % 2;
+    const row = Math.floor(zi / 2);
+    const zx = snap(col * (ZONE_W + ZONE_GAP));
+    const summaryY = snap(row * ROW_H);
+    const zy = snap(row * ROW_H + SUMMARY_H + SUMMARY_GAP);
+    const zoneId = `zone-${zi}`;
 
-  function showToast(message) {
-    toast.textContent = message;
-    toast.classList.add('show');
-    window.clearTimeout(showToast.timer);
-    showToast.timer = window.setTimeout(() => {
-      toast.classList.remove('show');
-    }, 1200);
-  }
-
-  function syncThemeIcon() {
-    const dark = root.dataset.theme === 'dark';
-    sunIcon.style.display = dark ? 'none' : 'block';
-    moonIcon.style.display = dark ? 'block' : 'none';
-  }
-
-  function syncColorwayState(activeId) {
-    colorwayItems.forEach((item) => {
-      item.classList.toggle('active', item.dataset.colorway === activeId);
+    nodes.push({
+      id: `summary-${zi}`,
+      type: 'zoneSummary',
+      position: { x: zx, y: summaryY },
+      data: { text: zoneSummaryTexts[zi], zoneName: zone.label, zoneColor: zone.color, cardCount: 3 },
+      style: { width: snap(ZONE_W), height: snap(SUMMARY_H) },
+      draggable: true,
     });
-  }
 
-  function renderAiSuggestion() {
-    const suggestion = aiSuggestions[aiIndex];
-    aiBubbleText.textContent = suggestion.text;
-    aiBubbleCount.textContent = (aiIndex + 1) + ' / ' + aiSuggestions.length;
-    aiBubbleActions.innerHTML = suggestion.actions.map((label, index) => {
-      return '<button class="ai-bubble-action"><span class="ai-bubble-action-key">' + String.fromCharCode(65 + index) + '</span>' + label + '</button>';
-    }).join('');
-  }
+    nodes.push({
+      id: zoneId,
+      type: 'zone',
+      position: { x: zx, y: zy },
+      data: { label: zone.label, color: zone.color },
+      style: { width: snap(ZONE_W), height: snap(ZONE_H) },
+      draggable: true,
+      selectable: true,
+    });
 
-  themeToggle.addEventListener('click', () => {
-    root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
-    syncThemeIcon();
+    const zoneCards = SAMPLE_CARDS.slice(zi * 3, zi * 3 + 3);
+    zoneCards.forEach((card, ci) => {
+      nodes.push({
+        id: `card-${zi}-${ci}`,
+        type: 'postit',
+        position: { x: snap(20 + (ci % COLS) * (CARD_SIZE + CARD_GAP)), y: snap(44 + Math.floor(ci / COLS) * (CARD_SIZE + CARD_GAP)) },
+        parentId: zoneId,
+        extent: 'parent',
+        data: { ...card, color: ZONE_TO_POSTIT[zone.color], starred: false },
+        draggable: true,
+      });
+    });
   });
 
-  colorwayToggle.addEventListener('click', (event) => {
-    event.stopPropagation();
-    colorwayDropdown.style.display = colorwayDropdown.style.display === 'none' ? 'block' : 'none';
+  const distilledX = snap(2 * (ZONE_W + ZONE_GAP) + 80);
+  const distilledY = snap(SUMMARY_H + SUMMARY_GAP);
+
+  nodes.push({
+    id: 'summary-distilled',
+    type: 'zoneSummary',
+    position: { x: distilledX, y: 0 },
+    data: { text: '', zoneName: 'Distilled', zoneColor: 'distilled', cardCount: 0 },
+    style: { width: snap(ZONE_W), height: snap(SUMMARY_H) },
+    draggable: true,
   });
 
-  colorwayItems.forEach((item) => {
-    item.addEventListener('click', () => {
-      const next = item.dataset.colorway;
-      if (next === 'gruvbox') {
-        root.removeAttribute('data-colorway');
-      } else {
-        root.dataset.colorway = next;
+  nodes.push({
+    id: 'zone-distilled',
+    type: 'zone',
+    position: { x: distilledX, y: distilledY },
+    data: { label: 'Distilled', color: 'distilled' },
+    style: { width: snap(ZONE_W), height: snap(ZONE_H * 2 + ZONE_GAP) },
+    draggable: true,
+    selectable: true,
+  });
+
+  nodes.push({
+    id: 'generate-standalone',
+    type: 'generate',
+    position: { x: snap(distilledX + ZONE_W + 60), y: snap(180) },
+    data: { zoneLabel: 'Canvas' },
+    draggable: true,
+  });
+
+  nodes.push({
+    id: 'question-1',
+    type: 'question',
+    position: { x: snap(-320 + 280), y: snap(SUMMARY_H + SUMMARY_GAP + 60) },
+    data: { questions: SAMPLE_QUESTIONS },
+    style: { width: snap(360) },
+    draggable: true,
+  });
+
+  return nodes;
+}
+
+function buildInitialEdges() {
+  return [
+    { id: 'e-brief-zone0', source: 'brief-node', sourceHandle: 'brief-out', target: 'zone-0', targetHandle: 'zone-left', type: 'smoothstep', animated: false },
+    { id: 'e-brief-question', source: 'brief-node', sourceHandle: 'brief-out', target: 'question-1', targetHandle: 'q-in', type: 'smoothstep', animated: true },
+    { id: 'e-mod-zone2', source: 'modifier-audience', sourceHandle: 'right', target: 'zone-2', targetHandle: 'zone-left', type: 'smoothstep', animated: false },
+    { id: 'e-sum0-z0', source: 'summary-0', sourceHandle: 'summary-bottom', target: 'zone-0', targetHandle: 'zone-top', type: 'smoothstep', animated: false },
+    { id: 'e-sum1-z1', source: 'summary-1', sourceHandle: 'summary-bottom', target: 'zone-1', targetHandle: 'zone-top', type: 'smoothstep', animated: false },
+    { id: 'e-sum2-z2', source: 'summary-2', sourceHandle: 'summary-bottom', target: 'zone-2', targetHandle: 'zone-top', type: 'smoothstep', animated: false },
+    { id: 'e-sum3-z3', source: 'summary-3', sourceHandle: 'summary-bottom', target: 'zone-3', targetHandle: 'zone-top', type: 'smoothstep', animated: false },
+  ];
+}
+
+function App() {
+  const [nodes, setNodes, onNodesChange] = useNodesState(buildInitialNodes());
+  const [edges, setEdges, onEdgesChange] = useEdgesState(buildInitialEdges());
+  const [tool, setTool] = React.useState('select');
+  const [zoom, setZoom] = React.useState(1);
+  const [showNewBlock, setShowNewBlock] = React.useState(false);
+  const [showNewNode, setShowNewNode] = React.useState(false);
+  const [showThemePicker, setShowThemePicker] = React.useState(false);
+  const [darkMode, setDarkMode] = React.useState(true);
+  const [colorway, setColorway] = React.useState('gruvbox');
+  const reactFlowInstance = useReactFlow();
+  const { setMenu } = React.useContext(ContextMenuContext);
+
+  React.useEffect(() => {
+    document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
+    if (colorway !== 'gruvbox') {
+      document.documentElement.setAttribute('data-colorway', colorway);
+    } else {
+      document.documentElement.removeAttribute('data-colorway');
+    }
+  }, [darkMode, colorway]);
+
+  const onMoveEnd = React.useCallback((_, vp) => setZoom(vp.zoom), []);
+  const onConnect = React.useCallback((params) => {
+    setEdges((eds) => addEdge({ ...params, type: 'smoothstep', animated: false }, eds));
+  }, [setEdges]);
+
+  const onPaneContextMenu = React.useCallback((e) => {
+    e.preventDefault();
+    const selectedNodes = nodes.filter((n) => n.selected);
+    const items = [];
+    if (selectedNodes.length > 1) {
+      items.push({ label: `Group ${selectedNodes.length} nodes`, icon: 'layers', action: () => showToast('grouping...') });
+      items.push({ divider: true });
+    }
+    items.push({
+      label: 'Add zone here',
+      icon: 'plus',
+      action: () => {
+        const vp = reactFlowInstance.getViewport();
+        const x = snap((e.clientX - vp.x) / vp.zoom);
+        const y = snap((e.clientY - vp.y) / vp.zoom);
+        const color = ZONE_COLORS[Math.floor(Math.random() * ZONE_COLORS.length)];
+        setNodes((nds) => [...nds, {
+          id: `zone-new-${Date.now()}`,
+          type: 'zone',
+          position: { x: snap(x - 300), y: snap(y - 250) },
+          data: { label: 'New Zone', color },
+          style: { width: 600, height: 500 },
+          draggable: true,
+          selectable: true,
+        }]);
+        showToast('zone added');
+      },
+    });
+    items.push({ label: 'Fit view', icon: 'search', action: () => reactFlowInstance.fitView({ duration: 200, padding: 0.15 }) });
+    setMenu({ x: e.clientX, y: e.clientY, items });
+  }, [nodes, reactFlowInstance, setNodes, setMenu]);
+
+  const addZone = React.useCallback((zoneType) => {
+    const vp = reactFlowInstance.getViewport();
+    const cx = (-vp.x + window.innerWidth / 2) / vp.zoom;
+    const cy = (-vp.y + window.innerHeight / 2) / vp.zoom;
+    const color = ZONE_COLORS[Math.floor(Math.random() * ZONE_COLORS.length)];
+    setNodes((nds) => [...nds, {
+      id: `zone-new-${Date.now()}`,
+      type: 'zone',
+      position: { x: cx - 300, y: cy - 250 },
+      data: { label: zoneType.label, color },
+      style: { width: 600, height: 500 },
+      draggable: true,
+      selectable: true,
+    }]);
+    setShowNewBlock(false);
+    showToast(`added ${zoneType.label}`);
+  }, [reactFlowInstance, setNodes]);
+
+  const addModifierNode = React.useCallback((nodeInfo) => {
+    const vp = reactFlowInstance.getViewport();
+    const cx = (-vp.x + window.innerWidth / 2) / vp.zoom;
+    const cy = (-vp.y + window.innerHeight / 2) / vp.zoom;
+    setNodes((nds) => [...nds, {
+      id: `modifier-${Date.now()}`,
+      type: 'modifier',
+      position: { x: cx - 90, y: cy - 50 },
+      data: { label: nodeInfo.label, iconType: nodeInfo.iconType, text: nodeInfo.defaultText },
+      style: { width: 180, height: 100 },
+      draggable: true,
+    }]);
+    setShowNewNode(false);
+    showToast(`added ${nodeInfo.label}`);
+  }, [reactFlowInstance, setNodes]);
+
+  React.useEffect(() => {
+    const handler = (e) => {
+      if (!e.target.closest('.new-block-btn') && !e.target.closest('.dropdown-menu')) {
+        setShowNewBlock(false);
+        setShowNewNode(false);
       }
-      syncColorwayState(next);
-      colorwayDropdown.style.display = 'none';
-      showToast('colorway: ' + item.textContent.trim().toLowerCase());
-    });
-  });
+      if (!e.target.closest('.theme-picker-wrapper')) {
+        setShowThemePicker(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
 
-  newNodeToggle.addEventListener('click', (event) => {
-    event.stopPropagation();
-    newNodeDropdown.style.display = newNodeDropdown.style.display === 'none' ? 'flex' : 'none';
-  });
+  return (
+    <>
+      <div className="logo-fixed">Seeds</div>
 
-  pointerMode.addEventListener('click', () => {
-    pointerMode.classList.add('active');
-    nodeMode.classList.remove('active');
-    canvasShell.classList.remove('canvas-node-mode');
-    canvasShell.classList.add('canvas-pointer-mode');
-    newNodeDropdown.style.display = 'none';
-  });
+      <div className="top-right-bar">
+        <button className="btn-icon" onClick={() => setDarkMode(!darkMode)} title={darkMode ? 'Light mode' : 'Dark mode'}>
+          {darkMode ? <Icon type="sun" size={14} /> : <Icon type="moon" size={14} />}
+        </button>
+        <div className="theme-picker-wrapper">
+          <button className="theme-picker-btn" onClick={() => setShowThemePicker(!showThemePicker)} title="Theme">
+            <Icon type="palette" size={14} />
+          </button>
+          {showThemePicker && (
+            <div className="theme-picker-dropdown">
+              <div className="dropdown-section-label" style={{ padding: '5px 12px 3px' }}>Color</div>
+              {COLORWAYS.filter((c) => c.group === 'color').map((cw) => (
+                <button key={cw.id} className={`theme-picker-item ${colorway === cw.id ? 'active' : ''}`} onClick={() => { setColorway(cw.id); setShowThemePicker(false); }}>
+                  <div className="theme-picker-swatch" style={{ background: cw.swatch }} />
+                  {cw.label}
+                </button>
+              ))}
+              <div className="theme-picker-divider" />
+              <div className="dropdown-section-label" style={{ padding: '5px 12px 3px' }}>Mono</div>
+              {COLORWAYS.filter((c) => c.group === 'mono').map((cw) => (
+                <button key={cw.id} className={`theme-picker-item ${colorway === cw.id ? 'active' : ''}`} onClick={() => { setColorway(cw.id); setShowThemePicker(false); }}>
+                  <div className="theme-picker-swatch" style={{ background: cw.swatch }} />
+                  {cw.label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+        <div className="user-avatar" title="Account"><Icon type="user" size={15} /></div>
+      </div>
 
-  nodeMode.addEventListener('click', () => {
-    nodeMode.classList.add('active');
-    pointerMode.classList.remove('active');
-    canvasShell.classList.remove('canvas-pointer-mode');
-    canvasShell.classList.add('canvas-node-mode');
-  });
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        onConnect={onConnect}
+        nodeTypes={nodeTypes}
+        onMoveEnd={onMoveEnd}
+        onPaneContextMenu={onPaneContextMenu}
+        panOnDrag={tool === 'hand' ? true : [1, 2]}
+        selectionOnDrag={tool === 'select'}
+        fitView
+        fitViewOptions={{ padding: 0.15 }}
+        minZoom={0.1}
+        maxZoom={3}
+        snapToGrid
+        snapGrid={[GRID, GRID]}
+        defaultEdgeOptions={{ type: 'smoothstep' }}
+        proOptions={{ hideAttribution: true }}
+        connectionLineStyle={{ stroke: 'var(--connection)', strokeWidth: 1.5, strokeDasharray: '6 3' }}
+      >
+        <Background variant="dots" color="var(--dot-color)" gap={20} size={2} />
+      </ReactFlow>
 
-  aiBubbleTrigger.addEventListener('click', () => {
-    const open = aiBubbleCard.style.display !== 'none';
-    aiBubbleCard.style.display = open ? 'none' : 'flex';
-  });
+      <div className="floating-toolbar">
+        <button className={`toolbar-btn ${tool === 'select' ? 'active' : ''}`} onClick={() => setTool('select')} title="Select">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/></svg>
+        </button>
+        <button className={`toolbar-btn ${tool === 'hand' ? 'active' : ''}`} onClick={() => setTool('hand')} title="Pan">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M18 11V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2v1M14 10V4a2 2 0 0 0-2-2a2 2 0 0 0-2 2v6M10 10.5V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2v8"/>
+            <path d="M18 8a2 2 0 0 1 2 2v7.4a4 4 0 0 1-.68 2.22L16.8 23.1a1 1 0 0 1-.85.47H8.73a1 1 0 0 1-.79-.39l-3.6-4.68A2 2 0 0 1 4 17.5a2 2 0 0 1 2-2h.59"/>
+          </svg>
+        </button>
+        <div className="toolbar-divider"></div>
+        <div style={{ position: 'relative' }}>
+          <button className="new-block-btn" onClick={() => { setShowNewBlock(!showNewBlock); setShowNewNode(false); }}>
+            <Icon type="plus" size={14} /> Block
+          </button>
+          {showNewBlock && (
+            <div className="dropdown-menu">
+              {ZONE_TYPES.map((zt, i) => (
+                <button key={i} className="dropdown-item" onClick={() => addZone(zt)}><Icon type={zt.iconType} size={13} />{zt.label}</button>
+              ))}
+            </div>
+          )}
+        </div>
+        <div style={{ position: 'relative' }}>
+          <button className="new-block-btn" onClick={() => { setShowNewNode(!showNewNode); setShowNewBlock(false); }}>
+            <Icon type="cube" size={14} /> Node
+          </button>
+          {showNewNode && (
+            <div className="dropdown-menu">
+              <div className="dropdown-section-label">Modifiers</div>
+              {NODE_TYPES_MENU.map((nt, i) => (
+                <button key={i} className="dropdown-item" onClick={() => addModifierNode(nt)}><Icon type={nt.iconType} size={13} />{nt.label}</button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
 
-  aiBubbleLater.addEventListener('click', () => {
-    aiIndex = (aiIndex + 1) % aiSuggestions.length;
-    renderAiSuggestion();
-    aiBubbleCard.style.display = 'none';
-  });
+      <div className="zoom-controls">
+        <button className="zoom-btn" onClick={() => reactFlowInstance.zoomIn({ duration: 150 })}>+</button>
+        <div className="zoom-level">{Math.round(zoom * 100)}%</div>
+        <button className="zoom-btn" onClick={() => reactFlowInstance.zoomOut({ duration: 150 })}>{'\u2212'}</button>
+        <button className="zoom-btn" onClick={() => reactFlowInstance.fitView({ duration: 200, padding: 0.15 })} title="Fit view" style={{ fontSize: '11px' }}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="12" height="12"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+        </button>
+      </div>
+    </>
+  );
+}
 
-  document.addEventListener('click', (event) => {
-    if (!colorwayDropdown.contains(event.target) && event.target !== colorwayToggle && !colorwayToggle.contains(event.target)) {
-      colorwayDropdown.style.display = 'none';
-    }
-    if (!newNodeDropdown.contains(event.target) && event.target !== newNodeToggle && !newNodeToggle.contains(event.target)) {
-      newNodeDropdown.style.display = 'none';
-    }
-  });
+function Root() {
+  return (
+    <ContextMenuProvider>
+      <ReactFlowProvider>
+        <App />
+      </ReactFlowProvider>
+    </ContextMenuProvider>
+  );
+}
 
-  syncThemeIcon();
-  syncColorwayState(root.dataset.colorway || 'gruvbox');
-  renderAiSuggestion();
+ReactDOM.createRoot(document.getElementById('root')).render(<Root />);
 </script>
 </body>
 </html>
