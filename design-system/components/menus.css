@@ -198,3 +198,21 @@
   background: var(--border);
   margin: 2px 0;
 }
+
+/* ── Responsive ── */
+@media (max-width: 700px) {
+  .context-menu {
+    min-width: 160px;
+    max-width: calc(100vw - 24px);
+  }
+
+  .dropdown-menu {
+    min-width: 160px;
+    max-width: calc(100vw - 24px);
+  }
+
+  .theme-picker-dropdown {
+    min-width: 140px;
+    max-width: calc(100vw - 24px);
+  }
+}

@@ -538,14 +538,18 @@
     <div class="subsection">
       <div class="subsection-title">Select</div>
       <div class="demo-row">
-        <select class="sort-select">
-          <option value="recent">Recent</option>
-          <option value="name">Name</option>
-          <option value="created">Created</option>
-        </select>
-        <select class="sort-select" disabled>
-          <option>Disabled</option>
-        </select>
+        <div class="sort-select-wrapper">
+          <select class="sort-select">
+            <option value="recent">Recent</option>
+            <option value="name">Name</option>
+            <option value="created">Created</option>
+          </select>
+        </div>
+        <div class="sort-select-wrapper">
+          <select class="sort-select" disabled>
+            <option>Disabled</option>
+          </select>
+        </div>
       </div>
     </div>
 
@@ -700,32 +704,6 @@
       </div>
     </div>
 
-    <div class="subsection">
-      <div class="subsection-title">Brief Node</div>
-      <div style="width:260px;">
-        <div class="brief-node">
-          <div class="brief-node-label">Brief</div>
-          <div class="brief-node-text">Develop brand positioning for a new skincare line targeting Gen Z. Focus on transparency, ingredient literacy, and standing out in a crowded clean beauty market.</div>
-          <div class="brief-node-meta">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            2 min ago
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="subsection">
-      <div class="subsection-title">Modifier Node</div>
-      <div style="width:220px;">
-        <div class="modifier-node">
-          <div class="modifier-node-label">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px; height:11px;"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-            Brand Reference
-          </div>
-          <div class="modifier-node-text">The Ordinary's radical ingredient transparency model. Scientific naming as brand language.</div>
-        </div>
-      </div>
-    </div>
   </div>
 
   <!-- ════════════════════════════════════════ -->
@@ -802,21 +780,90 @@
       <div class="subsection-title">Floating Toolbar</div>
       <div class="toolbar-demo">
         <div class="floating-toolbar">
-          <button class="toolbar-btn" title="Select">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 9 2 12 5 15"/><polyline points="9 5 12 2 15 5"/><polyline points="15 19 12 22 9 19"/><polyline points="19 9 22 12 19 15"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/></svg>
+          <button class="toolbar-btn active" title="Pointer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/><path d="M13 13l6 6"/></svg>
           </button>
-          <div class="toolbar-divider"></div>
-          <button class="toolbar-btn active" title="Post-it">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="0"/></svg>
-          </button>
-          <button class="toolbar-btn" title="Zone">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          <button class="toolbar-btn" title="Pan">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2v1M14 10V4a2 2 0 0 0-2-2a2 2 0 0 0-2 2v6M10 10.5V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 0 1 2 2v7.4a4 4 0 0 1-.68 2.22L16.8 23.1a1 1 0 0 1-.85.47H8.73a1 1 0 0 1-.79-.39l-3.6-4.68A2 2 0 0 1 4 17.5a2 2 0 0 1 2-2h.59"/></svg>
           </button>
           <div class="toolbar-divider"></div>
           <button class="new-block-btn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            New Block
+            <span>Block</span>
           </button>
+          <button class="new-block-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+            <span>Node</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Block Dropdown (Zone Types)</div>
+      <div class="demo-row" style="gap:24px; align-items:flex-start;">
+        <div class="menu-demo" style="display:inline-block;">
+          <div class="dropdown-menu" style="position:relative; bottom:auto; left:auto; transform:none;">
+            <button class="dropdown-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>
+              Ideas
+            </button>
+            <button class="dropdown-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+              Strategy
+            </button>
+            <button class="dropdown-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              Insights
+            </button>
+            <button class="dropdown-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+              Frameworks
+            </button>
+            <button class="dropdown-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              Tensions
+            </button>
+            <button class="dropdown-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M13.06 7.9a14.88 14.88 0 0 1 4 2.68"/><path d="M12 12a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/><path d="M2 16.1A5 5 0 0 1 5.9 20M5.9 12.1a9 9 0 0 1 6 3.4"/></svg>
+              Signals
+            </button>
+            <button class="dropdown-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+              Provocations
+            </button>
+            <button class="dropdown-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              Guard Rails
+            </button>
+          </div>
+        </div>
+
+        <div class="menu-demo" style="display:inline-block;">
+          <div class="subsection-title" style="margin-bottom:8px;">Node Dropdown (Modifiers)</div>
+          <div class="dropdown-menu" style="position:relative; bottom:auto; left:auto; transform:none;">
+            <div class="dropdown-section-label">Modifiers</div>
+            <button class="dropdown-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+              Brand Reference
+            </button>
+            <button class="dropdown-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              Audience Note
+            </button>
+            <button class="dropdown-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Constraint
+            </button>
+            <button class="dropdown-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              Question
+            </button>
+            <button class="dropdown-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              Reference Link
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -1086,6 +1133,704 @@
   </div>
 
   <!-- ════════════════════════════════════════ -->
+  <!-- NODE SYSTEM -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-title">Node System</div>
+
+    <!-- Node base template -->
+    <div class="subsection">
+      <div class="subsection-title">Node Base Template</div>
+      <div style="font-family:var(--mono); font-size:var(--text-xs); color:var(--fg-3); letter-spacing:var(--tracking-normal); margin-bottom:12px; max-width:600px; line-height:1.6;">
+        All canvas nodes extend <code style="background:var(--surface); border:1px solid var(--border); padding:1px 4px;">.node-base</code> for shared border, background, hover, selection, and multi-select states. This template ensures visual consistency when designing new node types.
+      </div>
+      <div class="demo-row" style="gap:16px; align-items:flex-start;">
+        <div>
+          <div style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Default</div>
+          <div class="node-base" style="width:180px; height:100px; padding:12px;">
+            <div class="node-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18"/></svg>
+              <span>Node Type</span>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Selected</div>
+          <div class="node-base selected" style="width:180px; height:100px; padding:12px;">
+            <div class="node-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18"/></svg>
+              <span>Node Type</span>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Multi-selected</div>
+          <div class="node-base multi-selected" style="width:180px; height:100px; padding:12px;">
+            <div class="node-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18"/></svg>
+              <span>Node Type</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Brief node input state -->
+    <div class="subsection">
+      <div class="subsection-title">Brief Node — Input State</div>
+      <div class="demo-row" style="gap:24px; align-items:flex-start;">
+        <div class="node-base brief-node-input" style="width:360px;">
+          <div class="node-header">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <span>Brief</span>
+          </div>
+
+          <textarea class="brief-input-text" placeholder="Describe your project brief, goals, and context..." rows="3">We're launching a new skincare line targeting Gen Z consumers who care about ingredient transparency. The brand should feel scientific but approachable.</textarea>
+
+          <div class="brief-drop-zone">
+            <div class="brief-drop-zone-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            </div>
+            <div class="brief-drop-zone-text">Drop files or click to upload</div>
+            <div class="brief-drop-zone-hint">PDF, images, docs up to 10MB</div>
+          </div>
+
+          <div class="brief-attachments">
+            <div class="brief-attachment">
+              <div class="brief-attachment-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              </div>
+              <div class="brief-attachment-info">
+                <div class="brief-attachment-name">brand-guidelines.pdf</div>
+                <div class="brief-attachment-size">2.4 MB</div>
+              </div>
+              <button class="brief-attachment-delete">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+            <div class="brief-attachment uploading">
+              <div class="brief-attachment-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              </div>
+              <div class="brief-attachment-progress">
+                <div class="brief-attachment-name">competitor-analysis.png</div>
+                <div class="brief-attachment-progress-bar">
+                  <div class="brief-attachment-progress-fill" style="width:65%;"></div>
+                </div>
+                <div class="brief-attachment-progress-text">65% — uploading...</div>
+              </div>
+              <button class="brief-attachment-delete">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+            <div class="brief-attachment error">
+              <div class="brief-attachment-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              </div>
+              <div class="brief-attachment-info">
+                <div class="brief-attachment-name">too-large-file.zip</div>
+                <div class="brief-attachment-size" style="color:var(--danger);">Exceeds 10MB limit</div>
+              </div>
+              <button class="brief-attachment-delete" style="opacity:1;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="brief-input-footer">
+            <span class="brief-char-count">142 / 2000</span>
+            <div class="spacer"></div>
+            <button class="btn-ghost" style="padding:5px 8px; font-size:9px;">Cancel</button>
+            <button class="btn-primary" style="padding:5px 10px; font-size:9px;">Save Brief</button>
+          </div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:8px; max-width:240px;">
+          <div style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em;">States shown</div>
+          <div style="font-family:var(--mono); font-size:9px; color:var(--fg-3); letter-spacing:0.04em; line-height:1.6;">
+            &bull; Textarea with placeholder<br>
+            &bull; Drop zone (default + drag-over)<br>
+            &bull; Completed upload with delete<br>
+            &bull; In-progress upload with bar<br>
+            &bull; Error state (file too large)<br>
+            &bull; Character count<br>
+            &bull; Footer with cancel/save
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Brief Node (display state) -->
+    <div class="subsection">
+      <div class="subsection-title">Brief Node — Display State</div>
+      <div style="width:260px;">
+        <div class="brief-node">
+          <div class="brief-node-label">Brief</div>
+          <div class="brief-node-text">Develop brand positioning for a new skincare line targeting Gen Z. Focus on transparency, ingredient literacy, and standing out in a crowded clean beauty market.</div>
+          <div class="brief-node-meta">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            2 min ago
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Brief node empty state -->
+    <div class="subsection">
+      <div class="subsection-title">Brief Node — Empty State</div>
+      <div class="demo-row" style="gap:24px; align-items:flex-start;">
+        <div class="node-base brief-node-input" style="width:360px;">
+          <div class="node-header">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <span>Brief</span>
+          </div>
+
+          <textarea class="brief-input-text" placeholder="Describe your project brief, goals, and context..." rows="3"></textarea>
+
+          <div class="brief-drop-zone">
+            <div class="brief-drop-zone-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            </div>
+            <div class="brief-drop-zone-text">Drop files or click to upload</div>
+            <div class="brief-drop-zone-hint">PDF, images, docs up to 10MB</div>
+          </div>
+
+          <div class="brief-input-footer">
+            <span class="brief-char-count">0 / 2000</span>
+            <div class="spacer"></div>
+            <button class="btn-primary" style="padding:5px 10px; font-size:9px;" disabled>Save Brief</button>
+          </div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:8px; max-width:240px;">
+          <div style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em;">Empty state</div>
+          <div style="font-family:var(--mono); font-size:9px; color:var(--fg-3); letter-spacing:0.04em; line-height:1.6;">
+            &bull; Visible textarea with placeholder<br>
+            &bull; Drop zone ready for files<br>
+            &bull; No attachments yet<br>
+            &bull; Save button disabled<br>
+            &bull; Character count at 0
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Brief node with prompt suggestions (below textarea) -->
+    <div class="subsection">
+      <div class="subsection-title">Brief Node — With Prompt Suggestions</div>
+      <div class="node-base brief-node-input" style="width:400px;">
+        <div class="node-header">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <span>Brief</span>
+        </div>
+
+        <textarea class="brief-input-text" placeholder="Start typing or pick a suggestion below..." rows="2"></textarea>
+
+        <div class="brief-suggestions-divider"></div>
+
+        <div class="brief-suggestions">
+          <div class="brief-suggestions-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.45 4.35L18 9l-4.55 1.65L12 15l-1.45-4.35L6 9l4.55-1.65L12 3z"/></svg>
+            Suggested prompts
+          </div>
+          <div class="brief-suggestion-chips">
+            <button class="brief-suggestion">Describe your target audience and what makes them unique</button>
+            <button class="brief-suggestion">What problem does your product solve?</button>
+            <button class="brief-suggestion">Define the emotional tone you want to convey</button>
+            <button class="brief-suggestion">List 3 competitors and what you'd do differently</button>
+          </div>
+        </div>
+
+        <div class="brief-drop-zone">
+          <div class="brief-drop-zone-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          </div>
+          <div class="brief-drop-zone-text">Drop files or click to upload</div>
+        </div>
+
+        <div class="brief-input-footer">
+          <span class="brief-char-count">0 / 2000</span>
+          <div class="spacer"></div>
+          <button class="btn-primary" style="padding:5px 10px; font-size:9px;" disabled>Save Brief</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modifier Node -->
+    <div class="subsection">
+      <div class="subsection-title">Modifier Node</div>
+      <div class="demo-row" style="gap:16px; align-items:flex-start;">
+        <div style="width:220px;">
+          <div class="modifier-node">
+            <div class="modifier-node-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px; height:11px;"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+              Brand Reference
+            </div>
+            <div class="modifier-node-text">The Ordinary's radical ingredient transparency model. Scientific naming as brand language.</div>
+          </div>
+        </div>
+        <div style="width:220px;">
+          <div class="modifier-node">
+            <div class="modifier-node-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px; height:11px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Constraint
+            </div>
+            <div class="modifier-node-text">Budget must not exceed $50k for initial launch. No animal testing claims without certification.</div>
+          </div>
+        </div>
+        <div style="width:220px;">
+          <div class="modifier-node">
+            <div class="modifier-node-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px; height:11px;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              Audience Note
+            </div>
+            <div class="modifier-node-text">Primary: 18-24 year olds who research ingredients on TikTok before purchasing.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Multi-select variants -->
+    <div class="subsection">
+      <div class="subsection-title">Multi-Select States</div>
+      <div style="font-family:var(--mono); font-size:var(--text-xs); color:var(--fg-3); letter-spacing:var(--tracking-normal); margin-bottom:12px; line-height:1.6;">
+        Hold Shift+Click to select multiple items, or drag a selection box across the canvas.
+      </div>
+      <div class="demo-row" style="gap:16px; align-items:flex-start;">
+        <div>
+          <div style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Multi-selected Post-its</div>
+          <div style="display:flex; gap:12px;">
+            <div class="postit-node multi-selected" data-color="yellow" style="width:120px; height:120px; padding:10px;">
+              <div class="postit-type">Idea</div>
+              <div class="postit-text" style="font-size:10px;">Selected item one</div>
+            </div>
+            <div class="postit-node multi-selected" data-color="blue" style="width:120px; height:120px; padding:10px;">
+              <div class="postit-type">Signal</div>
+              <div class="postit-text" style="font-size:10px;">Selected item two</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Selection Box (rubber band)</div>
+          <div style="position:relative; width:200px; height:120px; background:var(--bg); border:1px solid var(--border);">
+            <div class="selection-box" style="top:15px; left:20px; width:160px; height:90px;"></div>
+          </div>
+        </div>
+        <div>
+          <div style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Selection Count Bar</div>
+          <div class="selection-count" style="position:relative; bottom:auto; left:auto; transform:none;">
+            <span class="selection-count-number">3</span> items selected
+            <div class="selection-count-actions">
+              <button class="btn-action" style="margin-left:0;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+              </button>
+              <button class="btn-action">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="demo-row" style="gap:16px; margin-top:16px; align-items:flex-start;">
+        <div>
+          <div style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Multi-selected Zone</div>
+          <div class="zone-demo" style="width:200px; height:120px;">
+            <div class="zone-node multi-selected" style="width:200px; height:120px;">
+              <div class="zone-header">
+                <span class="zone-label">Zone A</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Multi-selected Project Cards</div>
+          <div style="display:flex; gap:8px;">
+            <div class="project-card multi-selected" style="width:140px;">
+              <div class="card-thumb" style="height:80px; position:relative;"></div>
+              <div class="card-info" style="padding:8px 10px;">
+                <div class="card-name" style="font-size:9px;">Project A</div>
+              </div>
+            </div>
+            <div class="project-card multi-selected" style="width:140px;">
+              <div class="card-thumb" style="height:80px; position:relative;"></div>
+              <div class="card-info" style="padding:8px 10px;">
+                <div class="card-name" style="font-size:9px;">Project B</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- AI BUBBLE -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-title">AI Suggestion Bubble</div>
+
+    <div class="subsection">
+      <div class="subsection-title">Suggestion Card (Static Demo)</div>
+      <div style="font-family:var(--mono); font-size:var(--text-xs); color:var(--fg-3); letter-spacing:var(--tracking-normal); margin-bottom:12px; max-width:600px; line-height:1.6;">
+        Fixed-position AI assistant that surfaces contextual suggestions. Auto-cycles through suggestions with dismiss/later flow. Card enters with spring overshoot from bottom-right origin.
+      </div>
+      <div class="demo-row" style="gap:24px; align-items:flex-end;">
+        <!-- Trigger states -->
+        <div class="demo-col" style="gap:12px;">
+          <div style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em;">Idle trigger</div>
+          <div style="position:relative; display:inline-flex;">
+            <button class="ai-bubble-trigger" style="position:relative;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.45 4.35L18 9l-4.55 1.65L12 15l-1.45-4.35L6 9l4.55-1.65L12 3z"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="demo-col" style="gap:12px;">
+          <div style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em;">Has suggestion (pulsing)</div>
+          <div style="position:relative; display:inline-flex;">
+            <button class="ai-bubble-trigger has-suggestion" style="position:relative;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.45 4.35L18 9l-4.55 1.65L12 15l-1.45-4.35L6 9l4.55-1.65L12 3z"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Full card -->
+        <div style="position:relative;">
+          <div class="ai-bubble-card" style="animation:none;">
+            <div class="ai-bubble-card-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;"><path d="M12 3l1.45 4.35L18 9l-4.55 1.65L12 15l-1.45-4.35L6 9l4.55-1.65L12 3z"/></svg>
+              <span>Suggestion</span>
+              <span class="ai-bubble-card-count">1/4</span>
+            </div>
+            <div class="ai-bubble-card-text">Your Strategic Direction zone only has 3 cards — most projects benefit from at least 5. Want me to generate more?</div>
+            <div class="ai-bubble-card-actions">
+              <button class="ai-bubble-action">
+                <span class="ai-bubble-action-key">A</span>
+                Generate 2 more
+              </button>
+              <button class="ai-bubble-action">
+                <span class="ai-bubble-action-key">B</span>
+                Show tensions
+              </button>
+            </div>
+            <button class="ai-bubble-later">I'm good</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Interactive Demo (click trigger to toggle)</div>
+      <div class="demo-row" style="gap:16px; align-items:flex-end; min-height:280px;">
+        <div class="ai-bubble" id="ai-bubble-demo" style="position:relative; bottom:auto; right:auto;">
+          <div class="ai-bubble-card" id="ai-bubble-demo-card" style="display:none;">
+            <div class="ai-bubble-card-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;"><path d="M12 3l1.45 4.35L18 9l-4.55 1.65L12 15l-1.45-4.35L6 9l4.55-1.65L12 3z"/></svg>
+              <span>Suggestion</span>
+              <span class="ai-bubble-card-count" id="ai-bubble-demo-count">1/3</span>
+            </div>
+            <div class="ai-bubble-card-text" id="ai-bubble-demo-text">I notice you haven't distilled any cards yet. The Cultural Landscape zone has some strong signals.</div>
+            <div class="ai-bubble-card-actions" id="ai-bubble-demo-actions">
+              <button class="ai-bubble-action" onclick="dismissAiBubbleDemo()">
+                <span class="ai-bubble-action-key">A</span>
+                Show me the top 3
+              </button>
+              <button class="ai-bubble-action" onclick="dismissAiBubbleDemo()">
+                <span class="ai-bubble-action-key">B</span>
+                I'll pick myself
+              </button>
+            </div>
+            <button class="ai-bubble-later" onclick="dismissAiBubbleDemo()">Later</button>
+          </div>
+          <button class="ai-bubble-trigger has-suggestion" id="ai-bubble-demo-trigger" onclick="toggleAiBubbleDemo()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.45 4.35L18 9l-4.55 1.65L12 15l-1.45-4.35L6 9l4.55-1.65L12 3z"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- ANIMATIONS & LOADING STATES -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-title">Animations &amp; Loading States</div>
+
+    <!-- Skeleton Post-its -->
+    <div class="subsection">
+      <div class="subsection-title">Skeleton Post-it Notes</div>
+      <div class="demo-row" style="gap:16px; align-items:flex-start;">
+        <div class="postit-node skeleton" data-color="yellow">
+          <div class="postit-type">Idea</div>
+          <div class="postit-text">Loading content...</div>
+        </div>
+        <div class="postit-node skeleton" data-color="pink">
+          <div class="postit-type">Idea</div>
+          <div class="postit-text">Loading content...</div>
+        </div>
+        <div class="postit-node skeleton" data-color="blue">
+          <div class="postit-type">Idea</div>
+          <div class="postit-text">Loading content...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Skeleton → Populated transition -->
+    <div class="subsection">
+      <div class="subsection-title">Skeleton → Populated (click to toggle)</div>
+      <div class="demo-row" style="gap:16px; align-items:flex-start;">
+        <div class="postit-node skeleton" data-color="green" id="skeletonToggle1" style="cursor:pointer;">
+          <div class="postit-type">Insight</div>
+          <div class="postit-text">Content loads here</div>
+        </div>
+        <div class="postit-node" data-color="green" id="skeletonToggle1Real" style="display:none;">
+          <div class="postit-type">Insight</div>
+          <div class="postit-text">Gen Z consumers prioritize ingredient transparency over brand heritage — 73% say they check labels before purchasing</div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:6px; align-self:center;">
+          <div style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em;">← click to toggle</div>
+          <div style="font-family:var(--mono); font-size:9px; color:var(--fg-3); letter-spacing:0.04em;">Opacity pulses gently<br>while awaiting AI response</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Skeleton Project Cards -->
+    <div class="subsection">
+      <div class="subsection-title">Skeleton Project Cards</div>
+      <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; max-width:720px;">
+        <div class="project-card skeleton">
+          <div class="card-thumb"><div class="thumb-dots"></div></div>
+          <div class="card-info">
+            <div class="card-name">&nbsp;</div>
+            <div class="card-meta">&nbsp;</div>
+          </div>
+        </div>
+        <div class="project-card skeleton">
+          <div class="card-thumb"><div class="thumb-dots"></div></div>
+          <div class="card-info">
+            <div class="card-name">&nbsp;</div>
+            <div class="card-meta">&nbsp;</div>
+          </div>
+        </div>
+        <div class="project-card skeleton">
+          <div class="card-thumb"><div class="thumb-dots"></div></div>
+          <div class="card-info">
+            <div class="card-name">&nbsp;</div>
+            <div class="card-meta">&nbsp;</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Skeleton Zone + Summary -->
+    <div class="subsection">
+      <div class="subsection-title">Skeleton Zone &amp; Zone Summary</div>
+      <div class="demo-row" style="gap:24px; align-items:flex-start;">
+        <div class="zone-demo">
+          <div class="zone-node skeleton">
+            <div class="zone-header">
+              <span class="zone-label">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+            </div>
+          </div>
+        </div>
+        <div style="width:260px;">
+          <div class="zone-summary-node skeleton">
+            <div class="zone-summary-header">
+              <span class="zone-summary-label">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+              <span class="zone-summary-zone-name">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+            </div>
+            <div class="zone-summary-text">&nbsp;</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Thinking / Sweep animation -->
+    <div class="subsection">
+      <div class="subsection-title">Thinking / Sweep Animation</div>
+      <div class="demo-row" style="gap:16px; align-items:flex-start;">
+        <div class="postit-node thinking" data-color="yellow">
+          <div class="postit-type">Generating</div>
+          <div class="postit-text">AI is processing this post-it and refining the content...</div>
+        </div>
+        <div class="postit-node thinking" data-color="blue">
+          <div class="postit-type">Analyzing</div>
+          <div class="postit-text">Connecting insights across zones to find patterns...</div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:6px; align-self:center;">
+          <div style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em;">sweep overlay</div>
+          <div style="font-family:var(--mono); font-size:9px; color:var(--fg-3); letter-spacing:0.04em;">Card-colored light<br>sweeps across surface</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Processing / Pulse states -->
+    <div class="subsection">
+      <div class="subsection-title">Processing &amp; Waiting States</div>
+      <div class="demo-row" style="gap:16px; align-items:flex-start;">
+        <div>
+          <div style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Border Pulse</div>
+          <div class="zone-summary-node processing" style="width:220px;">
+            <div class="zone-summary-header">
+              <span class="zone-summary-label">Summary</span>
+              <span class="zone-summary-zone-name" data-color="yellow">Zone A</span>
+            </div>
+            <div class="zone-summary-text">Generating summary from 12 post-its...</div>
+          </div>
+        </div>
+        <div>
+          <div style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Opacity Pulse</div>
+          <div class="generate-node waiting">
+            <div class="generate-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.45 4.35L18 9l-4.55 1.65L12 15l-1.45-4.35L6 9l4.55-1.65L12 3z"/></svg>
+              Generate
+            </div>
+            <button class="generate-btn">Waiting for response...</button>
+          </div>
+        </div>
+        <div>
+          <div style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Spinner (generating)</div>
+          <div class="generate-node generating">
+            <div class="generate-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.45 4.35L18 9l-4.55 1.65L12 15l-1.45-4.35L6 9l4.55-1.65L12 3z"/></svg>
+              Generate
+            </div>
+            <button class="generate-btn" disabled>Generating ideas<span class="toast-ellipsis"><span>.</span><span>.</span><span>.</span></span></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast variants -->
+    <div class="subsection">
+      <div class="subsection-title">Toast Notification Variants</div>
+      <div class="demo-row toast-demo" style="gap:12px; align-items:flex-start; flex-wrap:wrap;">
+        <div class="demo-col" style="gap:8px;">
+          <div style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em;">Default</div>
+          <div class="toast" style="opacity:1; transform:none; position:relative; bottom:auto; left:auto;">starred</div>
+          <div class="toast" style="opacity:1; transform:none; position:relative; bottom:auto; left:auto;">rejected</div>
+        </div>
+        <div class="demo-col" style="gap:8px;">
+          <div style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em;">Semantic</div>
+          <div class="toast toast-success" style="opacity:1; transform:none; position:relative; bottom:auto; left:auto;">saved successfully</div>
+          <div class="toast toast-error" style="opacity:1; transform:none; position:relative; bottom:auto; left:auto;">generation failed</div>
+          <div class="toast toast-warning" style="opacity:1; transform:none; position:relative; bottom:auto; left:auto;">unsaved changes</div>
+        </div>
+        <div class="demo-col" style="gap:8px;">
+          <div style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em;">With Sweep (thinking)</div>
+          <div class="toast thinking" style="opacity:1; transform:none; position:relative; bottom:auto; left:auto; overflow:hidden;">generating ideas<span class="toast-ellipsis"><span>.</span><span>.</span><span>.</span></span></div>
+          <div class="toast thinking" style="opacity:1; transform:none; position:relative; bottom:auto; left:auto; overflow:hidden;">analyzing zone<span class="toast-ellipsis"><span>.</span><span>.</span><span>.</span></span></div>
+        </div>
+        <div class="demo-col" style="gap:8px;">
+          <div style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em;">With Progress Bar</div>
+          <div class="toast" style="opacity:1; transform:none; position:relative; bottom:auto; left:auto; overflow:hidden;">
+            auto-saving<span class="toast-ellipsis"><span>.</span><span>.</span><span>.</span></span>
+            <div class="toast-progress" style="animation-play-state:running;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Node appear + Stagger reveal -->
+    <div class="subsection">
+      <div class="subsection-title">Node Appear &amp; Stagger Reveal (click to replay)</div>
+      <div class="demo-row" style="gap:24px; align-items:flex-start;">
+        <div>
+          <div style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Node Appear</div>
+          <div class="postit-node node-appear" data-color="orange" id="nodeAppearDemo" style="cursor:pointer;">
+            <div class="postit-type">Signal</div>
+            <div class="postit-text">Scales up from 85% with spring overshoot to 102% then settles</div>
+          </div>
+        </div>
+        <div>
+          <div style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Stagger Results</div>
+          <div class="generate-node results-in" id="staggerDemo" style="cursor:pointer;">
+            <div class="generate-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.45 4.35L18 9l-4.55 1.65L12 15l-1.45-4.35L6 9l4.55-1.65L12 3z"/></svg>
+              Generate
+            </div>
+            <button class="generate-btn">Tensions &amp; signals</button>
+            <button class="generate-btn">Strategic directions</button>
+            <button class="generate-btn">Creative ideas</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Animated edges -->
+    <div class="subsection">
+      <div class="subsection-title">Animated Edge Variants</div>
+      <div class="demo-row" style="gap:24px; align-items:flex-start;">
+        <div class="demo-col">
+          <div style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:4px;">Data Flow (animated)</div>
+          <svg width="200" height="40" style="overflow:visible;">
+            <line x1="10" y1="20" x2="190" y2="20" stroke="var(--connection)" stroke-width="1.5" stroke-dasharray="6 3">
+              <animate attributeName="stroke-dashoffset" from="18" to="0" dur="0.6s" repeatCount="indefinite"/>
+            </line>
+            <rect x="4" y="16" width="8" height="8" fill="var(--handle-color)" stroke="var(--bg)" stroke-width="1.5"/>
+            <rect x="186" y="16" width="8" height="8" fill="var(--handle-color)" stroke="var(--bg)" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <div class="demo-col">
+          <div style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:4px;">Reverse Flow</div>
+          <svg width="200" height="40" style="overflow:visible;">
+            <line x1="10" y1="20" x2="190" y2="20" stroke="var(--connection)" stroke-width="1.5" stroke-dasharray="6 3">
+              <animate attributeName="stroke-dashoffset" from="0" to="18" dur="0.6s" repeatCount="indefinite"/>
+            </line>
+            <rect x="4" y="16" width="8" height="8" fill="var(--handle-color)" stroke="var(--bg)" stroke-width="1.5"/>
+            <rect x="186" y="16" width="8" height="8" fill="var(--handle-color)" stroke="var(--bg)" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <div class="demo-col">
+          <div style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:4px;">Idle Pulse</div>
+          <svg width="200" height="40" style="overflow:visible;">
+            <line x1="10" y1="20" x2="190" y2="20" stroke="var(--connection)" stroke-width="1.5" stroke-dasharray="6 3" class="edge-idle"/>
+            <rect x="4" y="16" width="8" height="8" fill="var(--handle-color)" stroke="var(--bg)" stroke-width="1.5"/>
+            <rect x="186" y="16" width="8" height="8" fill="var(--handle-color)" stroke="var(--bg)" stroke-width="1.5"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card action animations -->
+    <div class="subsection">
+      <div class="subsection-title">Card Action Animations (click to trigger)</div>
+      <div class="demo-row" style="gap:16px; align-items:flex-start;">
+        <div>
+          <div style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Reject / Delete</div>
+          <div class="postit-node" data-color="pink" id="rejectDemo" style="cursor:pointer;">
+            <div class="postit-type">Idea</div>
+            <div class="postit-text">Click — scales down with slight rotation + desaturation</div>
+          </div>
+        </div>
+        <div>
+          <div style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Distill / Lock</div>
+          <div class="postit-node" data-color="purple" id="distillDemo" style="cursor:pointer;">
+            <div class="postit-type">Idea</div>
+            <div class="postit-text">Click — brief scale pulse with blue border flash</div>
+          </div>
+        </div>
+        <div>
+          <div style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Star / Pin</div>
+          <div class="postit-node" data-color="yellow" id="starDemo" style="cursor:pointer;">
+            <div class="postit-type">Signal</div>
+            <div class="postit-text">Click — subtle pop confirms the action</div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:var(--mono); font-size:9px; color:var(--fg-3); letter-spacing:0.04em; margin-top:12px; line-height:1.6;">
+        Node appear uses <code style="background:var(--surface); border:1px solid var(--border); padding:1px 4px;">cubic-bezier(0.34, 1.56, 0.64, 1)</code> for slight overshoot.
+        Reject uses <code style="background:var(--surface); border:1px solid var(--border); padding:1px 4px;">ease-in</code> — builds momentum before departure.
+        Entrances ease-out, exits ease-in (UI wiki rules).
+      </div>
+    </div>
+
+    <!-- Reduced motion note -->
+    <div style="font-family:var(--mono); font-size:9px; color:var(--fg-3); letter-spacing:0.04em; border-top:1px solid var(--border); padding-top:12px; margin-top:8px;">
+      All animations respect <code style="background:var(--surface); border:1px solid var(--border); padding:1px 4px;">prefers-reduced-motion: reduce</code> — skeleton pulse becomes static, sweep overlays hide, pulses stop, ellipsis dots show immediately, transitions become instant.
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
   <!-- ICON REFERENCE -->
   <!-- ════════════════════════════════════════ -->
   <div class="section">
@@ -1299,6 +2044,115 @@ renderDots('dots2', 1);
 renderDots('dots3', 2);
 renderDots('dots4', 3);
 renderDots('dots5', 4);
+
+// Skeleton toggle demo
+const skel1 = document.getElementById('skeletonToggle1');
+const real1 = document.getElementById('skeletonToggle1Real');
+if (skel1 && real1) {
+  let skelVisible = true;
+  const toggle = () => {
+    if (skelVisible) {
+      skel1.style.display = 'none';
+      real1.style.display = 'flex';
+      real1.classList.add('populating');
+      setTimeout(() => real1.classList.remove('populating'), 400);
+    } else {
+      skel1.style.display = 'flex';
+      real1.style.display = 'none';
+    }
+    skelVisible = !skelVisible;
+  };
+  skel1.addEventListener('click', toggle);
+  real1.addEventListener('click', toggle);
+}
+
+// Node appear replay
+const nodeAppear = document.getElementById('nodeAppearDemo');
+if (nodeAppear) {
+  nodeAppear.addEventListener('click', () => {
+    nodeAppear.classList.remove('node-appear');
+    void nodeAppear.offsetWidth;
+    nodeAppear.classList.add('node-appear');
+  });
+}
+
+// Stagger reveal replay
+const staggerDemo = document.getElementById('staggerDemo');
+if (staggerDemo) {
+  staggerDemo.addEventListener('click', () => {
+    staggerDemo.classList.remove('results-in');
+    void staggerDemo.offsetWidth;
+    staggerDemo.classList.add('results-in');
+  });
+}
+
+// Reject demo — uses node-reject CSS class
+const rejectDemo = document.getElementById('rejectDemo');
+if (rejectDemo) {
+  rejectDemo.addEventListener('click', () => {
+    rejectDemo.classList.add('node-reject');
+    setTimeout(() => {
+      rejectDemo.classList.remove('node-reject');
+      rejectDemo.style.opacity = '';
+      rejectDemo.style.transform = '';
+      rejectDemo.style.filter = '';
+    }, 350);
+  });
+}
+
+// Distill demo — uses node-distill CSS class
+const distillDemo = document.getElementById('distillDemo');
+if (distillDemo) {
+  distillDemo.addEventListener('click', () => {
+    distillDemo.classList.add('node-distill');
+    setTimeout(() => distillDemo.classList.remove('node-distill'), 400);
+  });
+}
+
+// Star demo — uses node-star CSS class
+const starDemo = document.getElementById('starDemo');
+if (starDemo) {
+  starDemo.addEventListener('click', () => {
+    starDemo.classList.add('node-star');
+    setTimeout(() => starDemo.classList.remove('node-star'), 300);
+  });
+}
+
+// AI Bubble interactive demo
+const aiBubbleSuggestions = [
+  { text: "I notice you haven't distilled any cards yet. The Cultural Landscape zone has some strong signals.", actions: ['Show me the top 3', "I'll pick myself"], later: 'Later' },
+  { text: "The brief mentions Gen Z but the Guard Rails don't address social media tone.", actions: ['Add social guidelines', 'Add 3 options'], later: 'Skip' },
+  { text: "You've been focused on ingredients — want me to explore the packaging angle?", actions: ['Explore packaging', 'Explore retail'], later: 'Not now' },
+];
+let aiBubbleDemoIdx = 0;
+let aiBubbleDemoOpen = false;
+
+function toggleAiBubbleDemo() {
+  aiBubbleDemoOpen = !aiBubbleDemoOpen;
+  const card = document.getElementById('ai-bubble-demo-card');
+  if (card) card.style.display = aiBubbleDemoOpen ? 'flex' : 'none';
+}
+
+function dismissAiBubbleDemo() {
+  aiBubbleDemoOpen = false;
+  const card = document.getElementById('ai-bubble-demo-card');
+  if (card) card.style.display = 'none';
+  aiBubbleDemoIdx = (aiBubbleDemoIdx + 1) % aiBubbleSuggestions.length;
+  const s = aiBubbleSuggestions[aiBubbleDemoIdx];
+  const textEl = document.getElementById('ai-bubble-demo-text');
+  const countEl = document.getElementById('ai-bubble-demo-count');
+  const actionsEl = document.getElementById('ai-bubble-demo-actions');
+  const laterEl = document.querySelector('#ai-bubble-demo .ai-bubble-later');
+  if (textEl) textEl.textContent = s.text;
+  if (countEl) countEl.textContent = (aiBubbleDemoIdx + 1) + '/' + aiBubbleSuggestions.length;
+  if (actionsEl) {
+    actionsEl.innerHTML = s.actions.map((a, i) =>
+      '<button class="ai-bubble-action" onclick="dismissAiBubbleDemo()">' +
+      '<span class="ai-bubble-action-key">' + String.fromCharCode(65 + i) + '</span>' + a + '</button>'
+    ).join('');
+  }
+  if (laterEl) laterEl.textContent = s.later;
+}
 
 // Nav item clicks
 document.querySelectorAll('.sidebar-nav .nav-item, .sidebar-bottom .nav-item').forEach(item => {

@@ -96,4 +96,26 @@
 /* ── Responsive ── */
 @media (max-width: 700px) {
   .sidebar { display: none; }
+
+  .top-bar {
+    padding: 0 12px;
+    height: 44px;
+  }
+
+  .action-bar {
+    padding: 10px 12px;
+    flex-wrap: wrap;
+    gap: var(--space-8);
+  }
+
+  .top-right-bar {
+    top: 10px;
+    right: 12px;
+  }
+}
+
+@media (max-width: 1100px) and (min-width: 701px) {
+  .sidebar {
+    width: 180px;
+  }
 }

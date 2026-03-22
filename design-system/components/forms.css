@@ -48,6 +48,26 @@
 }
 
 /* ── Custom select ── */
+/* Wrap select in .sort-select-wrapper for theme-aware chevron */
+.sort-select-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.sort-select-wrapper::after {
+  content: '';
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid var(--fg-3);
+  pointer-events: none;
+}
+
 .sort-select {
   font-family: var(--mono);
   font-size: var(--text-base);
@@ -62,10 +82,7 @@
   outline: none;
   -webkit-appearance: none;
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23928374' stroke-width='1.5' stroke-linecap='square'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 10px center;
-  background-size: 10px 6px;
+  background-image: none;
   transition: border-color var(--transition-fast), background-color var(--transition-fast);
 }
 
@@ -304,4 +321,19 @@
 
 .form-field.success .form-hint {
   color: var(--success);
+}
+
+/* ── Responsive ── */
+@media (max-width: 700px) {
+  .search-input {
+    width: 100%;
+  }
+
+  .sort-select {
+    width: 100%;
+  }
+
+  .action-bar {
+    flex-wrap: wrap;
+  }
 }

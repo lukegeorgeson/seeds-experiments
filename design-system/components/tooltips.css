@@ -86,3 +86,11 @@
   border: 4px solid transparent;
   border-left-color: var(--fg);
 }
+
+/* ── Responsive ── */
+/* Tooltips hidden on touch devices — use title attribute fallback */
+@media (hover: none) {
+  .tooltip-trigger .tooltip {
+    display: none;
+  }
+}

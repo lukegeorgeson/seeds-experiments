@@ -14,3 +14,6 @@
 @import 'components/questions.css';
 @import 'components/canvas.css';
 @import 'components/tooltips.css';
+@import 'components/nodes.css';
+@import 'components/ai-bubble.css';
+@import 'components/animations.css';

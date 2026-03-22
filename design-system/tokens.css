@@ -105,6 +105,8 @@
   --danger: var(--accent);
   --success: var(--postit-green);
   --warning: var(--postit-yellow);
+  --select: var(--postit-blue);
+  --select-bg: color-mix(in srgb, var(--postit-blue) 8%, transparent);
   --overlay: color-mix(in srgb, var(--fg) 15%, transparent);
   --overlay-strong: color-mix(in srgb, var(--fg) 30%, transparent);
 }

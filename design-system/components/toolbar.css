@@ -104,3 +104,25 @@
   padding: 1px 0;
   font-weight: 400;
 }
+
+/* ── Responsive ── */
+@media (max-width: 700px) {
+  .floating-toolbar {
+    bottom: 12px;
+    padding: 2px;
+  }
+
+  .new-block-btn {
+    padding: 0 8px;
+    font-size: var(--text-sm);
+  }
+
+  .new-block-btn span {
+    display: none;
+  }
+
+  .zoom-controls {
+    bottom: 12px;
+    right: 12px;
+  }
+}

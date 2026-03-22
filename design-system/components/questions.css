@@ -214,3 +214,18 @@
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
+
+/* ── Responsive ── */
+@media (max-width: 700px) {
+  .question-node {
+    padding: var(--space-14);
+  }
+
+  .question-text {
+    font-size: var(--text-lg);
+  }
+
+  .question-option {
+    padding: 12px 14px;
+  }
+}

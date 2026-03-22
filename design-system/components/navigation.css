@@ -93,3 +93,16 @@
 }
 
 .logo-fixed:hover { color: var(--accent); }
+
+/* ── Responsive ── */
+@media (max-width: 700px) {
+  .logo-fixed {
+    top: 12px;
+    left: 16px;
+    font-size: var(--text-base);
+  }
+
+  .nav-item {
+    padding: 10px 12px;
+  }
+}
