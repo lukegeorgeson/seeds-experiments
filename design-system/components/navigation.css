@@ -42,9 +42,20 @@
   color: var(--fg);
 }
 
+.nav-item:active {
+  opacity: 0.85;
+}
+
 .nav-item.active {
   background: var(--fg);
   color: var(--bg);
+}
+
+.nav-item:disabled,
+.nav-item[aria-disabled="true"] {
+  opacity: var(--disabled-opacity);
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 .nav-item svg {

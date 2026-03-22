@@ -48,6 +48,10 @@
   color: var(--bg);
 }
 
+.new-block-btn:active {
+  opacity: 0.85;
+}
+
 .new-block-btn svg { width: 14px; height: 14px; }
 
 /* ── Zoom Controls ── */
@@ -86,6 +90,10 @@
 .zoom-btn:hover {
   background: var(--fg);
   color: var(--bg);
+}
+
+.zoom-btn:active {
+  opacity: 0.85;
 }
 
 .zoom-level {

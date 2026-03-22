@@ -3,21 +3,21 @@
 /* Primary button (new project, CTA) */
 .btn-primary {
   font-family: var(--mono);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-wider);
   text-transform: uppercase;
   background: var(--fg);
   color: var(--bg);
-  border: 1px solid var(--fg);
-  border-radius: 0;
+  border: var(--border-width) solid var(--fg);
+  border-radius: var(--radius);
   padding: 7px 14px;
   cursor: pointer;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  transition: background var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
 }
 
 .btn-primary:hover {
@@ -26,26 +26,120 @@
   color: #fff;
 }
 
+.btn-primary:active {
+  opacity: 0.85;
+}
+
+.btn-primary:disabled {
+  opacity: var(--disabled-opacity);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 .btn-primary svg { width: 12px; height: 12px; }
+
+/* Secondary button (outlined) */
+.btn-secondary {
+  font-family: var(--mono);
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  background: none;
+  color: var(--fg);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius);
+  padding: 7px 14px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.btn-secondary:hover {
+  background: var(--fg);
+  color: var(--bg);
+  border-color: var(--fg);
+}
+
+.btn-secondary:active {
+  opacity: 0.85;
+}
+
+.btn-secondary:disabled {
+  opacity: var(--disabled-opacity);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.btn-secondary svg { width: 12px; height: 12px; }
+
+/* Danger button */
+.btn-danger {
+  font-family: var(--mono);
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  background: var(--danger);
+  color: #fff;
+  border: var(--border-width) solid var(--danger);
+  border-radius: var(--radius);
+  padding: 7px 14px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: opacity var(--transition-fast);
+}
+
+.btn-danger:hover {
+  opacity: 0.85;
+}
+
+.btn-danger:active {
+  opacity: 0.7;
+}
+
+.btn-danger:disabled {
+  opacity: var(--disabled-opacity);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.btn-danger svg { width: 12px; height: 12px; }
 
 /* Icon button (32px square) */
 .btn-icon {
   width: 32px;
   height: 32px;
-  border-radius: 0;
+  border-radius: var(--radius);
   background: var(--surface);
-  border: 1px solid var(--border);
+  border: var(--border-width) solid var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--fg-2);
   cursor: pointer;
-  transition: background var(--transition-fast);
+  transition: background var(--transition-fast), color var(--transition-fast);
 }
 
 .btn-icon:hover {
   background: var(--fg);
   color: var(--bg);
+}
+
+.btn-icon:active {
+  opacity: 0.85;
+}
+
+.btn-icon:disabled {
+  opacity: var(--disabled-opacity);
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 .btn-icon svg { width: 14px; height: 14px; }
@@ -65,7 +159,7 @@
   width: 32px;
   height: 32px;
   border: none;
-  border-radius: 0;
+  border-radius: var(--radius);
   background: none;
   cursor: pointer;
   display: flex;
@@ -82,9 +176,19 @@
   color: var(--bg);
 }
 
+.toolbar-btn:active {
+  opacity: 0.85;
+}
+
 .toolbar-btn.active {
   background: var(--fg);
   color: var(--bg);
+}
+
+.toolbar-btn:disabled {
+  opacity: var(--disabled-opacity);
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 .toolbar-btn svg { width: 16px; height: 16px; }
@@ -92,14 +196,14 @@
 /* Ghost button (no border, hover fill) */
 .btn-ghost {
   font-family: var(--mono);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.06em;
+  font-size: var(--text-base);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
   background: none;
   color: var(--fg-2);
   border: none;
-  border-radius: 0;
+  border-radius: var(--radius);
   padding: 7px 10px;
   cursor: pointer;
   display: inline-flex;
@@ -113,6 +217,16 @@
   color: var(--bg);
 }
 
+.btn-ghost:active {
+  opacity: 0.85;
+}
+
+.btn-ghost:disabled {
+  opacity: var(--disabled-opacity);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 .btn-ghost svg { width: 14px; height: 14px; }
 
 /* View toggle buttons */
@@ -124,8 +238,8 @@
 .view-btn {
   width: 32px;
   height: 32px;
-  border: 1px solid var(--border);
-  border-radius: 0;
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius);
   background: var(--surface);
   color: var(--fg-3);
   cursor: pointer;
@@ -137,6 +251,7 @@
 
 .view-btn + .view-btn { border-left: none; }
 .view-btn:hover { color: var(--fg); }
+.view-btn:active { opacity: 0.85; }
 .view-btn.active { background: var(--fg); color: var(--bg); }
 .view-btn svg { width: 14px; height: 14px; }
 
@@ -144,8 +259,8 @@
 .btn-action {
   width: 24px;
   height: 24px;
-  border: 1px solid var(--border);
-  border-radius: 0;
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius);
   background: var(--bg);
   cursor: pointer;
   display: flex;
@@ -158,4 +273,37 @@
 
 .btn-action:first-child { margin-left: 0; }
 .btn-action:hover { background: var(--fg); color: var(--bg); }
+.btn-action:active { opacity: 0.85; }
 .btn-action svg { width: 12px; height: 12px; }
+
+/* ── Loading state ── */
+.btn-loading {
+  position: relative;
+  pointer-events: none;
+  color: transparent !important;
+}
+
+.btn-loading::after {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  top: 50%;
+  left: 50%;
+  margin-top: -6px;
+  margin-left: -6px;
+  border: 1.5px solid var(--bg);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: btn-spin 0.5s linear infinite;
+}
+
+.btn-secondary.btn-loading::after,
+.btn-ghost.btn-loading::after {
+  border-color: var(--fg);
+  border-top-color: transparent;
+}
+
+@keyframes btn-spin {
+  to { transform: rotate(360deg); }
+}

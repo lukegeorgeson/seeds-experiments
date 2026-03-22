@@ -99,6 +99,14 @@
   --transition-slow: 0.15s;
   --transition-toast: 0.2s;
   --transition-anim: 0.25s;
+
+  /* ── State tokens ── */
+  --disabled-opacity: 0.4;
+  --danger: var(--accent);
+  --success: var(--postit-green);
+  --warning: var(--postit-yellow);
+  --overlay: color-mix(in srgb, var(--fg) 15%, transparent);
+  --overlay-strong: color-mix(in srgb, var(--fg) 30%, transparent);
 }
 
 /* ── Gruvbox Dark ── */

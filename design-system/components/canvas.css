@@ -124,6 +124,16 @@
   border-color: var(--fg);
 }
 
+.generate-btn:active {
+  opacity: 0.85;
+}
+
+.generate-btn:disabled {
+  opacity: var(--disabled-opacity);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 /* ── Toast notification ── */
 .toast {
   position: fixed;

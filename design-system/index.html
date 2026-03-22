@@ -260,6 +260,26 @@
     </div>
 
     <div class="subsection">
+      <div class="subsection-title">Secondary</div>
+      <div class="demo-row">
+        <button class="btn-secondary">Cancel</button>
+        <button class="btn-secondary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg>
+          Confirm
+        </button>
+        <button class="btn-secondary" disabled>Disabled</button>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Danger</div>
+      <div class="demo-row">
+        <button class="btn-danger">Delete Zone</button>
+        <button class="btn-danger" disabled>Disabled</button>
+      </div>
+    </div>
+
+    <div class="subsection">
       <div class="subsection-title">Ghost Button</div>
       <div class="demo-row">
         <button class="btn-ghost">
@@ -267,6 +287,26 @@
           Settings
         </button>
         <button class="btn-ghost">Help</button>
+        <button class="btn-ghost" disabled>Disabled</button>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Loading State</div>
+      <div class="demo-row">
+        <button class="btn-primary btn-loading">Saving</button>
+        <button class="btn-secondary btn-loading">Loading</button>
+        <button class="btn-ghost btn-loading">Wait</button>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Disabled States</div>
+      <div class="demo-row">
+        <button class="btn-primary" disabled>Primary</button>
+        <button class="btn-icon" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        </button>
       </div>
     </div>
 
@@ -478,13 +518,20 @@
     </div>
 
     <div class="subsection">
-      <div class="subsection-title">Text Input (no icon)</div>
+      <div class="subsection-title">Text Input</div>
       <div class="demo-row">
-        <input type="text" class="search-input" style="padding-left:10px; width:220px;" placeholder="Project name...">
-        <input type="text" class="search-input" style="padding-left:10px; width:220px; border-color:var(--border-strong);" placeholder="Focused state" value="My Project">
-      </div>
-      <div style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em; margin-top:8px;">
-        Focus state: border-color transitions to --border-strong
+        <div class="form-field" style="width:220px;">
+          <label class="form-label">Project Name</label>
+          <input type="text" class="text-input" placeholder="Enter project name...">
+        </div>
+        <div class="form-field" style="width:220px;">
+          <label class="form-label">Focused</label>
+          <input type="text" class="text-input" value="My Project">
+        </div>
+        <div class="form-field" style="width:220px;">
+          <label class="form-label">Read-only</label>
+          <input type="text" class="text-input" value="Locked value" readonly>
+        </div>
       </div>
     </div>
 
@@ -496,6 +543,85 @@
           <option value="name">Name</option>
           <option value="created">Created</option>
         </select>
+        <select class="sort-select" disabled>
+          <option>Disabled</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Textarea</div>
+      <div class="demo-row">
+        <div class="form-field" style="width:320px;">
+          <label class="form-label">Description</label>
+          <textarea class="textarea" placeholder="Add a description..."></textarea>
+          <span class="form-hint">Optional — shown below the zone summary</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Checkbox &amp; Toggle</div>
+      <div class="demo-row">
+        <label class="checkbox-wrapper">
+          <input type="checkbox" class="checkbox" checked>
+          <span class="checkbox-label">Auto-generate</span>
+        </label>
+        <label class="checkbox-wrapper">
+          <input type="checkbox" class="checkbox">
+          <span class="checkbox-label">Include brief</span>
+        </label>
+        <label class="checkbox-wrapper">
+          <input type="checkbox" class="checkbox" disabled>
+          <span class="checkbox-label">Disabled</span>
+        </label>
+      </div>
+      <div class="demo-row" style="margin-top:12px;">
+        <label class="checkbox-wrapper">
+          <input type="checkbox" class="toggle" checked>
+          <span class="checkbox-label">Dark mode</span>
+        </label>
+        <label class="checkbox-wrapper">
+          <input type="checkbox" class="toggle">
+          <span class="checkbox-label">Auto-save</span>
+        </label>
+        <label class="checkbox-wrapper">
+          <input type="checkbox" class="toggle" disabled>
+          <span class="checkbox-label">Disabled</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Validation States</div>
+      <div class="demo-row">
+        <div class="form-field error" style="width:220px;">
+          <label class="form-label">Error</label>
+          <input type="text" class="text-input" value="invalid@">
+          <span class="form-hint">Invalid email address</span>
+        </div>
+        <div class="form-field success" style="width:220px;">
+          <label class="form-label">Success</label>
+          <input type="text" class="text-input" value="my-project">
+          <span class="form-hint">Name available</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Disabled States</div>
+      <div class="demo-row">
+        <div class="form-field" style="width:220px;">
+          <label class="form-label">Input</label>
+          <input type="text" class="text-input" value="Disabled" disabled>
+        </div>
+        <div class="form-field" style="width:220px;">
+          <label class="form-label">Search</label>
+          <div class="search-wrapper">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" class="search-input" placeholder="Search..." disabled>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -929,13 +1055,31 @@
     </div>
 
     <div class="subsection">
-      <div class="subsection-title">Right-positioned Tooltip</div>
-      <div class="demo-row" style="padding-left:8px;">
+      <div class="subsection-title">All Positions</div>
+      <div class="demo-row" style="gap:32px; padding:40px 8px;">
         <div class="tooltip-trigger">
           <button class="btn-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><polyline points="18 15 12 9 6 15"/></svg>
           </button>
-          <span class="tooltip tooltip-right">Help</span>
+          <span class="tooltip">Top (default)</span>
+        </div>
+        <div class="tooltip-trigger">
+          <button class="btn-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+          <span class="tooltip tooltip-right">Right</span>
+        </div>
+        <div class="tooltip-trigger">
+          <button class="btn-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <span class="tooltip tooltip-bottom">Bottom</span>
+        </div>
+        <div class="tooltip-trigger">
+          <button class="btn-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <span class="tooltip tooltip-left">Left</span>
         </div>
       </div>
     </div>
