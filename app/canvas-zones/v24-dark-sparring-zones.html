@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seeds — Dark Sparring Canvas (Zone-First)</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: { sans: ['DM Sans', 'system-ui', 'sans-serif'] },
+      colors: {
+        canvas: { bg: '#0a0a0c', surface: '#161619', chrome: 'rgba(10,10,12,0.88)' },
+        fg: { DEFAULT: '#e0ddd8', 2: 'rgba(224,221,216,0.5)', 3: 'rgba(224,221,216,0.25)', 4: 'rgba(224,221,216,0.12)' },
+        accent: { DEFAULT: '#eac1f5', hover: '#ddb0eb', text: '#f0e0f8' },
+        tension: '#f472b6', signal: '#38bdf8', direction: '#a78bfa',
+        idea: '#34d399', provocation: '#fb923c', guardrail: '#ef4444',
+      }
+    }
+  }
+}
+</script>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { font-family: 'DM Sans', system-ui, sans-serif; background: #0a0a0c; color: #e0ddd8; overflow: hidden; height: 100vh; width: 100vw; -webkit-font-smoothing: antialiased; }
+
+  .canvas-world { position: absolute; inset: 0; overflow: hidden; cursor: grab;
+    background: radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px);
+    background-size: 24px 24px; }
+  .canvas-world:active { cursor: grabbing; }
+  .canvas-inner { position: absolute; width: 5000px; height: 4000px; transform-origin: 0 0; }
+
+  /* ── ZONES ── */
+  .zone {
+    position: absolute; border-radius: 16px; z-index: 2;
+  }
+  .zone-inner {
+    width: 100%; height: 100%;
+    border-radius: 16px;
+    position: relative;
+  }
+  .zone-head {
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 42px; padding: 0 16px;
+    display: flex; align-items: center; gap: 10px;
+    border-radius: 16px 16px 0 0;
+    z-index: 3;
+  }
+  .zone-color-bar { width: 4px; height: 16px; border-radius: 2px; flex-shrink: 0; }
+  .zone-name { font-size: 13px; font-weight: 500; letter-spacing: -0.01em; }
+  .zone-card-count { font-size: 10px; opacity: 0.3; }
+
+  /* Stage tabs — segmented control in zone header */
+  .stage-tabs {
+    margin-left: auto;
+    display: flex; gap: 0;
+    background: rgba(255,255,255,0.04);
+    border-radius: 7px;
+    padding: 2px;
+  }
+  .stage-tab {
+    font-size: 9px; font-weight: 500; letter-spacing: 0.03em;
+    padding: 3px 9px; border-radius: 5px;
+    color: rgba(224,221,216,0.25);
+    cursor: pointer; border: none; background: transparent;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.15s;
+  }
+  .stage-tab:hover { color: rgba(224,221,216,0.45); }
+  .stage-tab.active {
+    background: rgba(255,255,255,0.08);
+    color: rgba(224,221,216,0.8);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  }
+
+  /* Commitment dots */
+  .commit-dots { display: flex; align-items: center; gap: 3px; margin-left: 6px; }
+  .commit-dot {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: rgba(255,255,255,0.08); cursor: pointer;
+    transition: all 0.15s;
+  }
+  .commit-dot:hover { background: rgba(255,255,255,0.2); transform: scale(1.3); }
+  .commit-dot.on { background: rgba(224,221,216,0.6); }
+
+  /* Thesis card */
+  .thesis {
+    position: absolute;
+    left: 14px; right: 14px;
+    border-radius: 10px;
+    padding: 12px 14px;
+    z-index: 5;
+  }
+  .thesis-label {
+    font-size: 9px; font-weight: 500; letter-spacing: 0.05em;
+    text-transform: uppercase; margin-bottom: 4px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .thesis-label .who { font-size: 9px; text-transform: none; letter-spacing: 0; opacity: 0.4; }
+  .thesis-text { font-size: 12px; line-height: 1.55; opacity: 0.6; }
+  .thesis-meta { font-size: 9px; opacity: 0.2; margin-top: 6px; }
+
+  /* Zone footer */
+  .zone-footer {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 38px; padding: 0 14px;
+    display: flex; align-items: center; gap: 5px;
+    border-top: 1px solid rgba(255,255,255,0.03);
+    border-radius: 0 0 16px 16px;
+    z-index: 3;
+  }
+  .zone-footer-btn {
+    padding: 3px 10px; border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.06);
+    background: transparent;
+    font-size: 10px; font-weight: 400; font-family: 'DM Sans', sans-serif;
+    color: rgba(224,221,216,0.2); cursor: pointer;
+    transition: all 0.12s;
+  }
+  .zone-footer-btn:hover {
+    background: rgba(255,255,255,0.04);
+    color: rgba(224,221,216,0.5);
+    border-color: rgba(255,255,255,0.1);
+  }
+  .zone-footer-btn.primary {
+    border-color: rgba(255,255,255,0.08);
+    color: rgba(224,221,216,0.35);
+  }
+  .zone-footer-btn.primary:hover {
+    color: rgba(224,221,216,0.7);
+    background: rgba(255,255,255,0.06);
+  }
+  .zone-footer-spacer { flex: 1; }
+  .zone-footer-add {
+    padding: 3px 10px; border-radius: 6px;
+    border: 1px dashed rgba(255,255,255,0.06);
+    background: transparent;
+    font-size: 10px; color: rgba(224,221,216,0.15);
+    cursor: pointer; font-family: 'DM Sans', sans-serif;
+    transition: all 0.12s;
+  }
+  .zone-footer-add:hover { color: rgba(224,221,216,0.3); border-color: rgba(255,255,255,0.12); }
+
+  /* ── CARDS ── */
+  .card {
+    position: absolute; width: 200px; height: 130px; border-radius: 8px; padding: 12px 14px;
+    cursor: grab; user-select: none; -webkit-user-select: none;
+    transition: box-shadow 0.15s, border-color 0.15s; z-index: 10;
+    border: 1px solid rgba(255,255,255,0.06); background: #161619;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+  .card:hover { z-index: 50; box-shadow: 0 6px 24px rgba(0,0,0,0.4); border-color: rgba(255,255,255,0.1); }
+  .card:active { cursor: grabbing; }
+  .card.dragging { z-index: 100; box-shadow: 0 12px 48px rgba(0,0,0,0.5); }
+
+  .card-type { display: inline-flex; align-items: center; gap: 4px; font-size: 9px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 5px; flex-shrink: 0; }
+  .card-type-dot { width: 4px; height: 4px; border-radius: 50%; flex-shrink: 0; }
+  .card-text { font-size: 12px; line-height: 1.5; color: #e0ddd8; font-weight: 400; flex: 1; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
+  .card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.04); flex-shrink: 0; }
+  .card-tag { font-size: 8px; color: rgba(224,221,216,0.15); font-weight: 500; }
+  .card-actions { display: flex; gap: 2px; opacity: 0; transition: opacity 0.12s; }
+  .card:hover .card-actions { opacity: 1; }
+  .card-action { width: 20px; height: 20px; border-radius: 4px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.06); color: rgba(224,221,216,0.3); font-size: 9px; transition: all 0.1s; }
+  .card-action:hover { background: rgba(255,255,255,0.12); color: #e0ddd8; }
+
+  .card.selected { border-color: rgba(224,221,216,0.18); box-shadow: 0 0 0 2px rgba(224,221,216,0.04); }
+  .card.locked { border-color: rgba(224,221,216,0.22); border-width: 1.5px; }
+  .card.rejected { opacity: 0.2; }
+  .card.floating { opacity: 0.35; border-style: dashed; }
+
+  /* Riff card */
+  .card.riff-card { border: 1px dashed rgba(255,255,255,0.08); }
+  .riff-badge { font-size: 8px; color: rgba(224,221,216,0.2); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 3px; flex-shrink: 0; }
+
+  /* Ghost card */
+  .card-ghost { position: absolute; width: 200px; height: 130px; border-radius: 8px; border: 1px dashed rgba(167,139,250,0.12); background: rgba(167,139,250,0.02); display: flex; align-items: center; justify-content: center; z-index: 10; }
+  .card-ghost-label { font-size: 10px; color: rgba(224,221,216,0.15); animation: pulse-text 2s ease-in-out infinite; }
+  @keyframes pulse-text { 0%,100%{opacity:0.15} 50%{opacity:0.4} }
+
+  /* ── FOUNTAIN (Generate panel) ── */
+  .fountain {
+    position: absolute; z-index: 15; width: 200px; padding: 12px;
+    border-radius: 12px; backdrop-filter: blur(12px);
+  }
+  .fountain-header { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+  .fountain-icon { width: 22px; height: 22px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 11px; }
+  .fountain-title { font-size: 11px; font-weight: 500; letter-spacing: 0.02em; }
+  .fountain-btn {
+    width: 100%; padding: 8px 10px; border-radius: 7px;
+    border: 1px dashed rgba(255,255,255,0.06);
+    background: transparent; color: rgba(224,221,216,0.3);
+    font-family: 'DM Sans', sans-serif; font-size: 11px;
+    cursor: pointer; transition: all 0.12s; margin-bottom: 4px; text-align: left;
+  }
+  .fountain-btn:hover { background: rgba(255,255,255,0.04); color: rgba(224,221,216,0.7); border-color: rgba(255,255,255,0.12); }
+  .fountain-btn:last-child { margin-bottom: 0; }
+
+  /* ── PROMPT BAR ── */
+  .prompt-bar {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
+    padding: 8px 20px 12px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    background: rgba(10,10,12,0.92); backdrop-filter: blur(16px);
+  }
+  .prompt-inner {
+    max-width: 600px; margin: 0 auto; display: flex; align-items: center; gap: 6px;
+  }
+  .prompt-input {
+    flex: 1; padding: 8px 12px; border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.06);
+    background: #161619; color: #e0ddd8;
+    font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 400;
+    outline: none;
+  }
+  .prompt-input::placeholder { color: rgba(224,221,216,0.12); }
+  .prompt-input:focus { border-color: rgba(255,255,255,0.1); }
+  .prompt-send {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: #e0ddd8; color: #0a0a0c;
+    border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 500;
+    flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- Top Bar -->
+<div class="fixed top-0 left-0 right-0 z-[200] h-11 flex items-center justify-between px-4" style="background:rgba(10,10,12,0.88);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,0.06);">
+  <div class="flex items-center gap-3">
+    <span class="text-[11px] font-medium tracking-wide text-fg-3 uppercase">Seeds</span>
+    <div class="w-px h-4 bg-white/[0.06]"></div>
+    <span class="text-[12px] text-fg-2 font-normal">Skincare launch — ingredient-forward positioning</span>
+  </div>
+  <div class="flex items-center gap-1.5">
+    <button class="px-2.5 py-1 rounded-md text-[11px] text-fg-3 hover:bg-white/[0.06] hover:text-fg-2 transition-all">4 zones</button>
+    <button class="px-2.5 py-1 rounded-md text-[11px] text-fg-3 hover:bg-white/[0.06] hover:text-fg-2 transition-all">14 cards</button>
+    <button class="px-2.5 py-1 rounded-md text-[11px] text-fg-3 hover:bg-white/[0.06] hover:text-fg-2 transition-all">History</button>
+    <button class="px-2.5 py-1.5 rounded-md text-[11px] font-bold bg-fg text-canvas-bg hover:bg-white transition-all">Export</button>
+  </div>
+</div>
+
+<!-- Left Toolbar -->
+<div class="fixed left-2.5 top-1/2 -translate-y-1/2 z-[200] flex flex-col gap-px p-1.5 rounded-xl border border-white/[0.06]" style="background:rgba(18,18,22,0.95);backdrop-filter:blur(12px);">
+  <button class="w-[30px] h-[30px] rounded-lg flex items-center justify-center text-[13px] bg-white/[0.08] text-fg" title="Select">↖</button>
+  <button class="w-[30px] h-[30px] rounded-lg flex items-center justify-center text-[13px] text-fg-3 hover:bg-white/[0.06] hover:text-fg transition-all" title="Pan">✋</button>
+  <div class="w-[18px] h-px bg-white/[0.06] mx-auto my-1"></div>
+  <button class="w-[30px] h-[30px] rounded-lg flex items-center justify-center text-[13px] text-fg-3 hover:bg-white/[0.06] hover:text-fg transition-all" title="Zone">▢</button>
+  <button class="w-[30px] h-[30px] rounded-lg flex items-center justify-center text-[13px] text-fg-3 hover:bg-white/[0.06] hover:text-fg transition-all" title="Connect">⤳</button>
+  <button class="w-[30px] h-[30px] rounded-lg flex items-center justify-center text-[13px] text-fg-3 hover:bg-white/[0.06] hover:text-fg transition-all" title="Card">▤</button>
+  <div class="w-[18px] h-px bg-white/[0.06] mx-auto my-1"></div>
+  <button class="w-[30px] h-[30px] rounded-lg flex items-center justify-center text-[13px] text-direction hover:bg-white/[0.06] transition-all" title="Generate">✦</button>
+  <button class="w-[30px] h-[30px] rounded-lg flex items-center justify-center text-[13px] text-idea hover:bg-white/[0.06] transition-all" title="Synthesize">⊕</button>
+</div>
+
+<!-- Zoom -->
+<div class="fixed bottom-16 right-3 z-[200] flex items-center gap-px p-1 rounded-lg border border-white/[0.06]" style="background:rgba(18,18,22,0.95);backdrop-filter:blur(12px);">
+  <button id="zoom-out" class="w-[26px] h-[26px] rounded-md flex items-center justify-center text-[13px] text-fg-3 hover:bg-white/[0.08] hover:text-fg">−</button>
+  <span id="zoom-level" class="text-[10px] text-fg-4 px-1.5 min-w-[32px] text-center tabular-nums">100%</span>
+  <button id="zoom-in" class="w-[26px] h-[26px] rounded-md flex items-center justify-center text-[13px] text-fg-3 hover:bg-white/[0.08] hover:text-fg">+</button>
+</div>
+
+<!-- Keyboard hints -->
+<div class="fixed bottom-[52px] left-1/2 -translate-x-1/2 z-[200] flex gap-1">
+  <span class="px-2 py-0.5 rounded text-[9px] text-fg-4 border border-white/[0.06]" style="background:rgba(18,18,22,0.9);">⌘G generate</span>
+  <span class="px-2 py-0.5 rounded text-[9px] text-fg-4 border border-white/[0.06]" style="background:rgba(18,18,22,0.9);">⌘S synthesize</span>
+  <span class="px-2 py-0.5 rounded text-[9px] text-fg-4 border border-white/[0.06]" style="background:rgba(18,18,22,0.9);">⌘Z zone</span>
+  <span class="px-2 py-0.5 rounded text-[9px] text-fg-4 border border-white/[0.06]" style="background:rgba(18,18,22,0.9);">⌘R riff</span>
+</div>
+
+<!-- Canvas -->
+<div class="canvas-world" id="canvas-world">
+  <div class="canvas-inner" id="canvas-inner">
+
+    <!-- ═══════════════════════════════════════
+         ZONE 1: Exploring audience (Explore / Active)
+         ═══════════════════════════════════════ -->
+    <div class="zone" style="left:100px;top:80px;width:660px;height:540px;">
+      <div class="zone-inner" style="border:1.5px solid rgba(244,114,182,0.2);background:rgba(244,114,182,0.02);">
+        <div class="zone-head" style="background:rgba(244,114,182,0.04);">
+          <div class="zone-color-bar" style="background:#f472b6;"></div>
+          <span class="zone-name" style="color:#f472b6;">Exploring audience</span>
+          <span class="zone-card-count">4</span>
+          <div class="stage-tabs">
+            <button class="stage-tab active">Explore</button>
+            <button class="stage-tab">Sensemake</button>
+            <button class="stage-tab">Sharpen</button>
+            <button class="stage-tab">Handoff</button>
+          </div>
+          <div class="commit-dots">
+            <span class="commit-dot on"></span>
+            <span class="commit-dot on"></span>
+            <span class="commit-dot"></span>
+            <span class="commit-dot"></span>
+          </div>
+        </div>
+
+        <!-- Thesis -->
+        <div class="thesis" style="top:48px;background:rgba(244,114,182,0.03);border:1px solid rgba(244,114,182,0.08);">
+          <div class="thesis-label" style="color:rgba(244,114,182,0.5);">Thesis <span class="who">· AI draft</span></div>
+          <div class="thesis-text">Gen Z craves ingredient honesty but hates homework. The tension between transparency and decision fatigue is the positioning gap — a brand that resolves it wins.</div>
+          <div class="thesis-meta">From 4 cards · 3m ago</div>
+        </div>
+
+        <!-- Zone footer -->
+        <div class="zone-footer" style="background:rgba(244,114,182,0.02);">
+          <button class="zone-footer-btn">Extend</button>
+          <button class="zone-footer-btn">Summarize</button>
+          <button class="zone-footer-btn primary">Synthesize →</button>
+          <span class="zone-footer-spacer"></span>
+          <button class="zone-footer-add">+ Add card</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Zone 1 cards -->
+    <div class="card selected" style="left:116px;top:190px;">
+      <div class="card-type"><div class="card-type-dot" style="background:#f472b6"></div><span style="color:#f472b6">Tension</span></div>
+      <div class="card-text">Gen Z craves authenticity but engages most with highly produced content.</div>
+      <div class="card-footer"><span class="card-tag">#audience</span><div class="card-actions"><button class="card-action">✓</button><button class="card-action">↻</button><button class="card-action">×</button></div></div>
+    </div>
+
+    <div class="card" style="left:330px;top:190px;">
+      <div class="card-type"><div class="card-type-dot" style="background:#f472b6"></div><span style="color:#f472b6">Tension</span></div>
+      <div class="card-text">Ingredient transparency creates decision fatigue. People want to feel smart without homework.</div>
+      <div class="card-footer"><span class="card-tag">#ux</span><div class="card-actions"><button class="card-action">✓</button><button class="card-action">↻</button><button class="card-action">×</button></div></div>
+    </div>
+
+    <div class="card locked" style="left:116px;top:340px;">
+      <div class="card-type"><div class="card-type-dot" style="background:#f472b6"></div><span style="color:#f472b6">Tension</span></div>
+      <div class="card-text">"Clean beauty" peaked — the next wave claims literacy, not purity.</div>
+      <div class="card-footer"><span class="card-tag">#positioning · ⚑</span><div class="card-actions"><button class="card-action">✓</button><button class="card-action">↻</button><button class="card-action">×</button></div></div>
+    </div>
+
+    <div class="card" style="left:330px;top:340px;">
+      <div class="card-type"><div class="card-type-dot" style="background:#38bdf8"></div><span style="color:#38bdf8">Signal</span></div>
+      <div class="card-text">De-influencing is a demand for specificity. People want why this, not just what.</div>
+      <div class="card-footer"><span class="card-tag">#culture</span><div class="card-actions"><button class="card-action">✓</button><button class="card-action">↻</button><button class="card-action">×</button></div></div>
+    </div>
+
+    <div class="card" style="left:544px;top:190px;">
+      <div class="card-type"><div class="card-type-dot" style="background:#38bdf8"></div><span style="color:#38bdf8">Signal</span></div>
+      <div class="card-text">Reddit skincare: 4M+ members dissecting INCI lists. The audience exists.</div>
+      <div class="card-footer"><span class="card-tag">#market</span><div class="card-actions"><button class="card-action">✓</button><button class="card-action">↻</button><button class="card-action">×</button></div></div>
+    </div>
+
+
+    <!-- ═══════════════════════════════════════
+         ZONE 2: Building the position (Sensemake / Anchor)
+         ═══════════════════════════════════════ -->
+    <div class="zone" style="left:820px;top:80px;width:660px;height:540px;">
+      <div class="zone-inner" style="border:1.5px solid rgba(167,139,250,0.2);background:rgba(167,139,250,0.02);">
+        <div class="zone-head" style="background:rgba(167,139,250,0.04);">
+          <div class="zone-color-bar" style="background:#a78bfa;"></div>
+          <span class="zone-name" style="color:#a78bfa;">Building the position</span>
+          <span class="zone-card-count">4</span>
+          <div class="stage-tabs">
+            <button class="stage-tab">Explore</button>
+            <button class="stage-tab active">Sensemake</button>
+            <button class="stage-tab">Sharpen</button>
+            <button class="stage-tab">Handoff</button>
+          </div>
+          <div class="commit-dots">
+            <span class="commit-dot on"></span>
+            <span class="commit-dot on"></span>
+            <span class="commit-dot on"></span>
+            <span class="commit-dot"></span>
+          </div>
+        </div>
+
+        <div class="thesis" style="top:48px;background:rgba(167,139,250,0.03);border:1px solid rgba(167,139,250,0.08);">
+          <div class="thesis-label" style="color:rgba(167,139,250,0.5);">Thesis <span class="who">· edited by you</span></div>
+          <div class="thesis-text">Position as "ingredient-literate" beauty. Not clean, not clinical — just honest. Let formulation be the personality. Anti-marketing as the marketing.</div>
+          <div class="thesis-meta">From 4 cards · edited 1m ago</div>
+        </div>
+
+        <div class="zone-footer" style="background:rgba(167,139,250,0.02);">
+          <button class="zone-footer-btn">Extend</button>
+          <button class="zone-footer-btn">Summarize</button>
+          <button class="zone-footer-btn primary">Synthesize →</button>
+          <span class="zone-footer-spacer"></span>
+          <button class="zone-footer-add">+ Add card</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Zone 2 cards -->
+    <div class="card locked" style="left:836px;top:190px;">
+      <div class="card-type"><div class="card-type-dot" style="background:#a78bfa"></div><span style="color:#a78bfa">Direction</span></div>
+      <div class="card-text">Position as "ingredient-literate." Not clean, not clinical, just honest.</div>
+      <div class="card-footer"><span class="card-tag">#brand · ⚑</span><div class="card-actions"><button class="card-action">✓</button><button class="card-action">↻</button><button class="card-action">×</button></div></div>
+    </div>
+
+    <div class="card selected" style="left:1050px;top:190px;">
+      <div class="card-type"><div class="card-type-dot" style="background:#a78bfa"></div><span style="color:#a78bfa">Direction</span></div>
+      <div class="card-text">"Boring" as brand attitude. No hype. No miracle claims. Anti-marketing IS the marketing.</div>
+      <div class="card-footer"><span class="card-tag">#tone</span><div class="card-actions"><button class="card-action">✓</button><button class="card-action">↻</button><button class="card-action">×</button></div></div>
+    </div>
+
+    <div class="card" style="left:836px;top:340px;">
+      <div class="card-type"><div class="card-type-dot" style="background:#a78bfa"></div><span style="color:#a78bfa">Direction</span></div>
+      <div class="card-text">Lead with "why this concentration." Each product page is a micro-essay on formulation.</div>
+      <div class="card-footer"><span class="card-tag">#content</span><div class="card-actions"><button class="card-action">✓</button><button class="card-action">↻</button><button class="card-action">×</button></div></div>
+    </div>
+
+    <div class="card" style="left:1050px;top:340px;">
+      <div class="card-type"><div class="card-type-dot" style="background:#38bdf8"></div><span style="color:#38bdf8">Signal</span></div>
+      <div class="card-text">The Ordinary proved commodity positioning can be premium if framing is sharp.</div>
+      <div class="card-footer"><span class="card-tag">#precedent</span><div class="card-actions"><button class="card-action">✓</button><button class="card-action">↻</button><button class="card-action">×</button></div></div>
+    </div>
+
+    <div class="card rejected" style="left:1264px;top:190px;">
+      <div class="card-type"><div class="card-type-dot" style="background:#a78bfa"></div><span style="color:#a78bfa">Direction</span></div>
+      <div class="card-text">Partner with dermatologists for credibility seal program.</div>
+      <div class="card-footer"><span class="card-tag">#rejected</span></div>
+    </div>
+
+
+    <!-- ═══════════════════════════════════════
+         ZONE 3: Hot ideas (Explore / Active)
+         ═══════════════════════════════════════ -->
+    <div class="zone" style="left:100px;top:680px;width:660px;height:440px;">
+      <div class="zone-inner" style="border:1.5px solid rgba(52,211,153,0.2);background:rgba(52,211,153,0.02);">
+        <div class="zone-head" style="background:rgba(52,211,153,0.04);">
+          <div class="zone-color-bar" style="background:#34d399;"></div>
+          <span class="zone-name" style="color:#34d399;">Hot ideas</span>
+          <span class="zone-card-count">3</span>
+          <div class="stage-tabs">
+            <button class="stage-tab active">Explore</button>
+            <button class="stage-tab">Sensemake</button>
+            <button class="stage-tab">Sharpen</button>
+            <button class="stage-tab">Handoff</button>
+          </div>
+          <div class="commit-dots">
+            <span class="commit-dot on"></span>
+            <span class="commit-dot on"></span>
+            <span class="commit-dot"></span>
+            <span class="commit-dot"></span>
+          </div>
+        </div>
+
+        <div class="thesis" style="top:48px;background:rgba(52,211,153,0.03);border:1px solid rgba(52,211,153,0.08);">
+          <div class="thesis-label" style="color:rgba(52,211,153,0.5);">Thesis <span class="who">· AI draft</span></div>
+          <div class="thesis-text">Execution ideas converging on radical transparency as shareable content — from packaging as education to publishing cost breakdowns.</div>
+          <div class="thesis-meta">From 3 cards · 4m ago</div>
+        </div>
+
+        <div class="zone-footer" style="background:rgba(52,211,153,0.02);">
+          <button class="zone-footer-btn">Extend</button>
+          <button class="zone-footer-btn">Summarize</button>
+          <button class="zone-footer-btn primary">Synthesize →</button>
+          <span class="zone-footer-spacer"></span>
+          <button class="zone-footer-add">+ Add card</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Zone 3 cards -->
+    <div class="card" style="left:116px;top:790px;">
+      <div class="card-type"><div class="card-type-dot" style="background:#34d399"></div><span style="color:#34d399">Idea</span></div>
+      <div class="card-text">Formula card shipped with every product — designed to be photographed and shared.</div>
+      <div class="card-footer"><span class="card-tag">#packaging</span><div class="card-actions"><button class="card-action">✓</button><button class="card-action">↻</button><button class="card-action">×</button></div></div>
+    </div>
+
+    <div class="card selected" style="left:330px;top:790px;">
+      <div class="card-type"><div class="card-type-dot" style="background:#34d399"></div><span style="color:#34d399">Idea</span></div>
+      <div class="card-text">"Why we didn't include" page. List trending ingredients you left out and explain why.</div>
+      <div class="card-footer"><span class="card-tag">#content</span><div class="card-actions"><button class="card-action">✓</button><button class="card-action">↻</button><button class="card-action">×</button></div></div>
+    </div>
+
+    <div class="card" style="left:544px;top:790px;">
+      <div class="card-type"><div class="card-type-dot" style="background:#34d399"></div><span style="color:#34d399">Idea</span></div>
+      <div class="card-text">Routine builder tool. Users drag ingredients into slots. Makes complexity into a game.</div>
+      <div class="card-footer"><span class="card-tag">#product</span><div class="card-actions"><button class="card-action">✓</button><button class="card-action">↻</button><button class="card-action">×</button></div></div>
+    </div>
+
+    <!-- Ghost generating -->
+    <div class="card-ghost" style="left:116px;top:940px;">
+      <span class="card-ghost-label">Generating…</span>
+    </div>
+
+
+    <!-- ═══════════════════════════════════════
+         ZONE 4: Synthesis — Direction (Sharpen / Anchor)
+         ═══════════════════════════════════════ -->
+    <div class="zone" style="left:820px;top:680px;width:660px;height:440px;">
+      <div class="zone-inner" style="border:1.5px dashed rgba(224,221,216,0.12);background:rgba(224,221,216,0.01);">
+        <div class="zone-head" style="background:rgba(224,221,216,0.02);">
+          <div class="zone-color-bar" style="background:rgba(224,221,216,0.4);"></div>
+          <span class="zone-name" style="color:rgba(224,221,216,0.7);">Direction synthesis</span>
+          <span style="font-size:9px;color:rgba(224,221,216,0.2);text-transform:uppercase;letter-spacing:0.04em;padding:1px 6px;border-radius:4px;background:rgba(255,255,255,0.04);">synthesis</span>
+          <span class="zone-card-count">2</span>
+          <div class="stage-tabs">
+            <button class="stage-tab">Explore</button>
+            <button class="stage-tab">Sensemake</button>
+            <button class="stage-tab active">Sharpen</button>
+            <button class="stage-tab">Handoff</button>
+          </div>
+          <div class="commit-dots">
+            <span class="commit-dot on"></span>
+            <span class="commit-dot on"></span>
+            <span class="commit-dot on"></span>
+            <span class="commit-dot"></span>
+          </div>
+        </div>
+
+        <div class="thesis" style="top:48px;background:rgba(224,221,216,0.02);border:1px solid rgba(224,221,216,0.06);">
+          <div class="thesis-label" style="color:rgba(224,221,216,0.35);">Thesis <span class="who">· edited by you</span></div>
+          <div class="thesis-text">Ingredient-literate beauty that treats its audience as smart. Anti-marketing tone, radical transparency in formulation and pricing, with education built into every touchpoint.</div>
+          <div class="thesis-meta">From 2 zones · edited just now</div>
+        </div>
+
+        <div class="zone-footer" style="background:rgba(224,221,216,0.01);">
+          <button class="zone-footer-btn">Extend</button>
+          <button class="zone-footer-btn">Summarize</button>
+          <span class="zone-footer-spacer"></span>
+          <button class="zone-footer-add">+ Add card</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Zone 4 cards — forked descendants -->
+    <div class="card locked" style="left:836px;top:790px;">
+      <div class="card-type"><div class="card-type-dot" style="background:#a78bfa"></div><span style="color:#a78bfa">Direction</span></div>
+      <div class="card-text">Position as ingredient-literate beauty. Formulation IS the brand personality.</div>
+      <div class="card-footer"><span class="card-tag">#core · ⚑</span><div class="card-actions"><button class="card-action">✓</button><button class="card-action">↻</button><button class="card-action">×</button></div></div>
+    </div>
+
+    <div class="card locked" style="left:1050px;top:790px;">
+      <div class="card-type"><div class="card-type-dot" style="background:#34d399"></div><span style="color:#34d399">Idea</span></div>
+      <div class="card-text">Every touchpoint is education — packaging, pages, content, pricing all explain the why.</div>
+      <div class="card-footer"><span class="card-tag">#execution · ⚑</span><div class="card-actions"><button class="card-action">✓</button><button class="card-action">↻</button><button class="card-action">×</button></div></div>
+    </div>
+
+    <!-- Riff from synthesis card -->
+    <div class="card riff-card" style="left:1264px;top:790px;">
+      <div class="riff-badge">↻ riff</div>
+      <div class="card-text">Open-source formulation process — publish lab notes, ingredient sourcing decisions, failed batches.</div>
+      <div class="card-footer"><div class="card-actions" style="opacity:1"><button class="card-action" title="Promote" style="color:#34d399">↑</button><button class="card-action" title="Reject">×</button></div></div>
+    </div>
+
+
+    <!-- ═══════════════════════════════════════
+         FLOATING CARDS (weak context)
+         ═══════════════════════════════════════ -->
+    <div class="card floating" style="left:1540px;top:120px;">
+      <div class="card-type"><div class="card-type-dot" style="background:#fb923c"></div><span style="color:rgba(251,146,60,0.5)">Provocation</span></div>
+      <div class="card-text">What if packaging had no product name — only the INCI list?</div>
+      <div class="card-footer"><span class="card-tag">#branding</span></div>
+    </div>
+
+    <div class="card floating" style="left:1540px;top:280px;">
+      <div class="card-type"><div class="card-type-dot" style="background:#ef4444"></div><span style="color:rgba(239,68,68,0.5)">Guard Rail</span></div>
+      <div class="card-text">Never claim "clean" or "natural." Transparency should feel like generosity.</div>
+      <div class="card-footer"><span class="card-tag">#voice</span></div>
+    </div>
+
+
+    <!-- ═══════════════════════════════════════
+         FOUNTAIN (Generate panel)
+         ═══════════════════════════════════════ -->
+    <div class="fountain" style="left:1540px;top:480px;background:rgba(167,139,250,0.03);border:1px solid rgba(167,139,250,0.12);">
+      <div class="fountain-header">
+        <div class="fountain-icon" style="background:rgba(167,139,250,0.1);color:#a78bfa;">✦</div>
+        <span class="fountain-title" style="color:#a78bfa;">Generate</span>
+      </div>
+      <button class="fountain-btn">+ More ideas from this zone</button>
+      <button class="fountain-btn">+ Tensions I'm missing</button>
+      <button class="fountain-btn">+ Challenge my direction</button>
+      <button class="fountain-btn">+ Surprise me</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- Prompt Bar -->
+<div class="prompt-bar">
+  <div class="prompt-inner">
+    <input type="text" class="prompt-input" placeholder="Ask anything… 'extend the tensions zone' or 'create a synthesis from my locked cards'" />
+    <button class="prompt-send">→</button>
+  </div>
+</div>
+
+<script>
+const world = document.getElementById('canvas-world');
+const inner = document.getElementById('canvas-inner');
+let panX = -60, panY = -20, zoom = 1, isPanning = false, startX, startY, startPanX, startPanY;
+
+function applyTransform() {
+  inner.style.transform = `translate(${panX}px,${panY}px) scale(${zoom})`;
+  document.getElementById('zoom-level').textContent = Math.round(zoom * 100) + '%';
+}
+applyTransform();
+
+world.addEventListener('mousedown', e => {
+  if (e.target.closest('.card') || e.target.closest('.fountain') || e.target.closest('button') || e.target.closest('input')) return;
+  isPanning = true; startX = e.clientX; startY = e.clientY; startPanX = panX; startPanY = panY;
+});
+window.addEventListener('mousemove', e => { if (!isPanning) return; panX = startPanX + (e.clientX - startX); panY = startPanY + (e.clientY - startY); applyTransform(); });
+window.addEventListener('mouseup', () => { isPanning = false; });
+world.addEventListener('wheel', e => { e.preventDefault(); zoom = Math.max(0.25, Math.min(2.5, zoom * (e.deltaY > 0 ? 0.92 : 1.08))); applyTransform(); }, { passive: false });
+document.getElementById('zoom-in').onclick = () => { zoom = Math.min(2.5, zoom * 1.15); applyTransform(); };
+document.getElementById('zoom-out').onclick = () => { zoom = Math.max(0.25, zoom * 0.85); applyTransform(); };
+
+document.querySelectorAll('.card').forEach(card => {
+  let dx, dy, dragging = false;
+  card.addEventListener('mousedown', e => {
+    e.stopPropagation(); dragging = true; card.classList.add('dragging');
+    const rect = card.getBoundingClientRect(); dx = e.clientX - rect.left; dy = e.clientY - rect.top;
+    const onMove = ev => { if (!dragging) return; const wr = inner.getBoundingClientRect(); card.style.left = (ev.clientX - wr.left - dx * zoom) / zoom + 'px'; card.style.top = (ev.clientY - wr.top - dy * zoom) / zoom + 'px'; };
+    const onUp = () => { dragging = false; card.classList.remove('dragging'); window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); };
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+  });
+});
+</script>
+</body>
+</html>

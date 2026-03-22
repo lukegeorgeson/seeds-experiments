@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seeds — V17 Card Operations Within Zones</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://esm.sh/@xyflow/react@12/dist/style.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script type="importmap">
+  {
+    "imports": {
+      "react": "https://esm.sh/react@18",
+      "react/": "https://esm.sh/react@18/",
+      "react-dom": "https://esm.sh/react-dom@18",
+      "react-dom/": "https://esm.sh/react-dom@18/",
+      "@xyflow/react": "https://esm.sh/@xyflow/react@12?external=react,react-dom",
+      "@xyflow/react/": "https://esm.sh/@xyflow/react@12&external=react,react-dom/"
+    }
+  }
+  </script>
+  <style>
+    body { margin: 0; font-family: 'Inter', sans-serif; background: #ffffff; }
+
+    .zone-clean {
+      border: 1.5px solid rgba(0,0,0,0.07);
+      border-radius: 14px;
+      background: rgba(0,0,0,0.008);
+      width: 100%; height: 100%;
+      position: relative;
+    }
+    .zone-clean-label {
+      position: absolute;
+      top: -12px;
+      left: 16px;
+      background: #fff;
+      padding: 2px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #333;
+      z-index: 2;
+    }
+
+    .card-ref {
+      background: #fafafa;
+      border: 1px solid rgba(0,0,0,0.08);
+      border-radius: 10px;
+      padding: 12px 14px;
+      width: 210px;
+      font-size: 13px;
+      line-height: 1.45;
+      color: #1a1a1a;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .card-ref .type-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      display: inline-block; margin-right: 5px; flex-shrink: 0;
+    }
+
+    /* Card states */
+    .card-ref.state-selected {
+      border-color: rgba(234,193,245,0.5);
+      box-shadow: 0 0 0 2px rgba(234,193,245,0.12);
+      background: #fdfaff;
+    }
+    .card-ref.state-locked {
+      border-color: rgba(234,193,245,0.6);
+      border-width: 2px;
+      background: #fdfaff;
+    }
+    .lock-icon {
+      position: absolute;
+      top: 6px;
+      right: 8px;
+      font-size: 10px;
+      color: #c99dd6;
+    }
+    .card-ref.state-rejected {
+      opacity: 0.45;
+      border-color: rgba(239,68,68,0.25);
+    }
+    .card-ref.state-rejected .card-text-body {
+      text-decoration: line-through;
+      text-decoration-color: rgba(239,68,68,0.3);
+    }
+    .reject-label {
+      position: absolute;
+      top: 4px;
+      right: 6px;
+      font-size: 9px;
+      color: #ef4444;
+      font-weight: 500;
+    }
+    .card-ref.state-editing {
+      border-color: rgba(59,130,246,0.4);
+      box-shadow: 0 0 0 2px rgba(59,130,246,0.1);
+    }
+    .card-ref.state-hasnote {
+      border-color: rgba(0,0,0,0.08);
+    }
+    .note-dot {
+      position: absolute;
+      top: 6px;
+      right: 8px;
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #f59e0b;
+    }
+    .note-body {
+      margin-top: 8px;
+      padding: 8px 10px;
+      background: rgba(245,158,11,0.06);
+      border: 1px solid rgba(245,158,11,0.12);
+      border-radius: 6px;
+      font-size: 11px;
+      color: #8a6914;
+      line-height: 1.4;
+    }
+    .edited-badge {
+      display: inline-block;
+      font-size: 9px;
+      padding: 1px 5px;
+      border-radius: 4px;
+      background: rgba(59,130,246,0.08);
+      color: #3b82f6;
+      margin-top: 6px;
+    }
+
+    .action-row-full {
+      display: flex;
+      gap: 3px;
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(0,0,0,0.05);
+      flex-wrap: wrap;
+    }
+    .act-btn {
+      padding: 3px 8px;
+      border-radius: 6px;
+      border: 1px solid rgba(0,0,0,0.07);
+      background: rgba(0,0,0,0.015);
+      font-size: 10px;
+      font-family: 'Inter', sans-serif;
+      color: #666;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .act-btn:hover { background: rgba(0,0,0,0.04); color: #333; }
+
+    .inspector-panel {
+      position: fixed;
+      top: 48px;
+      right: 0;
+      width: 240px;
+      height: calc(100vh - 48px);
+      background: #fafafa;
+      border-left: 1px solid rgba(0,0,0,0.06);
+      padding: 16px;
+      overflow-y: auto;
+      z-index: 90;
+      font-size: 12px;
+    }
+    .inspector-panel h4 {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #999;
+      margin: 0 0 8px;
+    }
+    .inspector-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 0;
+      font-size: 11px;
+      color: #555;
+      border-bottom: 1px solid rgba(0,0,0,0.03);
+    }
+    .inspector-row .label { color: #999; }
+
+    .state-label {
+      display: inline-block;
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-bottom: 8px;
+    }
+
+    .top-bar-clean {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 48px;
+      background: rgba(255,255,255,0.9);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      z-index: 100;
+    }
+
+    .react-flow__background { opacity: 0.3; }
+    .react-flow__controls { bottom: 20px !important; right: 260px !important; }
+  </style>
+</head>
+<body>
+  <div id="root" style="width:100vw;height:100vh;"></div>
+
+  <script type="module">
+    import React, { useState } from 'react';
+    import { createRoot } from 'react-dom/client';
+    import {
+      ReactFlow,
+      Background,
+      Controls,
+      useNodesState,
+      useEdgesState,
+      Handle,
+      Position,
+    } from '@xyflow/react';
+
+    const h = React.createElement;
+
+    const COLORS = { ideas: '#34d399', tensions: '#f472b6', signals: '#38bdf8', strategy: '#a78bfa' };
+
+    function ZoneNode({ data }) {
+      return h('div', { className: 'zone-clean', style: { width: '100%', height: '100%' } },
+        h('div', { className: 'zone-clean-label' }, data.label),
+      );
+    }
+
+    function CardNode({ data }) {
+      const [hovered, setHovered] = useState(false);
+      const color = COLORS[data.cardType] || '#888';
+      let stateClass = '';
+      if (data.state === 'selected') stateClass = 'state-selected';
+      if (data.state === 'locked') stateClass = 'state-locked';
+      if (data.state === 'rejected') stateClass = 'state-rejected';
+      if (data.state === 'editing') stateClass = 'state-editing';
+      if (data.state === 'hasnote') stateClass = 'state-hasnote';
+
+      return h('div', {
+        className: `card-ref ${stateClass}`,
+        onMouseEnter: () => setHovered(true),
+        onMouseLeave: () => setHovered(false),
+      },
+        // State label
+        data.stateLabel && h('div', {
+          className: 'state-label',
+          style: { background: data.stateLabelBg || 'rgba(0,0,0,0.04)', color: data.stateLabelColor || '#888' },
+        }, data.stateLabel),
+
+        h('div', { style: { display: 'flex', alignItems: 'flex-start' } },
+          h('span', { className: 'type-dot', style: { background: color, marginTop: '6px' } }),
+          data.state === 'editing'
+            ? h('div', {
+                contentEditable: true,
+                suppressContentEditableWarning: true,
+                style: {
+                  outline: 'none',
+                  borderRadius: '4px',
+                  padding: '2px 4px',
+                  background: 'rgba(59,130,246,0.04)',
+                  minWidth: '140px',
+                  fontSize: '13px',
+                  lineHeight: '1.45',
+                  color: '#1a1a1a',
+                }
+              }, data.text)
+            : h('span', { className: 'card-text-body' }, data.text),
+        ),
+
+        // Locked icon
+        data.state === 'locked' && h('span', { className: 'lock-icon' }, '🔒'),
+
+        // Rejected label
+        data.state === 'rejected' && h('span', { className: 'reject-label' }, '✕'),
+
+        // Note dot and body
+        data.state === 'hasnote' && h('span', { className: 'note-dot' }),
+        data.noteText && h('div', { className: 'note-body' }, data.noteText),
+
+        // Edited badge
+        data.isEdited && h('div', { className: 'edited-badge' }, 'edited'),
+
+        // Actions on hover
+        hovered && h('div', { className: 'action-row-full' },
+          h('button', { className: 'act-btn' }, '✓ Select'),
+          h('button', { className: 'act-btn' }, '⚑ Lock'),
+          h('button', { className: 'act-btn' }, '↻ Riff'),
+          h('button', { className: 'act-btn' }, '✎ Edit'),
+          h('button', { className: 'act-btn' }, '✦ Note'),
+          h('button', { className: 'act-btn' }, '✕ Reject'),
+        ),
+
+        h(Handle, { type: 'source', position: Position.Right, style: { opacity: 0, width: 6, height: 6 } }),
+        h(Handle, { type: 'target', position: Position.Left, style: { opacity: 0, width: 6, height: 6 } }),
+      );
+    }
+
+    const nodeTypes = { zone: ZoneNode, card: CardNode };
+
+    const initialNodes = [
+      // Zone 1: Ideas
+      {
+        id: 'zone-1',
+        type: 'zone',
+        position: { x: 40, y: 80 },
+        data: { label: 'Ideas Zone' },
+        style: { width: 540, height: 750 },
+      },
+      // Default card
+      {
+        id: 'c-default',
+        type: 'card',
+        position: { x: 20, y: 25 },
+        parentId: 'zone-1',
+        extent: 'parent',
+        data: {
+          text: 'Partner with local food scene for launch events',
+          cardType: 'ideas',
+          state: 'default',
+          stateLabel: 'DEFAULT',
+          stateLabelBg: 'rgba(0,0,0,0.04)',
+          stateLabelColor: '#888',
+        },
+      },
+      // Selected card
+      {
+        id: 'c-selected',
+        type: 'card',
+        position: { x: 270, y: 25 },
+        parentId: 'zone-1',
+        extent: 'parent',
+        data: {
+          text: 'Story-driven content series following real customers',
+          cardType: 'ideas',
+          state: 'selected',
+          stateLabel: 'SELECTED',
+          stateLabelBg: 'rgba(234,193,245,0.12)',
+          stateLabelColor: '#c99dd6',
+        },
+      },
+      // Locked card
+      {
+        id: 'c-locked',
+        type: 'card',
+        position: { x: 20, y: 200 },
+        parentId: 'zone-1',
+        extent: 'parent',
+        data: {
+          text: 'Community co-ownership model for early supporters',
+          cardType: 'ideas',
+          state: 'locked',
+          stateLabel: 'LOCKED',
+          stateLabelBg: 'rgba(234,193,245,0.15)',
+          stateLabelColor: '#c99dd6',
+        },
+      },
+      // Rejected card
+      {
+        id: 'c-rejected',
+        type: 'card',
+        position: { x: 270, y: 200 },
+        parentId: 'zone-1',
+        extent: 'parent',
+        data: {
+          text: 'Celebrity endorsement deal with major influencer',
+          cardType: 'ideas',
+          state: 'rejected',
+          stateLabel: 'REJECTED',
+          stateLabelBg: 'rgba(239,68,68,0.08)',
+          stateLabelColor: '#ef4444',
+        },
+      },
+      // Editing card
+      {
+        id: 'c-editing',
+        type: 'card',
+        position: { x: 20, y: 390 },
+        parentId: 'zone-1',
+        extent: 'parent',
+        data: {
+          text: 'Rotating guest chef programme at flagship cafe',
+          cardType: 'ideas',
+          state: 'editing',
+          stateLabel: 'EDITING',
+          stateLabelBg: 'rgba(59,130,246,0.08)',
+          stateLabelColor: '#3b82f6',
+          isEdited: true,
+        },
+      },
+      // Has note card
+      {
+        id: 'c-note',
+        type: 'card',
+        position: { x: 270, y: 390 },
+        parentId: 'zone-1',
+        extent: 'parent',
+        data: {
+          text: 'Membership tier with behind-the-scenes access',
+          cardType: 'ideas',
+          state: 'hasnote',
+          stateLabel: 'HAS NOTE',
+          stateLabelBg: 'rgba(245,158,11,0.08)',
+          stateLabelColor: '#f59e0b',
+          noteText: 'Check competitor pricing for similar programmes — Soho House model may be relevant reference.',
+        },
+      },
+      // Riff source card
+      {
+        id: 'c-riff-source',
+        type: 'card',
+        position: { x: 145, y: 600 },
+        parentId: 'zone-1',
+        extent: 'parent',
+        data: {
+          text: 'Seasonal micro-markets in unexpected locations',
+          cardType: 'ideas',
+          state: 'default',
+          stateLabel: 'RIFF SOURCE',
+          stateLabelBg: 'rgba(234,193,245,0.08)',
+          stateLabelColor: '#c99dd6',
+        },
+      },
+
+      // Zone 2: Tensions
+      {
+        id: 'zone-2',
+        type: 'zone',
+        position: { x: 640, y: 80 },
+        data: { label: 'Tensions Zone' },
+        style: { width: 340, height: 400 },
+      },
+      {
+        id: 'c-t1',
+        type: 'card',
+        position: { x: 20, y: 25 },
+        parentId: 'zone-2',
+        extent: 'parent',
+        data: {
+          text: 'Premium quality expectations vs accessible pricing',
+          cardType: 'tensions',
+          state: 'selected',
+        },
+      },
+      {
+        id: 'c-t2',
+        type: 'card',
+        position: { x: 20, y: 170 },
+        parentId: 'zone-2',
+        extent: 'parent',
+        data: {
+          text: 'Local authenticity vs desire for global presence',
+          cardType: 'tensions',
+          state: 'locked',
+        },
+      },
+    ];
+
+    const initialEdges = [];
+
+    function App() {
+      const [nodes, , onNodesChange] = useNodesState(initialNodes);
+      const [edges, , onEdgesChange] = useEdgesState(initialEdges);
+
+      return h('div', { style: { width: '100vw', height: '100vh' } },
+        h('div', { className: 'top-bar-clean' },
+          h('span', { style: { fontWeight: 600, fontSize: '14px', color: '#1a1a1a' } }, 'Card Operations Reference'),
+          h('span', { style: { fontSize: '12px', color: '#999', marginLeft: '12px' } }, 'All card states and actions'),
+        ),
+        h('div', { style: { display: 'flex', width: '100%', height: '100%' } },
+          h('div', { style: { flex: 1 } },
+            h(ReactFlow, {
+              nodes, edges, onNodesChange, onEdgesChange,
+              nodeTypes,
+              fitView: true,
+              fitViewOptions: { padding: 0.2 },
+              style: { background: '#ffffff' },
+              proOptions: { hideAttribution: true },
+            },
+              h(Background, { gap: 20, size: 1, color: 'rgba(0,0,0,0.03)' }),
+              h(Controls, { showInteractive: false }),
+            ),
+          ),
+          // Inspector panel
+          h('div', { className: 'inspector-panel' },
+            h('h4', null, 'Card Inspector'),
+            h('p', { style: { fontSize: '11px', color: '#888', marginBottom: '16px' } }, 'Hover a card to see details'),
+            h('div', { style: { marginBottom: '16px' } },
+              h('h4', null, 'Card States'),
+              ['Default', 'Selected', 'Locked', 'Rejected', 'Editing', 'Has Note'].map(s =>
+                h('div', { key: s, className: 'inspector-row' },
+                  h('span', null, s),
+                  h('span', { className: 'label' }, 'Active'),
+                )
+              ),
+            ),
+            h('div', { style: { marginBottom: '16px' } },
+              h('h4', null, 'Available Actions'),
+              ['✓ Select', '⚑ Lock', '↻ Riff', '✎ Edit', '✦ Note', '✕ Reject'].map(a =>
+                h('div', { key: a, className: 'inspector-row' },
+                  h('span', null, a),
+                )
+              ),
+            ),
+            h('div', null,
+              h('h4', null, 'Signal Weight'),
+              h('div', { className: 'inspector-row' },
+                h('span', null, 'Locked'),
+                h('span', { className: 'label' }, 'Highest'),
+              ),
+              h('div', { className: 'inspector-row' },
+                h('span', null, 'User-edited'),
+                h('span', { className: 'label' }, 'High'),
+              ),
+              h('div', { className: 'inspector-row' },
+                h('span', null, 'Selected'),
+                h('span', { className: 'label' }, 'Medium'),
+              ),
+              h('div', { className: 'inspector-row' },
+                h('span', null, 'Default'),
+                h('span', { className: 'label' }, 'Low'),
+              ),
+              h('div', { className: 'inspector-row' },
+                h('span', null, 'Rejected'),
+                h('span', { className: 'label' }, 'Negative'),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    createRoot(document.getElementById('root')).render(h(App));
+  </script>
+</body>
+</html>

@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seeds — V22 Refined Zone Canvas</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://esm.sh/@xyflow/react@12/dist/style.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script type="importmap">
+  {
+    "imports": {
+      "react": "https://esm.sh/react@18",
+      "react/": "https://esm.sh/react@18/",
+      "react-dom": "https://esm.sh/react-dom@18",
+      "react-dom/": "https://esm.sh/react-dom@18/",
+      "@xyflow/react": "https://esm.sh/@xyflow/react@12?external=react,react-dom",
+      "@xyflow/react/": "https://esm.sh/@xyflow/react@12&external=react,react-dom/"
+    }
+  }
+  </script>
+  <style>
+    :root {
+      --bg:            rgb(240, 240, 240);
+      --surface:       rgb(255, 255, 255);
+      --text-1:        rgb(25, 25, 25);
+      --text-2:        rgb(82, 82, 82);
+      --text-3:        rgb(140, 140, 140);
+      --text-4:        rgb(190, 190, 190);
+      --border:        rgba(0, 0, 0, 0.05);
+      --border-hover:  rgba(0, 0, 0, 0.09);
+      --glass:         rgba(240, 240, 240, 0.72);
+      --dot-on:        rgb(25, 25, 25);
+      --dot-off:       rgb(212, 212, 212);
+      /* Zone accent tints — very restrained */
+      --z-ideas:       52, 211, 153;
+      --z-tensions:    244, 114, 182;
+      --z-signals:     56, 189, 248;
+      --z-strategy:    167, 139, 250;
+      --z-synthesis:   25, 25, 25;
+      --font: 'Inter', -apple-system, system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      font-weight: 400;
+      background: var(--bg);
+      color: var(--text-1);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── TOP BAR ── */
+    .top-bar {
+      position: fixed; top: 0; left: 0; right: 0;
+      height: 52px;
+      background: var(--glass);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 28px;
+      z-index: 100;
+    }
+    .top-title { font-size: 15px; color: var(--text-1); letter-spacing: -0.02em; }
+    .top-meta  { font-size: 12px; color: var(--text-3); margin-left: 14px; }
+
+    /* ── GLASS BUTTON ── */
+    .glass-btn {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 7px 18px;
+      border-radius: 9999px;
+      border: none;
+      background: var(--glass);
+      backdrop-filter: blur(4px);
+      box-shadow:
+        rgba(0,0,0,0.04) 0 2px 2px inset,
+        rgba(255,255,255,0.45) 0 -2px 2px inset,
+        rgba(0,0,0,0.03) 0 1px 4px;
+      background-image: linear-gradient(-75deg, rgba(255,255,255,0.04), rgba(255,255,255,0.18), rgba(255,255,255,0.04));
+      font-family: var(--font); font-size: 13px; font-weight: 400;
+      color: var(--text-2); cursor: pointer;
+      transition: transform 0.4s cubic-bezier(0.25,1,0.5,1), box-shadow 0.2s;
+    }
+    .glass-btn:hover {
+      transform: scale(1.02);
+      color: var(--text-1);
+    }
+
+    /* ── ZONE NODE ── */
+    .zone-wrap {
+      width: 100%; height: 100%;
+      border-radius: 14px;
+      position: relative;
+      transition: border-color 0.2s;
+    }
+
+    /* Header — sits flush at top of zone */
+    .z-head {
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 40px;
+      padding: 0 16px;
+      display: flex; align-items: center; gap: 10px;
+      border-bottom: 1px solid rgba(0,0,0,0.03);
+      border-radius: 14px 14px 0 0;
+      z-index: 2;
+    }
+    .z-color-bar {
+      width: 3px; height: 16px; border-radius: 2px; flex-shrink: 0;
+    }
+    .z-name {
+      font-size: 14px; color: var(--text-1); letter-spacing: -0.02em;
+    }
+    .z-count {
+      font-size: 11px; color: var(--text-4);
+    }
+
+    /* Stage pill — right side of header */
+    .stage-pill {
+      margin-left: auto;
+      font-size: 10px; font-weight: 400;
+      letter-spacing: 0.03em; text-transform: uppercase;
+      padding: 2px 9px;
+      border-radius: 9999px;
+      color: var(--text-3);
+      background: rgba(0,0,0,0.03);
+    }
+
+    /* Commitment dots — after stage pill */
+    .commit-group {
+      display: flex; align-items: center; gap: 3px;
+    }
+    .commit-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--dot-off);
+      transition: background 0.15s;
+    }
+    .commit-dot.on { background: var(--dot-on); }
+
+    /* Zone bottom actions — hidden until zone hover */
+    .z-actions {
+      position: absolute; bottom: 10px; right: 14px;
+      display: flex; gap: 4px;
+      opacity: 0; transition: opacity 0.2s;
+      z-index: 2;
+    }
+    .zone-wrap:hover .z-actions { opacity: 1; }
+    .z-act {
+      padding: 4px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-size: 11px; color: var(--text-3);
+      cursor: pointer; font-family: var(--font);
+      transition: all 0.12s;
+    }
+    .z-act:hover { color: var(--text-2); border-color: var(--border-hover); }
+
+    /* ── THESIS CARD ── */
+    .thesis {
+      border-radius: 10px;
+      padding: 14px 16px;
+      position: relative;
+    }
+    .thesis-tag {
+      font-size: 10px; color: var(--text-4);
+      text-transform: uppercase; letter-spacing: 0.04em;
+      margin-bottom: 5px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .thesis-tag .who {
+      font-size: 10px; text-transform: none; letter-spacing: 0;
+    }
+    .thesis-body {
+      font-size: 14px; line-height: 1.6; color: var(--text-2);
+      letter-spacing: -0.01em;
+    }
+    .thesis-foot {
+      font-size: 10px; color: var(--text-4); margin-top: 8px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .stale-badge {
+      display: inline-flex; align-items: center; gap: 3px;
+      color: rgb(180,140,60); font-size: 10px;
+    }
+    .stale-badge .dot {
+      width: 4px; height: 4px; border-radius: 50%; background: rgb(180,140,60);
+    }
+    @keyframes blink { 0%,50%{opacity:1}51%,100%{opacity:0} }
+    .cursor-blink { animation: blink .8s infinite; color: var(--text-3); }
+
+    /* ── CARD NODE ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 11px 13px;
+      width: 205px;
+      font-size: 13px; line-height: 1.5;
+      color: var(--text-2); letter-spacing: -0.01em;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      position: relative;
+    }
+    .card:hover {
+      border-color: var(--border-hover);
+      box-shadow: 0 1px 6px rgba(0,0,0,0.03);
+    }
+    .card.selected {
+      border-color: rgba(0,0,0,0.14);
+      box-shadow: 0 0 0 2px rgba(0,0,0,0.03);
+    }
+    .card.locked {
+      border-color: rgba(0,0,0,0.18);
+      border-width: 1.5px;
+    }
+    .card.rejected { opacity: 0.28; }
+    .card.floating { opacity: 0.45; border-style: dashed; }
+    .card .flag {
+      position: absolute; top: 5px; right: 7px;
+      font-size: 10px; color: var(--text-4);
+    }
+
+    /* Card hover actions */
+    .c-acts {
+      display: flex; gap: 2px; flex-wrap: wrap;
+      margin-top: 8px; padding-top: 7px;
+      border-top: 1px solid var(--border);
+    }
+    .c-act {
+      padding: 2px 7px; border-radius: 5px;
+      border: 1px solid var(--border);
+      background: transparent;
+      font-size: 10px; color: var(--text-3);
+      cursor: pointer; font-family: var(--font);
+      transition: all 0.1s;
+    }
+    .c-act:hover { color: var(--text-2); border-color: var(--border-hover); }
+
+    /* ── RIFF CARD ── */
+    .riff {
+      background: var(--surface);
+      border: 1px dashed rgba(0,0,0,0.08);
+      border-radius: 10px;
+      padding: 11px 13px;
+      width: 195px;
+      font-size: 13px; line-height: 1.5;
+      color: var(--text-2); position: relative;
+    }
+    .riff-tag {
+      font-size: 9px; color: var(--text-4);
+      text-transform: uppercase; letter-spacing: 0.04em;
+      margin-bottom: 3px;
+    }
+
+    /* ── SYNTHESIS ZONE override ── */
+    .zone-wrap.synthesis {
+      border-style: dashed;
+    }
+    .synth-tag {
+      font-size: 9px; color: var(--text-4);
+      text-transform: uppercase; letter-spacing: 0.04em;
+      padding: 1px 6px; border-radius: 4px;
+      background: rgba(0,0,0,0.03);
+    }
+
+    /* ── BOTTOM TOOLBAR ── */
+    .bot-bar {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 2px;
+      background: var(--glass);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(0,0,0,0.03);
+      border-radius: 9999px;
+      padding: 5px 6px;
+      box-shadow:
+        rgba(0,0,0,0.03) 0 2px 2px inset,
+        rgba(255,255,255,0.4) 0 -1px 2px inset,
+        rgba(0,0,0,0.05) 0 4px 24px;
+      z-index: 100;
+    }
+    .bot-bar button {
+      padding: 7px 18px; border-radius: 9999px;
+      border: none; background: transparent;
+      font-size: 13px; font-weight: 400;
+      color: var(--text-3); cursor: pointer;
+      font-family: var(--font); transition: all 0.15s;
+    }
+    .bot-bar button:hover { color: var(--text-2); }
+    .bot-bar button.on { background: rgba(0,0,0,0.05); color: var(--text-1); }
+
+    /* ── REACT FLOW ── */
+    .react-flow__background { opacity: 0.3; }
+    .react-flow__controls {
+      bottom: 80px !important;
+      box-shadow: none !important;
+      border: 1px solid var(--border) !important;
+      border-radius: 10px !important; overflow: hidden;
+    }
+    .react-flow__controls button {
+      background: var(--surface) !important;
+      color: var(--text-3) !important;
+      border-color: var(--border) !important;
+      width: 28px !important; height: 28px !important;
+    }
+    .react-flow__controls button:hover {
+      color: var(--text-2) !important;
+    }
+    .react-flow__minimap {
+      background: rgba(240,240,240,0.92) !important;
+      border-radius: 8px; overflow: hidden;
+      border: 1px solid var(--border) !important;
+      bottom: 80px !important;
+    }
+  </style>
+</head>
+<body>
+  <div id="root" style="width:100vw;height:100vh;"></div>
+
+  <script type="module">
+    import React, { useState } from 'react';
+    import { createRoot } from 'react-dom/client';
+    import {
+      ReactFlow, Background, Controls, MiniMap,
+      useNodesState, useEdgesState, Handle, Position, getBezierPath,
+    } from '@xyflow/react';
+
+    const h = React.createElement;
+
+    const STAGES = { explore:'Explore', sensemake:'Sensemake', sharpen:'Sharpen', handoff:'Handoff' };
+    const COMMIT = { sandbox:1, active:2, anchor:3, final:4 };
+    const ZCOL = {
+      ideas:     '52,211,153',
+      tensions:  '244,114,182',
+      signals:   '56,189,248',
+      strategy:  '167,139,250',
+      synthesis: '25,25,25',
+    };
+
+    /* ── ZONE ── */
+    function ZoneNode({ data }) {
+      const rgb = ZCOL[data.zoneType] || ZCOL.synthesis;
+      const cl = COMMIT[data.commitment] || 2;
+      const isSyn = data.isSynthesis;
+      return h('div', {
+        className: `zone-wrap ${isSyn ? 'synthesis' : ''}`,
+        style: {
+          width:'100%', height:'100%',
+          border: `1px solid rgba(${rgb}, ${isSyn ? 0.12 : 0.18})`,
+          background: `rgba(${rgb}, 0.02)`,
+        },
+      },
+        h('div', { className: 'z-head', style: { background: `rgba(${rgb}, 0.03)` } },
+          h('div', { className: 'z-color-bar', style: { background: `rgb(${rgb})` } }),
+          h('span', { className: 'z-name' }, data.label),
+          isSyn && h('span', { className: 'synth-tag' }, 'synthesis'),
+          h('span', { className: 'z-count' }, data.cardCount),
+          h('span', { className: 'stage-pill' }, STAGES[data.stage] || 'Explore'),
+          h('div', { className: 'commit-group' },
+            [1,2,3,4].map(n => h('span', { key:n, className: `commit-dot ${n<=cl?'on':''}` })),
+          ),
+        ),
+        h('div', { className: 'z-actions' },
+          h('button', { className: 'z-act' }, 'Extend'),
+          h('button', { className: 'z-act' }, 'Summarize'),
+          !isSyn && h('button', { className: 'z-act' }, 'Synthesize →'),
+        ),
+      );
+    }
+
+    /* ── THESIS ── */
+    function ThesisNode({ data }) {
+      const rgb = ZCOL[data.zoneType] || ZCOL.synthesis;
+      return h('div', {
+        className: 'thesis',
+        style: {
+          background: `rgba(${rgb}, 0.03)`,
+          border: `1px solid rgba(${rgb}, 0.08)`,
+        },
+      },
+        h('div', { className: 'thesis-tag' },
+          'Thesis',
+          h('span', { className: 'who' }, data.editedByUser ? '· edited by you' : '· AI draft'),
+        ),
+        h('div', { className: 'thesis-body' },
+          data.text,
+          data.streaming && h('span', { className: 'cursor-blink' }, '▎'),
+        ),
+        h('div', { className: 'thesis-foot' },
+          h('span', null, `${data.cardCount} cards`),
+          data.stale
+            ? h('span', { className: 'stale-badge' }, h('span',{className:'dot'}), ' Stale')
+            : h('span', null, data.age || 'now'),
+        ),
+        h(Handle, { type:'source', position:Position.Right, style:{opacity:0,width:6,height:6} }),
+        h(Handle, { type:'target', position:Position.Left, style:{opacity:0,width:6,height:6} }),
+      );
+    }
+
+    /* ── CARD ── */
+    function CardNode({ data }) {
+      const [hov, setHov] = useState(false);
+      let cls = 'card';
+      if (data.isSelected) cls += ' selected';
+      if (data.isLocked)   cls += ' locked';
+      if (data.isRejected) cls += ' rejected';
+      if (data.isFloating) cls += ' floating';
+
+      return h('div', { className: cls, onMouseEnter:()=>setHov(true), onMouseLeave:()=>setHov(false) },
+        data.text && h('div', null, data.text),
+        data.isLocked && h('span', { className:'flag' }, '⚑'),
+        hov && !data.isRejected && h('div', { className: 'c-acts' },
+          ['Select','Riff','Lock','Edit','Reject'].map(a =>
+            h('button', { key:a, className:'c-act' }, a)
+          ),
+        ),
+        h(Handle, { type:'source', position:Position.Right, style:{opacity:0,width:6,height:6} }),
+        h(Handle, { type:'target', position:Position.Left, style:{opacity:0,width:6,height:6} }),
+      );
+    }
+
+    /* ── RIFF ── */
+    function RiffNode({ data }) {
+      return h('div', { className: 'riff' },
+        h('div', { className: 'riff-tag' }, '↻ riff'),
+        h('div', null, data.text),
+        h('div', { style:{ display:'flex', gap:'3px', marginTop:'7px' } },
+          h('button', { className:'c-act' }, 'Promote'),
+          h('button', { className:'c-act' }, 'Reject'),
+        ),
+        h(Handle, { type:'target', position:Position.Left, style:{opacity:0,width:6,height:6} }),
+        h(Handle, { type:'source', position:Position.Right, style:{opacity:0,width:6,height:6} }),
+      );
+    }
+
+    /* ── FLOATING ── */
+    function FloatingNode({ data }) {
+      const [hov, setHov] = useState(false);
+      return h('div', { className:'card floating', onMouseEnter:()=>setHov(true), onMouseLeave:()=>setHov(false) },
+        h('div', null, data.text),
+        hov && h('div', { className:'c-acts' },
+          h('button',{className:'c-act'},'Move to zone'),
+          h('button',{className:'c-act'},'Riff'),
+        ),
+        h(Handle, { type:'source', position:Position.Right, style:{opacity:0,width:6,height:6} }),
+        h(Handle, { type:'target', position:Position.Left, style:{opacity:0,width:6,height:6} }),
+      );
+    }
+
+    /* ── EDGES ── */
+    function RiffEdge(p) {
+      const [d] = getBezierPath(p);
+      return h('g',null, h('path',{d,fill:'none',stroke:'rgba(0,0,0,0.07)',strokeWidth:1,strokeDasharray:'4 4',style:{animation:'dash 2s linear infinite'}}));
+    }
+    function ThesisEdge(p) {
+      const [d] = getBezierPath(p);
+      return h('g',null, h('path',{d,fill:'none',stroke:'rgba(0,0,0,0.04)',strokeWidth:1,strokeDasharray:'6 6'}));
+    }
+
+    const nodeTypes  = { zone:ZoneNode, thesis:ThesisNode, card:CardNode, riff:RiffNode, floating:FloatingNode };
+    const edgeTypes  = { riff:RiffEdge, thesis:ThesisEdge };
+
+    /* ─────────────────────────────
+       BOARD DATA
+       ───────────────────────────── */
+    const N = [
+      // ── Zone: Ideas (Explore / Active) ──
+      { id:'z1', type:'zone', position:{x:40,y:80},
+        data:{label:'Initial Ideas',zoneType:'ideas',stage:'explore',commitment:'active',cardCount:6},
+        style:{width:560,height:580} },
+      { id:'th1', type:'thesis', position:{x:16,y:48}, parentId:'z1', extent:'parent',
+        data:{
+          text:'Early exploration centres on experiential storytelling — shifting from product-first messaging to culture-embedded narratives. Community co-creation and radical transparency emerging as differentiators.',
+          cardCount:6, age:'2m ago', stale:false, editedByUser:false, zoneType:'ideas',
+        }, style:{width:520} },
+      ...['Experiential pop-ups as brand storytelling vehicles',
+          'User-generated content as the primary creative asset',
+          'Collaboration with emerging artists over established celebrities',
+          'Seasonal micro-campaigns vs one big annual push',
+          'Behind-the-scenes content as trust-building mechanism',
+          'Community voting on next product colourway',
+      ].map((t,i)=>({
+        id:`c1-${i}`, type:'card',
+        position:{ x:16+(i%2)*268, y:175+Math.floor(i/2)*125 },
+        parentId:'z1', extent:'parent',
+        data:{ text:t, isSelected:i===0||i===2||i===4, isLocked:i===4 },
+      })),
+
+      // ── Zone: Tensions (Sensemake / Anchor) ──
+      { id:'z2', type:'zone', position:{x:660,y:80},
+        data:{label:'Audience Tensions',zoneType:'tensions',stage:'sensemake',commitment:'anchor',cardCount:4},
+        style:{width:510,height:500} },
+      { id:'th2', type:'thesis', position:{x:16,y:48}, parentId:'z2', extent:'parent',
+        data:{
+          text:'Core tension between desire for authenticity and appetite for convenience. Audience is sceptical of brand claims but responsive to peer endorsement.',
+          cardCount:5, stale:true, editedByUser:true, zoneType:'tensions',
+        }, style:{width:470} },
+      ...['Customers want ethical products but won\'t pay premium',
+          'Social media distrust rising but engagement still social-led',
+          'Desire for uniqueness conflicts with desire to belong',
+          'Sustainability fatigue — audience tired of empty pledges',
+      ].map((t,i)=>({
+        id:`c2-${i}`, type:'card',
+        position:{ x:16+(i%2)*245, y:175+Math.floor(i/2)*125 },
+        parentId:'z2', extent:'parent',
+        data:{ text:t, isSelected:i===0||i===3, isRejected:i===1 },
+      })),
+
+      // ── Zone: Signals (Explore / Sandbox) ──
+      { id:'z3', type:'zone', position:{x:40,y:720},
+        data:{label:'Market Signals',zoneType:'signals',stage:'explore',commitment:'sandbox',cardCount:3},
+        style:{width:510,height:340} },
+      { id:'th3', type:'thesis', position:{x:16,y:48}, parentId:'z3', extent:'parent',
+        data:{
+          text:'Weak early signals. Gen Z discovery driven by social commerce, brand loyalty declining across categories, resale outpacing new.',
+          cardCount:3, age:'5m ago', stale:false, editedByUser:false, zoneType:'signals',
+        }, style:{width:470} },
+      ...['TikTok Shop driving 60% of Gen Z discovery',
+          'Secondhand luxury market growing 3x faster than new',
+          'Brand loyalty declining — 78% switched brands this year',
+      ].map((t,i)=>({
+        id:`c3-${i}`, type:'card',
+        position:{ x:16+(i%2)*245, y:165+Math.floor(i/2)*110 },
+        parentId:'z3', extent:'parent',
+        data:{ text:t },
+      })),
+
+      // ── Synthesis Zone (Sharpen / Active) ──
+      { id:'z4', type:'zone', position:{x:660,y:640},
+        data:{label:'Direction Synthesis',zoneType:'synthesis',stage:'sharpen',commitment:'active',cardCount:3,isSynthesis:true},
+        style:{width:510,height:420} },
+      { id:'th4', type:'thesis', position:{x:16,y:48}, parentId:'z4', extent:'parent',
+        data:{
+          text:'Converging on community-first positioning: the brand exists to serve and amplify its community. Physical spaces as cultural platforms. Transparency as operational truth, not marketing layer.',
+          cardCount:3, age:'just now', stale:false, editedByUser:true, zoneType:'synthesis',
+        }, style:{width:470} },
+      ...['Community co-creation as core product development model',
+          'Physical spaces serve culture first, commerce second',
+          'Radical transparency: publish costs, margins, impact data quarterly',
+      ].map((t,i)=>({
+        id:`c4-${i}`, type:'card',
+        position:{ x:16+(i%2)*245, y:180+Math.floor(i/2)*110 },
+        parentId:'z4', extent:'parent',
+        data:{ text:t, isLocked:i===0, isSelected:i>0 },
+      })),
+
+      // Riff from synthesis card
+      { id:'riff1', type:'riff', position:{x:270,y:305}, parentId:'z4', extent:'parent',
+        data:{ text:'Open-source the supply chain — invite community audits as brand ritual' } },
+
+      // ── Floating cards ──
+      { id:'f1', type:'floating', position:{x:1230,y:140},
+        data:{ text:'Consider luxury positioning vs accessible pricing long-term' } },
+      { id:'f2', type:'floating', position:{x:1230,y:300},
+        data:{ text:'Competitor analysis needed — who else plays the community card?' } },
+    ];
+
+    const E = [
+      { id:'e-th12', source:'th1', target:'th2', type:'thesis' },
+      { id:'e-th24', source:'th2', target:'th4', type:'thesis' },
+      { id:'e-riff', source:'c4-2', target:'riff1', type:'riff' },
+    ];
+
+    /* ── APP ── */
+    function App() {
+      const [nodes,,onNodesChange] = useNodesState(N);
+      const [edges,,onEdgesChange] = useEdgesState(E);
+      const [tool, setTool] = useState('select');
+
+      return h('div', { style:{width:'100vw',height:'100vh'} },
+        h('div', { className:'top-bar' },
+          h('div', { style:{display:'flex',alignItems:'center'} },
+            h('span',{className:'top-title'},'DTC Brand Launch'),
+            h('span',{className:'top-meta'},'4 zones · 16 cards · 2 floating'),
+          ),
+          h('div',{style:{display:'flex',gap:'8px'}},
+            h('button',{className:'glass-btn'},'Create synthesis'),
+            h('button',{className:'glass-btn'},'Export'),
+          ),
+        ),
+
+        h(ReactFlow, {
+          nodes, edges, onNodesChange, onEdgesChange,
+          nodeTypes, edgeTypes,
+          fitView:true, fitViewOptions:{padding:0.12},
+          style:{background:'rgb(240,240,240)'},
+          proOptions:{hideAttribution:true},
+        },
+          h(Background,{gap:28,size:1,color:'rgba(0,0,0,0.03)'}),
+          h(Controls,{showInteractive:false}),
+          h(MiniMap,{ nodeColor:(n)=>{
+            const rgb = ZCOL[n.data?.zoneType];
+            if(rgb) return `rgb(${rgb})`;
+            return 'rgb(212,212,212)';
+          }}),
+        ),
+
+        h('div',{className:'bot-bar'},
+          ['Select','Zone','Connect','Generate'].map(t=>
+            h('button',{key:t,className:tool===t.toLowerCase()?'on':'',onClick:()=>setTool(t.toLowerCase())},t)
+          ),
+        ),
+      );
+    }
+
+    createRoot(document.getElementById('root')).render(h(App));
+  </script>
+  <style>@keyframes dash{to{stroke-dashoffset:-24}}</style>
+</body>
+</html>

@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seeds — V15 Nested Zones & Parent Context</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://esm.sh/@xyflow/react@12/dist/style.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script type="importmap">
+  {
+    "imports": {
+      "react": "https://esm.sh/react@18",
+      "react/": "https://esm.sh/react@18/",
+      "react-dom": "https://esm.sh/react-dom@18",
+      "react-dom/": "https://esm.sh/react-dom@18/",
+      "@xyflow/react": "https://esm.sh/@xyflow/react@12?external=react,react-dom",
+      "@xyflow/react/": "https://esm.sh/@xyflow/react@12&external=react,react-dom/"
+    }
+  }
+  </script>
+  <style>
+    body { margin: 0; font-family: 'Space Grotesk', sans-serif; background: #f4f4f2; }
+
+    .parent-zone {
+      border: 1.5px solid rgba(0,0,0,0.08);
+      border-radius: 16px;
+      background: rgba(0,0,0,0.012);
+      width: 100%; height: 100%;
+      position: relative;
+    }
+    .parent-label {
+      position: absolute;
+      top: -14px;
+      left: 16px;
+      background: #f4f4f2;
+      padding: 3px 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #222;
+      z-index: 2;
+    }
+    .parent-meta {
+      position: absolute;
+      top: -12px;
+      right: 16px;
+      display: flex;
+      gap: 6px;
+      z-index: 2;
+    }
+    .parent-meta-btn {
+      background: #f4f4f2;
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 6px;
+      padding: 2px 10px;
+      font-size: 10px;
+      font-weight: 500;
+      color: #888;
+      cursor: pointer;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    .parent-meta-btn:hover { background: #eee; color: #555; }
+
+    .child-zone {
+      border-radius: 12px;
+      width: 100%; height: 100%;
+      position: relative;
+    }
+    .child-label {
+      position: absolute;
+      top: -10px;
+      left: 14px;
+      background: #f4f4f2;
+      padding: 2px 8px;
+      border-radius: 5px;
+      font-size: 11px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      z-index: 2;
+    }
+    .child-type-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+    }
+
+    .context-stack {
+      position: absolute;
+      bottom: 10px;
+      left: 14px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 9px;
+      color: #aaa;
+      letter-spacing: 0.02em;
+      z-index: 2;
+    }
+    .context-breadcrumb {
+      padding: 1px 6px;
+      border-radius: 4px;
+      background: rgba(0,0,0,0.04);
+    }
+    .context-arrow { color: #ccc; }
+
+    .card-light {
+      background: #ffffff;
+      border: 1px solid rgba(0,0,0,0.07);
+      border-radius: 10px;
+      padding: 12px 14px;
+      width: 195px;
+      font-size: 13px;
+      line-height: 1.45;
+      color: #1a1a1a;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+      transition: all 0.2s;
+      position: relative;
+    }
+    .card-light:hover {
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      border-color: rgba(0,0,0,0.12);
+    }
+    .card-light .type-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      display: inline-block; margin-right: 5px; flex-shrink: 0;
+    }
+
+    .standalone-zone {
+      border: 1.5px dashed rgba(0,0,0,0.1);
+      border-radius: 14px;
+      background: rgba(0,0,0,0.008);
+      width: 100%; height: 100%;
+      position: relative;
+    }
+    .standalone-label {
+      position: absolute;
+      top: -12px;
+      left: 16px;
+      background: #f4f4f2;
+      padding: 2px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      color: #666;
+      z-index: 2;
+    }
+
+    .depth-warning {
+      position: absolute;
+      bottom: 8px;
+      right: 14px;
+      font-size: 9px;
+      color: #ccc;
+      font-style: italic;
+      z-index: 2;
+    }
+
+    .top-bar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 48px;
+      background: rgba(244,244,242,0.88);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      z-index: 100;
+    }
+
+    .react-flow__background { opacity: 0.3; }
+    .react-flow__controls { bottom: 20px !important; }
+    .react-flow__minimap { border-radius: 8px; overflow: hidden; }
+  </style>
+</head>
+<body>
+  <div id="root" style="width:100vw;height:100vh;"></div>
+
+  <script type="module">
+    import React, { useState } from 'react';
+    import { createRoot } from 'react-dom/client';
+    import {
+      ReactFlow,
+      Background,
+      Controls,
+      MiniMap,
+      useNodesState,
+      useEdgesState,
+      Handle,
+      Position,
+    } from '@xyflow/react';
+
+    const h = React.createElement;
+
+    const COLORS = {
+      ideas: '#34d399',
+      tensions: '#f472b6',
+      signals: '#38bdf8',
+      strategy: '#a78bfa',
+      frameworks: '#fb923c',
+    };
+
+    function ParentZoneNode({ data }) {
+      return h('div', { className: 'parent-zone', style: { width: '100%', height: '100%' } },
+        h('div', { className: 'parent-label' }, data.label),
+        h('div', { className: 'parent-meta' },
+          h('button', { className: 'parent-meta-btn' }, '+ Child zone'),
+          h('button', { className: 'parent-meta-btn' }, '−'),
+        ),
+      );
+    }
+
+    function ChildZoneNode({ data }) {
+      const color = COLORS[data.zoneType] || '#888';
+      return h('div', {
+        className: 'child-zone',
+        style: {
+          width: '100%', height: '100%',
+          border: `1.5px solid ${color}33`,
+          background: `${color}06`,
+        }
+      },
+        h('div', { className: 'child-label' },
+          h('span', { className: 'child-type-dot', style: { background: color } }),
+          h('span', { style: { color: '#555' } }, data.label),
+        ),
+        // Context stack breadcrumb
+        data.contextStack && h('div', { className: 'context-stack' },
+          h('span', { style: { color: '#bbb', fontWeight: 500 } }, 'AI context: '),
+          ...data.contextStack.flatMap((ctx, i) => [
+            i > 0 && h('span', { key: `a-${i}`, className: 'context-arrow' }, '→'),
+            h('span', { key: `c-${i}`, className: 'context-breadcrumb' }, ctx),
+          ]).filter(Boolean),
+        ),
+        // Max depth warning
+        data.maxDepth && h('div', { className: 'depth-warning' }, 'Max nesting depth (2 levels)'),
+      );
+    }
+
+    function StandaloneZoneNode({ data }) {
+      return h('div', { className: 'standalone-zone', style: { width: '100%', height: '100%' } },
+        h('div', { className: 'standalone-label' },
+          data.label,
+          data.zoneType && h('span', {
+            style: {
+              marginLeft: '8px',
+              color: COLORS[data.zoneType],
+              fontSize: '10px',
+              fontWeight: 500,
+            }
+          }, data.zoneType.toUpperCase()),
+        ),
+      );
+    }
+
+    function CardNode({ data }) {
+      const color = COLORS[data.cardType] || '#888';
+      return h('div', { className: 'card-light' },
+        h('div', { style: { display: 'flex', alignItems: 'flex-start' } },
+          h('span', { className: 'type-dot', style: { background: color, marginTop: '6px' } }),
+          h('span', null, data.text),
+        ),
+        h(Handle, { type: 'source', position: Position.Right, style: { opacity: 0, width: 6, height: 6 } }),
+        h(Handle, { type: 'target', position: Position.Left, style: { opacity: 0, width: 6, height: 6 } }),
+      );
+    }
+
+    const nodeTypes = {
+      parentZone: ParentZoneNode,
+      childZone: ChildZoneNode,
+      standaloneZone: StandaloneZoneNode,
+      card: CardNode,
+    };
+
+    const initialNodes = [
+      // Parent zone: Strategy Sprint
+      {
+        id: 'parent-1',
+        type: 'parentZone',
+        position: { x: 40, y: 80 },
+        data: { label: 'Strategy Sprint 1' },
+        style: { width: 800, height: 560 },
+      },
+      // Child zone: Tensions (inside parent)
+      {
+        id: 'child-tensions',
+        type: 'childZone',
+        position: { x: 20, y: 30 },
+        parentId: 'parent-1',
+        extent: 'parent',
+        data: {
+          label: 'Tensions',
+          zoneType: 'tensions',
+          contextStack: ['Strategy Sprint 1', 'Tensions'],
+        },
+        style: { width: 360, height: 480 },
+      },
+      // Cards in Tensions child zone
+      ...['Premium positioning limits addressable market',
+          'Brand heritage feels exclusionary to younger audiences',
+          'Digital transformation threatens physical retail identity'
+      ].map((text, i) => ({
+        id: `card-t-${i}`,
+        type: 'card',
+        position: { x: 15, y: 25 + i * 130 },
+        parentId: 'child-tensions',
+        extent: 'parent',
+        data: { text, cardType: 'tensions' },
+      })),
+
+      // Child zone: Ideas (inside parent)
+      {
+        id: 'child-ideas',
+        type: 'childZone',
+        position: { x: 410, y: 30 },
+        parentId: 'parent-1',
+        extent: 'parent',
+        data: {
+          label: 'Ideas',
+          zoneType: 'ideas',
+          contextStack: ['Strategy Sprint 1', 'Ideas'],
+        },
+        style: { width: 360, height: 480 },
+      },
+      // Cards in Ideas child zone
+      ...['Hybrid retail-gallery spaces in cultural districts',
+          'Mentorship programme connecting craftspeople with Gen Z designers',
+          'Archive collection re-releases with modern reinterpretation',
+          'Member-only maker workshops at flagship stores'
+      ].map((text, i) => ({
+        id: `card-i-${i}`,
+        type: 'card',
+        position: { x: 15, y: 25 + i * 105 },
+        parentId: 'child-ideas',
+        extent: 'parent',
+        data: { text, cardType: 'ideas' },
+      })),
+
+      // Standalone zone: Signals
+      {
+        id: 'standalone-signals',
+        type: 'standaloneZone',
+        position: { x: 900, y: 80 },
+        data: { label: 'Market Signals', zoneType: 'signals' },
+        style: { width: 380, height: 350 },
+      },
+      ...['Luxury resale market valued at $50B, growing 15% annually',
+          'Gen Z luxury buyers prioritise brand values over brand name',
+          'Experiential retail foot traffic up 30% post-pandemic'
+      ].map((text, i) => ({
+        id: `card-s-${i}`,
+        type: 'card',
+        position: { x: 15, y: 25 + i * 100 },
+        parentId: 'standalone-signals',
+        extent: 'parent',
+        data: { text, cardType: 'signals' },
+      })),
+
+      // Standalone zone: Frameworks (empty)
+      {
+        id: 'standalone-fw',
+        type: 'standaloneZone',
+        position: { x: 900, y: 480 },
+        data: { label: 'Frameworks', zoneType: 'frameworks' },
+        style: { width: 380, height: 200 },
+      },
+    ];
+
+    const initialEdges = [];
+
+    function App() {
+      const [nodes, , onNodesChange] = useNodesState(initialNodes);
+      const [edges, , onEdgesChange] = useEdgesState(initialEdges);
+
+      return h('div', { style: { width: '100vw', height: '100vh' } },
+        h('div', { className: 'top-bar' },
+          h('span', { style: { fontWeight: 600, fontSize: '14px', color: '#1a1a1a' } }, 'Heritage Fashion Brand'),
+          h('span', { style: { fontSize: '12px', color: '#999', marginLeft: '12px' } }, 'Nested zones · 2-level structure'),
+        ),
+        h(ReactFlow, {
+          nodes, edges, onNodesChange, onEdgesChange,
+          nodeTypes,
+          fitView: true,
+          fitViewOptions: { padding: 0.2 },
+          style: { background: '#f4f4f2' },
+          proOptions: { hideAttribution: true },
+        },
+          h(Background, { gap: 20, size: 1, color: 'rgba(0,0,0,0.04)' }),
+          h(Controls, { showInteractive: false }),
+          h(MiniMap, {
+            nodeColor: (n) => {
+              if (n.data?.zoneType) return COLORS[n.data.zoneType] || '#ddd';
+              if (n.type === 'parentZone') return '#ccc';
+              return '#ddd';
+            },
+          }),
+        ),
+      );
+    }
+
+    createRoot(document.getElementById('root')).render(h(App));
+  </script>
+</body>
+</html>

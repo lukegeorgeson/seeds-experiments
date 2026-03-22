@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seeds — V14 Zone Summaries</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://esm.sh/@xyflow/react@12/dist/style.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script type="importmap">
+  {
+    "imports": {
+      "react": "https://esm.sh/react@18",
+      "react/": "https://esm.sh/react@18/",
+      "react-dom": "https://esm.sh/react-dom@18",
+      "react-dom/": "https://esm.sh/react-dom@18/",
+      "@xyflow/react": "https://esm.sh/@xyflow/react@12?external=react,react-dom",
+      "@xyflow/react/": "https://esm.sh/@xyflow/react@12&external=react,react-dom/"
+    }
+  }
+  </script>
+  <style>
+    body { margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; background: #0f0f13; color: #e0e0e0; }
+
+    .zone-dark {
+      border-radius: 14px;
+      width: 100%; height: 100%;
+      position: relative;
+    }
+    .zone-header {
+      position: absolute;
+      top: -14px;
+      left: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 2;
+    }
+    .zone-name {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 6px;
+      background: #0f0f13;
+    }
+    .zone-meta {
+      font-size: 10px;
+      color: #555;
+    }
+    .summarize-btn {
+      position: absolute;
+      top: -14px;
+      right: 16px;
+      background: rgba(234,193,245,0.08);
+      border: 1px solid rgba(234,193,245,0.15);
+      border-radius: 6px;
+      padding: 3px 10px;
+      font-size: 10px;
+      font-weight: 500;
+      color: #c99dd6;
+      cursor: pointer;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      z-index: 2;
+      transition: all 0.15s;
+    }
+    .summarize-btn:hover { background: rgba(234,193,245,0.14); }
+
+    .summary-card {
+      background: #1e1c28;
+      border: 1px solid rgba(234,193,245,0.12);
+      border-radius: 10px;
+      padding: 14px 16px;
+      width: 100%;
+      box-sizing: border-box;
+      position: relative;
+    }
+    .summary-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: #eac1f5;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .summary-text {
+      font-size: 13px;
+      line-height: 1.55;
+      color: #c0bfd0;
+    }
+    .summary-meta {
+      font-size: 10px;
+      color: #555;
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .stale-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #f59e0b;
+      display: inline-block;
+    }
+    .summary-divider {
+      height: 1px;
+      background: rgba(234,193,245,0.08);
+      margin: 0 -16px;
+      margin-top: 12px;
+      margin-bottom: 4px;
+    }
+
+    .card-dark {
+      background: #1b1b20;
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px;
+      padding: 12px 14px;
+      width: 195px;
+      font-size: 13px;
+      line-height: 1.45;
+      color: #d0d0d0;
+      transition: all 0.2s;
+    }
+    .card-dark:hover {
+      border-color: rgba(255,255,255,0.12);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+    .card-dark .type-bar {
+      width: 3px; border-radius: 2px;
+      position: absolute; left: 0; top: 8px; bottom: 8px;
+    }
+
+    .collapsed-zone {
+      background: #16161c;
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+    }
+    .collapsed-type-bar {
+      width: 3px; height: 28px; border-radius: 2px;
+    }
+    .collapsed-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #d0d0d0;
+    }
+    .collapsed-summary {
+      font-size: 12px;
+      color: #777;
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .collapsed-count {
+      font-size: 10px;
+      color: #555;
+      background: rgba(255,255,255,0.04);
+      padding: 2px 8px;
+      border-radius: 6px;
+    }
+
+    @keyframes blink { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }
+    .cursor-blink { animation: blink 0.8s infinite; color: #eac1f5; }
+
+    .top-bar-dark {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 48px;
+      background: rgba(15,15,19,0.88);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      z-index: 100;
+    }
+
+    .react-flow__background { opacity: 0.2; }
+    .react-flow__controls button { background: #222 !important; color: #aaa !important; border-color: #333 !important; }
+    .react-flow__minimap { background: #1a1a1e !important; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <div id="root" style="width:100vw;height:100vh;"></div>
+
+  <script type="module">
+    import React, { useState } from 'react';
+    import { createRoot } from 'react-dom/client';
+    import {
+      ReactFlow,
+      Background,
+      Controls,
+      MiniMap,
+      useNodesState,
+      useEdgesState,
+      Handle,
+      Position,
+    } from '@xyflow/react';
+
+    const h = React.createElement;
+
+    const ZONE_COLORS = {
+      ideas: '#34d399',
+      tensions: '#f472b6',
+      signals: '#38bdf8',
+      strategy: '#a78bfa',
+    };
+
+    function ZoneNode({ data }) {
+      const color = ZONE_COLORS[data.zoneType] || '#888';
+      return h('div', {
+        className: 'zone-dark',
+        style: {
+          width: '100%', height: '100%',
+          border: `1.5px solid ${color}33`,
+          background: `${color}06`,
+        }
+      },
+        h('div', { className: 'zone-header' },
+          h('span', { className: 'zone-name', style: { color } }, data.label),
+          h('span', { className: 'zone-meta' }, `${data.cardCount} cards`),
+        ),
+        !data.hasSummary && h('div', { className: 'summarize-btn' }, '✦ Summarize zone'),
+      );
+    }
+
+    function SummaryNode({ data }) {
+      const isStale = data.stale;
+      return h('div', { className: 'summary-card', style: isStale ? { opacity: 0.6 } : {} },
+        h('div', { className: 'summary-label' },
+          '✦ Summary',
+          isStale && h('span', { className: 'stale-dot', title: 'Summary is stale' }),
+        ),
+        h('div', { className: 'summary-text' },
+          data.text,
+          data.streaming && h('span', { className: 'cursor-blink' }, '▎'),
+        ),
+        h('div', { className: 'summary-meta' },
+          h('span', null, `Summarized from ${data.cardCount} cards`),
+          data.stale
+            ? h('span', { style: { color: '#f59e0b', cursor: 'pointer' } }, '↻ Refresh summary')
+            : h('span', null, `${data.age || '2m'} ago`),
+        ),
+        h(Handle, { type: 'source', position: Position.Right, style: { opacity: 0, width: 6, height: 6 } }),
+        h(Handle, { type: 'target', position: Position.Left, style: { opacity: 0, width: 6, height: 6 } }),
+      );
+    }
+
+    function CardNode({ data }) {
+      const color = ZONE_COLORS[data.cardType] || '#888';
+      return h('div', {
+        className: 'card-dark',
+        style: { position: 'relative', paddingLeft: '18px' },
+      },
+        h('div', { className: 'type-bar', style: { background: color } }),
+        h('div', null, data.text),
+        h(Handle, { type: 'source', position: Position.Right, style: { opacity: 0, width: 6, height: 6 } }),
+        h(Handle, { type: 'target', position: Position.Left, style: { opacity: 0, width: 6, height: 6 } }),
+      );
+    }
+
+    function CollapsedZoneNode({ data }) {
+      const color = ZONE_COLORS[data.zoneType] || '#888';
+      return h('div', { className: 'collapsed-zone' },
+        h('div', { className: 'collapsed-type-bar', style: { background: color } }),
+        h('div', { className: 'collapsed-label' }, data.label),
+        h('div', { className: 'collapsed-summary' }, data.summaryPreview || 'No summary yet'),
+        h('div', { className: 'collapsed-count' }, `${data.cardCount} cards`),
+      );
+    }
+
+    const nodeTypes = { zone: ZoneNode, summary: SummaryNode, card: CardNode, collapsed: CollapsedZoneNode };
+
+    const initialNodes = [
+      // Zone 1: Freshly summarized (Ideas)
+      {
+        id: 'zone-1',
+        type: 'zone',
+        position: { x: 40, y: 80 },
+        data: { label: 'Campaign Ideas', zoneType: 'ideas', cardCount: 6, hasSummary: true },
+        style: { width: 550, height: 520 },
+      },
+      {
+        id: 'summary-1',
+        type: 'summary',
+        position: { x: 15, y: 25 },
+        parentId: 'zone-1',
+        extent: 'parent',
+        data: {
+          text: 'The emerging direction centres on experiential storytelling — shifting from product-first messaging to culture-embedded narratives. Strong signals toward community co-creation and radical transparency as differentiators.',
+          cardCount: 6,
+          age: '2m',
+          stale: false,
+        },
+        style: { width: 510 },
+      },
+      ...['Experiential pop-ups as brand storytelling vehicles',
+          'User-generated content as the primary creative asset',
+          'Collaboration with emerging artists over established celebrities',
+          'Seasonal micro-campaigns vs one big annual push',
+          'Behind-the-scenes content as trust-building mechanism',
+          'Community voting on next product colourway'
+      ].map((text, i) => ({
+        id: `card-1-${i}`,
+        type: 'card',
+        position: { x: 15 + (i % 2) * 260, y: 150 + Math.floor(i / 2) * 115 },
+        parentId: 'zone-1',
+        extent: 'parent',
+        data: { text, cardType: 'ideas' },
+      })),
+
+      // Zone 2: Stale summary (Tensions)
+      {
+        id: 'zone-2',
+        type: 'zone',
+        position: { x: 640, y: 80 },
+        data: { label: 'Audience Tensions', zoneType: 'tensions', cardCount: 4, hasSummary: true },
+        style: { width: 480, height: 450 },
+      },
+      {
+        id: 'summary-2',
+        type: 'summary',
+        position: { x: 15, y: 25 },
+        parentId: 'zone-2',
+        extent: 'parent',
+        data: {
+          text: 'Core tension between desire for authenticity and appetite for convenience. Audience is sceptical of brand claims but responsive to peer endorsement.',
+          cardCount: 5,
+          stale: true,
+        },
+        style: { width: 440 },
+      },
+      ...['Customers want ethical products but won\'t pay premium',
+          'Social media distrust rising but engagement still social-led',
+          'Desire for uniqueness conflicts with desire to belong',
+          'Sustainability fatigue — audience tired of empty pledges'
+      ].map((text, i) => ({
+        id: `card-2-${i}`,
+        type: 'card',
+        position: { x: 15 + (i % 2) * 225, y: 150 + Math.floor(i / 2) * 115 },
+        parentId: 'zone-2',
+        extent: 'parent',
+        data: { text, cardType: 'tensions' },
+      })),
+
+      // Zone 3: No summary yet (Signals)
+      {
+        id: 'zone-3',
+        type: 'zone',
+        position: { x: 40, y: 660 },
+        data: { label: 'Market Signals', zoneType: 'signals', cardCount: 3, hasSummary: false },
+        style: { width: 480, height: 300 },
+      },
+      ...['TikTok Shop driving 60% of Gen Z discovery',
+          'Secondhand luxury market growing 3x faster than new',
+          'Brand loyalty declining — 78% switched brands this year'
+      ].map((text, i) => ({
+        id: `card-3-${i}`,
+        type: 'card',
+        position: { x: 15 + (i % 2) * 225, y: 30 + Math.floor(i / 2) * 115 },
+        parentId: 'zone-3',
+        extent: 'parent',
+        data: { text, cardType: 'signals' },
+      })),
+    ];
+
+    // Summary-to-summary edge
+    const initialEdges = [
+      {
+        id: 'e-s1-s2',
+        source: 'summary-1',
+        target: 'summary-2',
+        style: { stroke: 'rgba(234,193,245,0.15)', strokeWidth: 1, strokeDasharray: '4 4' },
+      },
+    ];
+
+    function App() {
+      const [nodes, , onNodesChange] = useNodesState(initialNodes);
+      const [edges, , onEdgesChange] = useEdgesState(initialEdges);
+
+      return h('div', { style: { width: '100vw', height: '100vh' } },
+        h('div', { className: 'top-bar-dark' },
+          h('span', { style: { fontWeight: 600, fontSize: '14px' } }, 'DTC Brand Launch'),
+          h('span', { style: { fontSize: '12px', color: '#666', marginLeft: '12px' } }, '3 zones · 13 cards · 2 summaries'),
+        ),
+        h(ReactFlow, {
+          nodes, edges, onNodesChange, onEdgesChange,
+          nodeTypes,
+          fitView: true,
+          fitViewOptions: { padding: 0.2 },
+          style: { background: '#0f0f13' },
+          proOptions: { hideAttribution: true },
+        },
+          h(Background, { gap: 24, size: 1, color: 'rgba(255,255,255,0.02)' }),
+          h(Controls, { showInteractive: false }),
+          h(MiniMap, {
+            nodeColor: (n) => ZONE_COLORS[n.data?.zoneType] || '#333',
+          }),
+        ),
+      );
+    }
+
+    createRoot(document.getElementById('root')).render(h(App));
+  </script>
+</body>
+</html>
