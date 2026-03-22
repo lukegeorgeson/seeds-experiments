@@ -18,6 +18,35 @@
   stroke-dasharray: none;
 }
 
+.react-flow__edge.selected .react-flow__edge-path {
+  stroke: var(--connection);
+  stroke-width: 2;
+  stroke-dasharray: none;
+}
+
+@keyframes edge-flow {
+  from { stroke-dashoffset: 18; }
+  to { stroke-dashoffset: 0; }
+}
+
+.react-flow__edge.animated .react-flow__edge-path {
+  stroke-dasharray: 6 3;
+  animation: edge-flow 0.6s linear infinite;
+}
+
+.react-flow__connection-line {
+  stroke: var(--connection);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 3;
+}
+
+.react-flow__edge-interaction {
+  stroke: transparent;
+  stroke-width: 20;
+  fill: none;
+  pointer-events: stroke;
+}
+
 /* Edge labels */
 .react-flow__edge-text {
   font-family: var(--mono);
