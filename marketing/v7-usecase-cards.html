@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seeds — See what AI generates from a single brief</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --postit-yellow: #fabd2f;
+  --postit-pink: #d3869b;
+  --postit-green: #b8bb26;
+  --postit-blue: #83a598;
+  --postit-orange: #fe8019;
+  --postit-fg: #282828;
+  --zone-yellow: #d79921;
+  --zone-pink: #b16286;
+  --zone-green: #98971a;
+  --zone-blue: #458588;
+  --font: 'Inter', -apple-system, system-ui, sans-serif;
+  --mono: 'IBM Plex Mono', 'SF Mono', 'Consolas', monospace;
+}
+
+[data-theme="dark"] {
+  --bg: #282828;
+  --surface: #32302f;
+  --bg-1: #3c3836;
+  --fg: #ebdbb2;
+  --fg-2: #d5c4a1;
+  --fg-3: #a89984;
+  --fg-4: #928374;
+  --fg-5: #665c54;
+  --border: #504945;
+  --accent: #fb4934;
+}
+[data-theme="light"] {
+  --bg: #fbf1c7;
+  --surface: #f9f5d7;
+  --bg-1: #f2e5bc;
+  --fg: #3c3836;
+  --fg-2: #504945;
+  --fg-3: #928374;
+  --fg-4: #a89984;
+  --fg-5: #d5c4a1;
+  --border: #d5c4a1;
+  --accent: #cc241d;
+}
+
+html, body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--fg);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  transition: background 0.2s, color 0.2s;
+}
+
+/* ── Nav ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 20px 32px;
+  display: flex; align-items: center; justify-content: space-between;
+  transition: background 0.2s, backdrop-filter 0.2s;
+}
+nav.scrolled {
+  background: color-mix(in srgb, var(--bg) 85%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-left { display: flex; align-items: center; gap: 0; }
+.nav-logo {
+  font-family: var(--mono); font-size: 13px; font-weight: 600;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--fg);
+}
+.nav-right { display: flex; align-items: center; gap: 0; }
+.theme-btn {
+  width: 36px; height: 36px; border: 1px solid var(--border); border-radius: 0;
+  background: none; cursor: pointer; display: flex;
+  align-items: center; justify-content: center; color: var(--fg-3);
+  transition: background 0.12s, color 0.12s;
+}
+.theme-btn:hover { background: var(--fg); color: var(--bg); }
+.theme-btn svg { width: 16px; height: 16px; }
+.nav-cta {
+  font-family: var(--mono); font-size: 11px; font-weight: 500;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 10px 20px; border: 1px solid var(--border); border-radius: 0;
+  background: none; color: var(--fg-3); cursor: pointer;
+  transition: background 0.12s, color 0.12s; margin-left: -1px;
+}
+.nav-cta:hover { background: var(--fg); color: var(--bg); }
+.nav-cta:active { transform: scale(0.98); }
+
+/* ── Hero ── */
+.hero {
+  min-height: 100vh; padding: 120px 32px 80px;
+  display: flex; flex-direction: column; align-items: center;
+}
+.hero-label {
+  font-family: var(--mono); font-size: 10px; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.14em; color: var(--fg-4);
+  margin-bottom: 20px;
+}
+.hero h1 {
+  font-size: clamp(2rem, 4.5vw, 3.5rem); font-weight: 400;
+  letter-spacing: -0.03em; line-height: 1.1; text-align: center;
+  text-wrap: balance; margin-bottom: 12px;
+}
+.hero-sub {
+  font-size: clamp(0.95rem, 1.3vw, 1.15rem); color: var(--fg-3);
+  text-align: center; max-width: 480px; line-height: 1.5;
+  margin-bottom: 48px;
+}
+
+/* ── Output card grid ── */
+.output-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+  max-width: 700px; width: 100%;
+}
+.output-card {
+  padding: 16px; border-radius: 0; display: flex; flex-direction: column;
+  transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+  opacity: 0; transform: translateY(12px);
+}
+.output-card.visible { opacity: 1; transform: translateY(0); }
+.output-card:hover { transform: translateY(-2px); }
+.output-card[data-c="yellow"] { background: var(--postit-yellow); color: var(--postit-fg); }
+.output-card[data-c="pink"] { background: var(--postit-pink); color: var(--postit-fg); }
+.output-card[data-c="green"] { background: var(--postit-green); color: var(--postit-fg); }
+.output-card[data-c="blue"] { background: var(--postit-blue); color: var(--postit-fg); }
+.output-card[data-c="orange"] { background: var(--postit-orange); color: var(--postit-fg); }
+.output-type {
+  font-family: var(--mono); font-size: 8px; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.12em;
+  opacity: 0.55; margin-bottom: 10px; flex-shrink: 0;
+}
+.output-text { font-size: 12px; line-height: 1.55; flex: 1; }
+.output-star {
+  align-self: flex-end; margin-top: 8px; opacity: 0.5; font-size: 12px;
+}
+
+.hero-brief {
+  font-family: var(--mono); font-size: 11px; color: var(--fg-4);
+  margin-top: 24px; text-align: center; letter-spacing: 0.02em;
+  max-width: 600px;
+}
+
+/* ── Use Cases ── */
+section { padding: 120px 0; }
+.container { max-width: 1000px; margin: 0 auto; padding: 0 32px; }
+.section-label {
+  font-family: var(--mono); font-size: 10px; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.12em; color: var(--fg-4);
+  text-align: center; margin-bottom: 48px;
+}
+
+.usecase-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+}
+.usecase-card {
+  background: var(--surface); border: 1px solid var(--border);
+  padding: 28px; transition: border-color 0.12s;
+}
+.usecase-card:hover { border-color: var(--fg-4); }
+.usecase-label {
+  font-family: var(--mono); font-size: 9px; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.1em; color: var(--fg-4);
+  margin-bottom: 12px;
+}
+.usecase-title {
+  font-size: 18px; font-weight: 500; letter-spacing: -0.02em;
+  margin-bottom: 16px;
+}
+.usecase-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.usecase-chip {
+  font-size: 10px; line-height: 1.4; padding: 6px 10px;
+  border-radius: 0;
+}
+.usecase-chip[data-c="yellow"] { background: var(--postit-yellow); color: var(--postit-fg); }
+.usecase-chip[data-c="pink"] { background: var(--postit-pink); color: var(--postit-fg); }
+.usecase-chip[data-c="green"] { background: var(--postit-green); color: var(--postit-fg); }
+.usecase-chip[data-c="blue"] { background: var(--postit-blue); color: var(--postit-fg); }
+.usecase-chip[data-c="orange"] { background: var(--postit-orange); color: var(--postit-fg); }
+
+/* ── Process ── */
+.process-section {
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 100px 0;
+}
+.process-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px;
+  max-width: 900px; margin: 0 auto; padding: 0 32px;
+}
+.process-step { text-align: center; position: relative; }
+.process-step::after {
+  content: ''; position: absolute; top: 24px; right: -16px;
+  width: 32px; height: 1px; background: var(--border);
+}
+.process-step:last-child::after { display: none; }
+.process-num {
+  font-family: var(--mono); font-size: 11px; color: var(--accent);
+  margin-bottom: 12px; letter-spacing: 0.02em;
+}
+.process-title {
+  font-family: var(--mono); font-size: 12px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  margin-bottom: 8px;
+}
+.process-desc { font-size: 13px; line-height: 1.5; color: var(--fg-3); }
+
+/* Visual for each process step */
+.process-visual {
+  width: 64px; height: 48px; margin: 0 auto 16px;
+  display: flex; align-items: center; justify-content: center;
+}
+.pv-brief { width: 40px; height: 32px; border: 1px solid var(--border); }
+.pv-cards { display: flex; gap: 3px; }
+.pv-card-mini { width: 14px; height: 18px; border-radius: 0; }
+.pv-zones { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
+.pv-zone-mini { width: 16px; height: 14px; border: 1px solid; }
+.pv-distill { display: flex; align-items: center; gap: 4px; }
+.pv-distill-target { width: 24px; height: 24px; border: 1px dashed var(--fg-4); }
+
+/* ── Before/After ── */
+.comparison {
+  display: grid; grid-template-columns: 1fr 1px 1fr; gap: 48px;
+  max-width: 800px; margin: 0 auto;
+}
+.comparison-divider { background: var(--border); }
+.comparison-col h3 {
+  font-family: var(--mono); font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  margin-bottom: 24px;
+}
+.comparison-col.before h3 { color: var(--fg-4); }
+.comparison-col.after h3 { color: var(--postit-green); }
+.comparison-item {
+  font-size: 14px; line-height: 1.55; margin-bottom: 16px;
+  padding-left: 16px; position: relative;
+}
+.comparison-item::before {
+  content: ''; position: absolute; left: 0; top: 8px;
+  width: 6px; height: 6px; border-radius: 0;
+}
+.comparison-col.before .comparison-item { color: var(--fg-4); }
+.comparison-col.before .comparison-item::before { background: var(--fg-5); }
+.comparison-col.after .comparison-item { color: var(--fg); }
+.comparison-col.after .comparison-item::before { background: var(--postit-green); }
+
+/* ── CTA ── */
+.cta-section {
+  background: var(--surface); border-top: 1px solid var(--border);
+  text-align: center; padding: 120px 32px;
+}
+.cta-title {
+  font-size: clamp(1.75rem, 3.5vw, 2.75rem); font-weight: 400;
+  letter-spacing: -0.03em; margin-bottom: 32px; text-wrap: balance;
+}
+.cta-btn {
+  font-family: var(--mono); font-size: 12px; font-weight: 500;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 16px 40px; border: 1px solid var(--fg); border-radius: 0;
+  background: var(--fg); color: var(--bg); cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+.cta-btn:hover { background: transparent; color: var(--fg); }
+.cta-btn:active { transform: scale(0.98); }
+.cta-note {
+  font-family: var(--mono); font-size: 11px; color: var(--fg-5);
+  margin-top: 16px; letter-spacing: 0.04em;
+}
+
+/* ── Footer ── */
+footer {
+  padding: 32px; display: flex; justify-content: space-between;
+  align-items: center; border-top: 1px solid var(--border);
+}
+.footer-logo {
+  font-family: var(--mono); font-size: 11px; font-weight: 600;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--fg-4);
+}
+.footer-year {
+  font-family: var(--mono); font-size: 11px; color: var(--fg-5);
+}
+
+/* ── Reveal ── */
+.reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.3s cubic-bezier(0.22, 1, 0.36, 1), transform 0.3s cubic-bezier(0.22, 1, 0.36, 1); }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .output-grid { grid-template-columns: 1fr 1fr; }
+  .usecase-grid { grid-template-columns: 1fr; }
+  .process-grid { grid-template-columns: 1fr 1fr; gap: 24px; }
+  .process-step::after { display: none; }
+  .comparison { grid-template-columns: 1fr; gap: 32px; }
+  .comparison-divider { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  .output-card { opacity: 1; transform: none; }
+  .reveal { opacity: 1; transform: none; }
+}
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <div class="nav-left">
+    <div class="nav-logo">Seeds</div>
+  </div>
+  <div class="nav-right">
+    <button class="theme-btn" id="themeToggle" title="Toggle theme">
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+    <button class="nav-cta">Get Started</button>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-label">AI Canvas for Creative Strategy</div>
+  <h1>See what Seeds generates<br>from a single brief</h1>
+  <p class="hero-sub">Real output from real briefs — strategic seeds your team can build on</p>
+
+  <div class="output-grid" id="outputGrid">
+    <div class="output-card" data-c="yellow">
+      <div class="output-type">Tension</div>
+      <div class="output-text">Gen Z craves authenticity but engages most with highly produced content. The brands that win make production feel effortless.</div>
+      <div class="output-star">&#9733;</div>
+    </div>
+    <div class="output-card" data-c="pink">
+      <div class="output-type">Direction</div>
+      <div class="output-text">Position as "ingredient-literate" beauty — not clean, not clinical, just honest. Let the formula be the personality.</div>
+      <div class="output-star">&#9733;</div>
+    </div>
+    <div class="output-card" data-c="green">
+      <div class="output-type">Idea</div>
+      <div class="output-text">A "formula card" shipped with every product — ingredient breakdown designed to be photographed and shared.</div>
+    </div>
+    <div class="output-card" data-c="blue">
+      <div class="output-type">Signal</div>
+      <div class="output-text">TikTok skincare routines get more engagement when they explain why each step matters, not just what to use.</div>
+    </div>
+    <div class="output-card" data-c="orange">
+      <div class="output-type">Provocation</div>
+      <div class="output-text">What if we never claimed "clean" or "natural"? Those are the words of brands with something to hide.</div>
+    </div>
+    <div class="output-card" data-c="yellow">
+      <div class="output-type">Guard Rail</div>
+      <div class="output-text">Never use aspirational lifestyle imagery. Show the product, the texture, the formula. Substance over vibes.</div>
+      <div class="output-star">&#9733;</div>
+    </div>
+  </div>
+
+  <p class="hero-brief">Generated from brief: "Skincare launch — ingredient-forward brand for Gen Z"</p>
+</section>
+
+<!-- Use Cases -->
+<section>
+  <div class="container">
+    <div class="section-label">What Teams Use Seeds For</div>
+    <div class="usecase-grid">
+      <div class="usecase-card reveal">
+        <div class="usecase-label">Brand Strategy</div>
+        <div class="usecase-title">Launch positioning that cuts through</div>
+        <div class="usecase-chips">
+          <div class="usecase-chip" data-c="pink">Positioning directions</div>
+          <div class="usecase-chip" data-c="yellow">Audience tensions</div>
+          <div class="usecase-chip" data-c="blue">Competitive signals</div>
+        </div>
+      </div>
+      <div class="usecase-card reveal">
+        <div class="usecase-label">Campaign Ideation</div>
+        <div class="usecase-title">Concepts that start conversations</div>
+        <div class="usecase-chips">
+          <div class="usecase-chip" data-c="green">Campaign hooks</div>
+          <div class="usecase-chip" data-c="orange">Provocations</div>
+          <div class="usecase-chip" data-c="yellow">Cultural insights</div>
+        </div>
+      </div>
+      <div class="usecase-card reveal">
+        <div class="usecase-label">Product Naming</div>
+        <div class="usecase-title">Names that carry the strategy</div>
+        <div class="usecase-chips">
+          <div class="usecase-chip" data-c="pink">Name candidates</div>
+          <div class="usecase-chip" data-c="blue">Tone directions</div>
+          <div class="usecase-chip" data-c="green">Tagline options</div>
+        </div>
+      </div>
+      <div class="usecase-card reveal">
+        <div class="usecase-label">Pitch Decks</div>
+        <div class="usecase-title">Strategic scaffolding in minutes</div>
+        <div class="usecase-chips">
+          <div class="usecase-chip" data-c="yellow">Narrative arcs</div>
+          <div class="usecase-chip" data-c="orange">Key messages</div>
+          <div class="usecase-chip" data-c="pink">Proof points</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Process -->
+<section class="process-section">
+  <div class="section-label">How It Works</div>
+  <div class="process-grid reveal">
+    <div class="process-step">
+      <div class="process-visual">
+        <div class="pv-brief"></div>
+      </div>
+      <div class="process-num">01</div>
+      <div class="process-title">Brief</div>
+      <div class="process-desc">Tell Seeds what you're working on and what matters</div>
+    </div>
+    <div class="process-step">
+      <div class="process-visual">
+        <div class="pv-cards">
+          <div class="pv-card-mini" style="background: var(--postit-yellow);"></div>
+          <div class="pv-card-mini" style="background: var(--postit-pink);"></div>
+          <div class="pv-card-mini" style="background: var(--postit-green);"></div>
+          <div class="pv-card-mini" style="background: var(--postit-blue);"></div>
+        </div>
+      </div>
+      <div class="process-num">02</div>
+      <div class="process-title">Generate</div>
+      <div class="process-desc">AI creates strategic seeds across thinking zones</div>
+    </div>
+    <div class="process-step">
+      <div class="process-visual">
+        <div class="pv-zones">
+          <div class="pv-zone-mini" style="border-color: var(--zone-yellow);"></div>
+          <div class="pv-zone-mini" style="border-color: var(--zone-pink);"></div>
+          <div class="pv-zone-mini" style="border-color: var(--zone-green);"></div>
+          <div class="pv-zone-mini" style="border-color: var(--zone-blue);"></div>
+        </div>
+      </div>
+      <div class="process-num">03</div>
+      <div class="process-title">Curate</div>
+      <div class="process-desc">Star, reject, remix — your taste shapes the output</div>
+    </div>
+    <div class="process-step">
+      <div class="process-visual">
+        <div class="pv-distill">
+          <div class="pv-card-mini" style="background: var(--fg-5); width: 10px; height: 12px;"></div>
+          <div class="pv-card-mini" style="background: var(--fg-5); width: 10px; height: 12px;"></div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--fg-4)" stroke-width="2" width="14" height="14"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          <div class="pv-distill-target"></div>
+        </div>
+      </div>
+      <div class="process-num">04</div>
+      <div class="process-title">Distill</div>
+      <div class="process-desc">The best ideas surface into one clear direction</div>
+    </div>
+  </div>
+</section>
+
+<!-- Before/After -->
+<section>
+  <div class="container">
+    <div class="comparison reveal">
+      <div class="comparison-col before">
+        <h3>Before Seeds</h3>
+        <div class="comparison-item">3-hour brainstorm for 5 usable ideas</div>
+        <div class="comparison-item">Strategy decks that take weeks</div>
+        <div class="comparison-item">Creative director bottleneck</div>
+        <div class="comparison-item">Ideas die in meeting notes</div>
+      </div>
+      <div class="comparison-divider"></div>
+      <div class="comparison-col after">
+        <h3>With Seeds</h3>
+        <div class="comparison-item">12 strategic seeds in 2 minutes</div>
+        <div class="comparison-item">Direction clarity in one session</div>
+        <div class="comparison-item">Every team member has a voice</div>
+        <div class="comparison-item">Ideas live on a shareable canvas</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2 class="cta-title">Your next brief is waiting</h2>
+  <button class="cta-btn">Start Creating</button>
+  <p class="cta-note">Free to use — no credit card</p>
+</section>
+
+<footer>
+  <div class="footer-logo">Seeds</div>
+  <div class="footer-year">2026</div>
+</footer>
+
+<script>
+// Nav scroll
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 40);
+}, { passive: true });
+
+// Theme toggle
+const toggle = document.getElementById('themeToggle');
+const sunIcon = toggle.querySelector('.icon-sun');
+const moonIcon = toggle.querySelector('.icon-moon');
+
+toggle.addEventListener('click', () => {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  sunIcon.style.display = isDark ? 'none' : 'block';
+  moonIcon.style.display = isDark ? 'block' : 'none';
+});
+
+// Staggered hero card entrance
+const outputGrid = document.getElementById('outputGrid');
+const cards = outputGrid.querySelectorAll('.output-card');
+cards.forEach((card, i) => {
+  setTimeout(() => card.classList.add('visible'), 200 + i * 40);
+});
+
+// Scroll reveal
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
+  });
+}, { threshold: 0.15 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
