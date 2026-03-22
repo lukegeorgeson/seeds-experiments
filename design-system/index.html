@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Seeds Design System — Component Showcase</title>
+<link rel="icon" href="data:,">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -52,6 +53,34 @@
     padding: 0 8px 6px; background: var(--surface);
   }
 
+  .token-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+  .token-card {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .token-name {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--fg-3);
+  }
+  .token-value {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--fg);
+  }
+  .token-note {
+    font-family: var(--font);
+    font-size: 11px;
+    line-height: 1.4;
+    color: var(--fg-2);
+  }
+
   /* Typography scale */
   .type-row { display: flex; align-items: baseline; gap: 16px; margin-bottom: 8px; }
   .type-label {
@@ -76,6 +105,7 @@
   .menu-demo .context-menu { position: relative; }
   .menu-demo .dropdown-menu { position: relative; bottom: auto; left: auto; transform: none; }
   .menu-demo .theme-picker-dropdown { position: relative; top: auto; right: auto; }
+  .menu-demo .theme-picker-dropdown[hidden] { display: none !important; }
 
   /* Toolbar demo positioning */
   .toolbar-demo .floating-toolbar { position: relative; bottom: auto; left: auto; transform: none; display: inline-flex; }
@@ -92,32 +122,24 @@
   <div class="showcase-header">
     <div class="showcase-title">Seeds Design System</div>
     <div class="showcase-controls">
-      <button class="btn-icon" id="themeToggle" title="Toggle dark mode">
-        <svg id="sunIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square">
-          <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-        </svg>
-        <svg id="moonIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" style="display:none;">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-        </svg>
-      </button>
-      <div class="theme-picker-wrapper">
-        <button class="btn-icon" id="colorwayToggle" title="Change colorway" style="margin-left:-1px;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r="0.5" fill="currentColor" stroke="none"/><circle cx="17.5" cy="10.5" r="0.5" fill="currentColor" stroke="none"/><circle cx="8.5" cy="7.5" r="0.5" fill="currentColor" stroke="none"/><circle cx="6.5" cy="12" r="0.5" fill="currentColor" stroke="none"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.93 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.04-.23-.29-.38-.63-.38-1.02 0-.83.67-1.5 1.5-1.5H16c3.31 0 6-2.69 6-6 0-5.17-4.49-9-10-9z"/></svg>
+      <div class="btn-icon-group">
+        <button class="btn-icon" id="themeToggle" title="Toggle dark mode">
+          <svg id="sunIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square">
+            <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+          <svg id="moonIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" style="display:none;">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
         </button>
-        <div class="theme-picker-dropdown" id="colorwayDropdown" style="display:none;">
-          <div class="dropdown-section-label">Color</div>
-          <button class="theme-picker-item active" data-colorway="gruvbox"><span class="theme-picker-swatch" style="background:#fabd2f;"></span>Gruvbox</button>
-          <button class="theme-picker-item" data-colorway="andromeda"><span class="theme-picker-swatch" style="background:#8aadf4;"></span>Andromeda</button>
-          <button class="theme-picker-item" data-colorway="rosepine"><span class="theme-picker-swatch" style="background:#ebbcba;"></span>Rose Pine</button>
-          <button class="theme-picker-item" data-colorway="nord"><span class="theme-picker-swatch" style="background:#88c0d0;"></span>Nord</button>
-          <button class="theme-picker-item" data-colorway="solarized"><span class="theme-picker-swatch" style="background:#268bd2;"></span>Solarized</button>
-          <button class="theme-picker-item" data-colorway="flexoki"><span class="theme-picker-swatch" style="background:#d0a215;"></span>Flexoki</button>
-          <div class="theme-picker-divider"></div>
-          <div class="dropdown-section-label">Mono</div>
-          <button class="theme-picker-item" data-colorway="ink"><span class="theme-picker-swatch" style="background:#b0b0b0;"></span>Ink</button>
-          <button class="theme-picker-item" data-colorway="ash"><span class="theme-picker-swatch" style="background:#8e8e94;"></span>Ash</button>
-          <button class="theme-picker-item" data-colorway="bone"><span class="theme-picker-swatch" style="background:#d8d3cb;"></span>Bone</button>
+        <div class="theme-picker-wrapper">
+          <button class="btn-icon theme-picker-btn" id="colorwayToggle" title="Change colorway">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r="0.5" fill="currentColor" stroke="none"/><circle cx="17.5" cy="10.5" r="0.5" fill="currentColor" stroke="none"/><circle cx="8.5" cy="7.5" r="0.5" fill="currentColor" stroke="none"/><circle cx="6.5" cy="12" r="0.5" fill="currentColor" stroke="none"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.93 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.04-.23-.29-.38-.63-.38-1.02 0-.83.67-1.5 1.5-1.5H16c3.31 0 6-2.69 6-6 0-5.17-4.49-9-10-9z"/></svg>
+          </button>
+          <div class="theme-picker-dropdown" id="colorwayDropdown" style="display:none;"></div>
         </div>
+        <button class="btn-icon chrome-avatar-btn" title="Account">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </button>
       </div>
     </div>
   </div>
@@ -210,6 +232,11 @@
         <div class="swatch"><div class="swatch-color" style="background:var(--zone-stroke-green);"></div><div class="swatch-label">--zone-stroke-green</div></div>
         <div class="swatch"><div class="swatch-color" style="background:var(--zone-stroke-blue);"></div><div class="swatch-label">--zone-stroke-blue</div></div>
       </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Canvas Geometry Tokens</div>
+      <div class="token-grid" id="canvasTokenGrid"></div>
     </div>
   </div>
 
@@ -756,16 +783,7 @@
 
       <div class="menu-demo">
         <div class="subsection-title">Theme Picker</div>
-        <div class="theme-picker-dropdown" style="display:block; position:relative; top:auto; right:auto;">
-          <div class="dropdown-section-label">Color</div>
-          <button class="theme-picker-item active"><span class="theme-picker-swatch" style="background:#fabd2f;"></span>Gruvbox</button>
-          <button class="theme-picker-item"><span class="theme-picker-swatch" style="background:#8aadf4;"></span>Andromeda</button>
-          <button class="theme-picker-item"><span class="theme-picker-swatch" style="background:#ebbcba;"></span>Rose Pine</button>
-          <div class="theme-picker-divider"></div>
-          <div class="dropdown-section-label">Mono</div>
-          <button class="theme-picker-item"><span class="theme-picker-swatch" style="background:#b0b0b0;"></span>Ink</button>
-          <button class="theme-picker-item"><span class="theme-picker-swatch" style="background:#8e8e94;"></span>Ash</button>
-        </div>
+        <div class="theme-picker-dropdown" id="themePickerDemo" style="display:block; position:relative; top:auto; right:auto;"></div>
       </div>
     </div>
   </div>
@@ -1961,7 +1979,10 @@
 
 </div>
 
+<script src="foundations.js"></script>
 <script>
+const { colorways: COLORWAYS, readCanvasTokens } = window.SeedsDesignSystem;
+
 // Theme toggle
 const themeToggle = document.getElementById('themeToggle');
 const sunIcon = document.getElementById('sunIcon');
@@ -1981,10 +2002,80 @@ themeToggle.addEventListener('click', () => {
 
 applyTheme();
 
+function renderColorwayButtons(targetId, activeId, compactLabels) {
+  const target = document.getElementById(targetId);
+  if (!target) return;
+  target.innerHTML = '';
+  const colorGroup = COLORWAYS.filter((colorway) => colorway.group === 'color');
+  const monoGroup = COLORWAYS.filter((colorway) => colorway.group === 'mono');
+
+  const colorLabel = document.createElement('div');
+  colorLabel.className = `dropdown-section-label${compactLabels ? ' dropdown-section-label--compact' : ''}`;
+  colorLabel.textContent = 'Color';
+  target.appendChild(colorLabel);
+
+  colorGroup.forEach((colorway) => target.appendChild(buildColorwayButton(colorway, colorway.id === activeId)));
+
+  const divider = document.createElement('div');
+  divider.className = 'theme-picker-divider';
+  target.appendChild(divider);
+
+  const monoLabel = document.createElement('div');
+  monoLabel.className = `dropdown-section-label${compactLabels ? ' dropdown-section-label--compact' : ''}`;
+  monoLabel.textContent = 'Mono';
+  target.appendChild(monoLabel);
+
+  monoGroup.forEach((colorway) => target.appendChild(buildColorwayButton(colorway, colorway.id === activeId)));
+}
+
+function buildColorwayButton(colorway, active) {
+  const button = document.createElement('button');
+  button.className = `theme-picker-item${active ? ' active' : ''}`;
+  button.dataset.colorway = colorway.id;
+
+  const swatch = document.createElement('span');
+  swatch.className = 'theme-picker-swatch';
+  swatch.dataset.colorway = colorway.id;
+
+  button.appendChild(swatch);
+  button.appendChild(document.createTextNode(colorway.label));
+  return button;
+}
+
+function renderCanvasTokens() {
+  const grid = document.getElementById('canvasTokenGrid');
+  if (!grid) return;
+  const tokens = readCanvasTokens();
+  const entries = [
+    { name: '--grid', value: `${tokens.grid}px`, note: 'Snap baseline' },
+    { name: '--gutter', value: `${tokens.gutter}px`, note: 'Canvas spacing' },
+    { name: '--card-size', value: `${tokens.cardSize}px`, note: 'Post-it square' },
+    { name: '--zone-width', value: `${tokens.zoneWidth}px`, note: 'Zone width' },
+    { name: '--zone-height', value: `${tokens.zoneHeight}px`, note: 'Zone height' },
+    { name: '--summary-height', value: `${tokens.summaryHeight}px`, note: 'Zone summary' },
+    { name: '--modifier-width', value: `${tokens.modifierWidth}px`, note: 'Modifier node width' },
+    { name: '--question-width', value: `${tokens.questionWidth}px`, note: 'Question node width' },
+    { name: '--generate-width', value: `${tokens.generateWidth}px`, note: 'Generate node width' },
+    { name: '--fit-view-padding', value: `${tokens.fitViewPadding}`, note: 'React Flow fit-view' },
+  ];
+
+  grid.innerHTML = entries.map((entry) => `
+    <div class="token-card">
+      <div class="token-name">${entry.name}</div>
+      <div class="token-value">${entry.value}</div>
+      <div class="token-note">${entry.note}</div>
+    </div>
+  `).join('');
+}
+
 // Colorway picker
 const colorwayToggle = document.getElementById('colorwayToggle');
 const colorwayDropdown = document.getElementById('colorwayDropdown');
 let colorwayOpen = false;
+
+renderColorwayButtons('colorwayDropdown', 'gruvbox', true);
+renderColorwayButtons('themePickerDemo', 'gruvbox', false);
+renderCanvasTokens();
 
 colorwayToggle.addEventListener('click', (e) => {
   e.stopPropagation();
@@ -1999,11 +2090,12 @@ document.addEventListener('click', () => {
 
 colorwayDropdown.addEventListener('click', (e) => { e.stopPropagation(); });
 
-document.querySelectorAll('#colorwayDropdown .theme-picker-item').forEach(btn => {
+document.querySelectorAll('.theme-picker-item[data-colorway]').forEach(btn => {
   btn.addEventListener('click', () => {
     const cw = btn.dataset.colorway;
-    document.querySelectorAll('#colorwayDropdown .theme-picker-item').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
+    document.querySelectorAll('.theme-picker-item[data-colorway]').forEach((item) => {
+      item.classList.toggle('active', item.dataset.colorway === cw);
+    });
     if (cw === 'gruvbox') {
       document.documentElement.removeAttribute('data-colorway');
     } else {
