@@ -1,0 +1,47 @@
+/* Custom tooltips */
+.tooltip-trigger { position: relative; }
+.tooltip-trigger .tooltip {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--fg);
+  color: var(--bg);
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 4px 8px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+  z-index: 100;
+}
+/* Arrow */
+.tooltip-trigger .tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 4px solid transparent;
+  border-top-color: var(--fg);
+}
+.tooltip-trigger:hover .tooltip { opacity: 1; }
+/* Position variants */
+.tooltip-trigger .tooltip.tooltip-right {
+  bottom: auto;
+  left: calc(100% + 6px);
+  top: 50%;
+  transform: translateY(-50%);
+}
+.tooltip-trigger .tooltip.tooltip-right::after {
+  top: 50%;
+  left: auto;
+  right: 100%;
+  transform: translateY(-50%);
+  border: 4px solid transparent;
+  border-right-color: var(--fg);
+}
