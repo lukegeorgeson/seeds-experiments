@@ -178,7 +178,7 @@
     <div class="subsection">
       <div class="subsection-title">Base Palette</div>
       <div class="swatch-grid">
-        <div class="swatch"><div class="swatch-color" style="background:var(--bg);"></div><div class="swatch-label">--bg</div><div class="swatch-value">Background</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:var(--bg); box-shadow: inset 0 0 0 1px var(--border);"></div><div class="swatch-label">--bg</div><div class="swatch-value">Background</div></div>
         <div class="swatch"><div class="swatch-color" style="background:var(--bg-1);"></div><div class="swatch-label">--bg-1</div><div class="swatch-value">Background alt</div></div>
         <div class="swatch"><div class="swatch-color" style="background:var(--surface);"></div><div class="swatch-label">--surface</div><div class="swatch-value">Surface</div></div>
         <div class="swatch"><div class="swatch-color" style="background:var(--fg);"></div><div class="swatch-label">--fg</div><div class="swatch-value">Foreground</div></div>
@@ -466,16 +466,37 @@
   <!-- ════════════════════════════════════════ -->
   <div class="section">
     <div class="section-title">Form Elements</div>
-    <div class="demo-row">
-      <div class="search-wrapper">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input type="text" class="search-input" placeholder="Search projects...">
+
+    <div class="subsection">
+      <div class="subsection-title">Search Input</div>
+      <div class="demo-row">
+        <div class="search-wrapper">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" class="search-input" placeholder="Search projects...">
+        </div>
       </div>
-      <select class="sort-select">
-        <option value="recent">Recent</option>
-        <option value="name">Name</option>
-        <option value="created">Created</option>
-      </select>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Text Input (no icon)</div>
+      <div class="demo-row">
+        <input type="text" class="search-input" style="padding-left:10px; width:220px;" placeholder="Project name...">
+        <input type="text" class="search-input" style="padding-left:10px; width:220px; border-color:var(--border-strong);" placeholder="Focused state" value="My Project">
+      </div>
+      <div style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em; margin-top:8px;">
+        Focus state: border-color transitions to --border-strong
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Select</div>
+      <div class="demo-row">
+        <select class="sort-select">
+          <option value="recent">Recent</option>
+          <option value="name">Name</option>
+          <option value="created">Created</option>
+        </select>
+      </div>
     </div>
   </div>
 
@@ -501,6 +522,10 @@
             <div class="zone-resize-handle-corner zone-resize-corner-tr" style="opacity:1;"></div>
             <div class="zone-resize-handle-corner zone-resize-corner-bl" style="opacity:1;"></div>
             <div class="zone-resize-handle-corner zone-resize-corner-br" style="opacity:1;"></div>
+            <div class="zone-resize-handle-edge zone-resize-edge-t" style="opacity:1;"></div>
+            <div class="zone-resize-handle-edge zone-resize-edge-b" style="opacity:1;"></div>
+            <div class="zone-resize-handle-edge zone-resize-edge-l" style="opacity:1;"></div>
+            <div class="zone-resize-handle-edge zone-resize-edge-r" style="opacity:1;"></div>
           </div>
         </div>
         <div class="zone-demo">
@@ -781,6 +806,266 @@
         <div class="toast" style="opacity:1; transform:none; position:relative; bottom:auto; left:auto;">starred</div>
         <div class="toast" style="opacity:1; transform:none; position:relative; bottom:auto; left:auto; margin-top:8px;">rejected</div>
         <div class="toast" style="opacity:1; transform:none; position:relative; bottom:auto; left:auto; margin-top:8px;">generating...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- CONNECTION LINES & HANDLES -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-title">Connection Lines &amp; Handles</div>
+
+    <div class="subsection">
+      <div class="subsection-title">Edge / Connection Styles</div>
+      <div class="demo-row" style="gap:24px; align-items:flex-start;">
+        <div class="demo-col">
+          <div style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:4px;">Default (dashed)</div>
+          <svg width="200" height="40" style="overflow:visible;">
+            <line x1="10" y1="20" x2="190" y2="20" stroke="var(--connection)" stroke-width="1.5" stroke-dasharray="6 3"/>
+          </svg>
+        </div>
+        <div class="demo-col">
+          <div style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:4px;">Hover (solid)</div>
+          <svg width="200" height="40" style="overflow:visible;">
+            <line x1="10" y1="20" x2="190" y2="20" stroke="var(--connection-hover)" stroke-width="2"/>
+          </svg>
+        </div>
+        <div class="demo-col">
+          <div style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:4px;">Selected (solid)</div>
+          <svg width="200" height="40" style="overflow:visible;">
+            <line x1="10" y1="20" x2="190" y2="20" stroke="var(--connection)" stroke-width="2"/>
+          </svg>
+        </div>
+      </div>
+      <div class="demo-row" style="gap:24px; margin-top:12px; align-items:flex-start;">
+        <div class="demo-col">
+          <div style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:4px;">Curved Path (default)</div>
+          <svg width="200" height="80" style="overflow:visible;">
+            <path d="M10,60 C60,60 140,20 190,20" fill="none" stroke="var(--connection)" stroke-width="1.5" stroke-dasharray="6 3"/>
+          </svg>
+        </div>
+        <div class="demo-col">
+          <div style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:4px;">Curved Path (hover)</div>
+          <svg width="200" height="80" style="overflow:visible;">
+            <path d="M10,60 C60,60 140,20 190,20" fill="none" stroke="var(--connection-hover)" stroke-width="2"/>
+          </svg>
+        </div>
+        <div class="demo-col">
+          <div style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:4px;">Edge Label</div>
+          <svg width="200" height="80" style="overflow:visible;">
+            <path d="M10,60 C60,60 140,20 190,20" fill="none" stroke="var(--connection)" stroke-width="1.5" stroke-dasharray="6 3"/>
+            <text x="100" y="32" text-anchor="middle" font-family="var(--mono)" font-size="9" fill="var(--fg-3)">informs</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Node Handles (Connection Dots)</div>
+      <div class="demo-row" style="gap:32px; align-items:flex-start;">
+        <div class="demo-col">
+          <div style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Default (invisible)</div>
+          <div style="position:relative; width:120px; height:80px; border:1px solid var(--border); background:var(--surface);">
+            <div style="position:absolute; top:-4px; left:50%; transform:translateX(-50%); width:8px; height:8px; background:transparent; border:1.5px solid transparent;"></div>
+            <div style="position:absolute; bottom:-4px; left:50%; transform:translateX(-50%); width:8px; height:8px; background:transparent; border:1.5px solid transparent;"></div>
+            <div style="position:absolute; left:-4px; top:50%; transform:translateY(-50%); width:8px; height:8px; background:transparent; border:1.5px solid transparent;"></div>
+            <div style="position:absolute; right:-4px; top:50%; transform:translateY(-50%); width:8px; height:8px; background:transparent; border:1.5px solid transparent;"></div>
+          </div>
+        </div>
+        <div class="demo-col">
+          <div style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Hover / Connecting (visible)</div>
+          <div style="position:relative; width:120px; height:80px; border:1px solid var(--border-strong); background:var(--surface);">
+            <div style="position:absolute; top:-4px; left:50%; transform:translateX(-50%); width:8px; height:8px; background:var(--handle-color); border:1.5px solid var(--bg);"></div>
+            <div style="position:absolute; bottom:-4px; left:50%; transform:translateX(-50%); width:8px; height:8px; background:var(--handle-color); border:1.5px solid var(--bg);"></div>
+            <div style="position:absolute; left:-4px; top:50%; transform:translateY(-50%); width:8px; height:8px; background:var(--handle-color); border:1.5px solid var(--bg);"></div>
+            <div style="position:absolute; right:-4px; top:50%; transform:translateY(-50%); width:8px; height:8px; background:var(--handle-color); border:1.5px solid var(--bg);"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- TOOLTIPS -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-title">Tooltips</div>
+
+    <div class="subsection">
+      <div class="subsection-title">Icon Buttons with Tooltips</div>
+      <div class="demo-row" style="gap:12px; padding-top:32px;">
+        <div class="tooltip-trigger">
+          <button class="btn-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          </button>
+          <span class="tooltip">Light Mode</span>
+        </div>
+        <div class="tooltip-trigger">
+          <button class="btn-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          </button>
+          <span class="tooltip">Dark Mode</span>
+        </div>
+        <div class="tooltip-trigger">
+          <button class="btn-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.45 4.35L18 9l-4.55 1.65L12 15l-1.45-4.35L6 9l4.55-1.65L12 3z"/></svg>
+          </button>
+          <span class="tooltip">Generate</span>
+        </div>
+        <div class="tooltip-trigger">
+          <button class="btn-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          </button>
+          <span class="tooltip">Delete</span>
+        </div>
+        <div class="tooltip-trigger">
+          <button class="btn-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          </button>
+          <span class="tooltip">Copy</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Right-positioned Tooltip</div>
+      <div class="demo-row" style="padding-left:8px;">
+        <div class="tooltip-trigger">
+          <button class="btn-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          </button>
+          <span class="tooltip tooltip-right">Help</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- ICON REFERENCE -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-title">Icon Reference</div>
+
+    <div class="subsection">
+      <div class="subsection-title">Zone Type Icons</div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(72px, 1fr)); gap:12px;">
+        <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>
+          <span style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em;">lightbulb</span>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+          <span style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em;">target</span>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" width="16" height="16"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <span style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em;">search</span>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" width="16" height="16"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          <span style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em;">grid</span>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          <span style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em;">zap</span>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"/></svg>
+          <span style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em;">radio</span>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14 0-5.5 2-6.5 0 3.5 2.56 5.44 3.5 7.5.86 1.9.37 4.07-1 5.5-1.5 1.5-3.5 2-5.5 1.5"/></svg>
+          <span style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em;">flame</span>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em;">shield</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Node Type Menu Icons</div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(72px, 1fr)); gap:12px;">
+        <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+          <span style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em;">bookmark</span>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" width="16" height="16"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em;">users</span>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <span style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em;">lock</span>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" width="16" height="16"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <span style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em;">help</span>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          <span style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em;">link</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Action Icons</div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(72px, 1fr)); gap:12px;">
+        <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" width="16" height="16"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em;">plus</span>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+          <span style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em;">cube</span>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" width="16" height="16"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <span style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em;">sun</span>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" width="16" height="16"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          <span style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em;">moon</span>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M12 3l1.45 4.35L18 9l-4.55 1.65L12 15l-1.45-4.35L6 9l4.55-1.65L12 3z"/></svg>
+          <span style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em;">sparkles</span>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          <span style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em;">trash</span>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          <span style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em;">edit</span>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <span style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em;">copy</span>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+          <span style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em;">layers</span>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="5 9 2 12 5 15"/><polyline points="9 5 12 2 15 5"/><polyline points="15 19 12 22 9 19"/><polyline points="19 9 22 12 19 15"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/></svg>
+          <span style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em;">move</span>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+          <svg viewBox="0 0 24 24" fill="currentColor" stroke="none" width="16" height="16"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <span style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em;">star-filled</span>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="10 15 15 20 20 15"/><path d="M4 4h7a4 4 0 0 1 4 4v12"/></svg>
+          <span style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em;">corner-right-down</span>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><circle cx="13.5" cy="6.5" r="0.5" fill="currentColor" stroke="none"/><circle cx="17.5" cy="10.5" r="0.5" fill="currentColor" stroke="none"/><circle cx="8.5" cy="7.5" r="0.5" fill="currentColor" stroke="none"/><circle cx="6.5" cy="12" r="0.5" fill="currentColor" stroke="none"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.93 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.04-.23-.29-.38-.63-.38-1.02 0-.83.67-1.5 1.5-1.5H16c3.31 0 6-2.69 6-6 0-5.17-4.49-9-10-9z"/></svg>
+          <span style="font-family:var(--mono); font-size:9px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.06em;">palette</span>
+        </div>
       </div>
     </div>
   </div>
