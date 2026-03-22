@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seeds — V19 Zone Collapse & Navigation</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://esm.sh/@xyflow/react@12/dist/style.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script type="importmap">
+  {
+    "imports": {
+      "react": "https://esm.sh/react@18",
+      "react/": "https://esm.sh/react@18/",
+      "react-dom": "https://esm.sh/react-dom@18",
+      "react-dom/": "https://esm.sh/react-dom@18/",
+      "@xyflow/react": "https://esm.sh/@xyflow/react@12?external=react,react-dom",
+      "@xyflow/react/": "https://esm.sh/@xyflow/react@12&external=react,react-dom/"
+    }
+  }
+  </script>
+  <style>
+    body { margin: 0; font-family: 'Inter', sans-serif; background: #f0ede8; }
+    .fraunces { font-family: 'Fraunces', serif; }
+
+    .zone-warm {
+      border: 1.5px solid rgba(0,0,0,0.08);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.35);
+      width: 100%; height: 100%;
+      position: relative;
+    }
+    .zone-warm-header {
+      position: absolute;
+      top: -14px;
+      left: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 2;
+    }
+    .zone-warm-name {
+      font-family: 'Fraunces', serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: #2a2520;
+      background: #f0ede8;
+      padding: 2px 10px;
+      border-radius: 6px;
+    }
+    .zone-count-badge {
+      font-size: 10px;
+      color: #888;
+      background: rgba(0,0,0,0.04);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .collapse-btn {
+      position: absolute;
+      top: -12px;
+      right: 16px;
+      background: #f0ede8;
+      border: 1px solid rgba(0,0,0,0.08);
+      border-radius: 5px;
+      width: 22px; height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: #888;
+      cursor: pointer;
+      z-index: 2;
+      font-family: 'Inter', sans-serif;
+    }
+    .collapse-btn:hover { background: #e8e4de; color: #555; }
+
+    .collapsed-bar {
+      background: #faf8f5;
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 10px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .collapsed-bar:hover {
+      border-color: rgba(0,0,0,0.12);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .collapsed-type-edge {
+      width: 3px; height: 28px; border-radius: 2px; flex-shrink: 0;
+    }
+    .collapsed-name {
+      font-family: 'Fraunces', serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: #2a2520;
+      flex-shrink: 0;
+    }
+    .collapsed-summary-text {
+      font-size: 12px;
+      color: #888;
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .collapsed-badge {
+      font-size: 10px;
+      color: #999;
+      background: rgba(0,0,0,0.04);
+      padding: 2px 8px;
+      border-radius: 6px;
+      flex-shrink: 0;
+    }
+
+    .card-warm {
+      background: #faf8f5;
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 10px;
+      padding: 12px 14px;
+      width: 200px;
+      font-size: 13px;
+      line-height: 1.45;
+      color: #2a2520;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .card-warm:hover {
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      border-color: rgba(0,0,0,0.1);
+    }
+    .card-warm .type-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      display: inline-block; margin-right: 5px; flex-shrink: 0;
+    }
+
+    .toolbar-warm {
+      position: fixed;
+      top: 56px;
+      right: 20px;
+      display: flex;
+      gap: 4px;
+      z-index: 100;
+    }
+    .toolbar-btn {
+      padding: 5px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(0,0,0,0.08);
+      background: rgba(240,237,232,0.9);
+      backdrop-filter: blur(8px);
+      font-size: 11px;
+      font-weight: 500;
+      color: #666;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.15s;
+    }
+    .toolbar-btn:hover { background: #e8e4de; color: #333; }
+    .toolbar-btn.active {
+      background: #eac1f5;
+      border-color: rgba(234,193,245,0.5);
+      color: #2a1a30;
+    }
+
+    .top-bar-warm {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 48px;
+      background: rgba(240,237,232,0.9);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      z-index: 100;
+    }
+
+    .react-flow__background { opacity: 0.25; }
+    .react-flow__controls { bottom: 20px !important; }
+    .react-flow__minimap { border-radius: 8px; overflow: hidden; }
+  </style>
+</head>
+<body>
+  <div id="root" style="width:100vw;height:100vh;"></div>
+
+  <script type="module">
+    import React, { useState, useCallback } from 'react';
+    import { createRoot } from 'react-dom/client';
+    import {
+      ReactFlow,
+      Background,
+      Controls,
+      MiniMap,
+      useNodesState,
+      useEdgesState,
+      Handle,
+      Position,
+    } from '@xyflow/react';
+
+    const h = React.createElement;
+
+    const COLORS = { ideas: '#34d399', tensions: '#f472b6', signals: '#38bdf8', strategy: '#a78bfa' };
+
+    function ZoneNode({ data }) {
+      const color = COLORS[data.zoneType] || '#888';
+      return h('div', { className: 'zone-warm', style: { width: '100%', height: '100%', borderLeftColor: `${color}55`, borderLeftWidth: '3px' } },
+        h('div', { className: 'zone-warm-header' },
+          h('span', { className: 'zone-warm-name' }, data.label),
+          h('span', { className: 'zone-count-badge' }, `${data.cardCount} cards`),
+        ),
+        h('div', { className: 'collapse-btn', title: 'Collapse zone' }, '−'),
+      );
+    }
+
+    function CollapsedNode({ data }) {
+      const color = COLORS[data.zoneType] || '#888';
+      return h('div', { className: 'collapsed-bar' },
+        h('div', { className: 'collapsed-type-edge', style: { background: color } }),
+        h('span', { className: 'collapsed-name' }, data.label),
+        h('span', { className: 'collapsed-summary-text' }, data.summaryPreview),
+        h('span', { className: 'collapsed-badge' }, `${data.cardCount} cards`),
+      );
+    }
+
+    function CardNode({ data }) {
+      const color = COLORS[data.cardType] || '#888';
+      return h('div', { className: 'card-warm' },
+        h('div', { style: { display: 'flex', alignItems: 'flex-start' } },
+          h('span', { className: 'type-dot', style: { background: color, marginTop: '6px' } }),
+          h('span', null, data.text),
+        ),
+        h(Handle, { type: 'source', position: Position.Right, style: { opacity: 0, width: 6, height: 6 } }),
+        h(Handle, { type: 'target', position: Position.Left, style: { opacity: 0, width: 6, height: 6 } }),
+      );
+    }
+
+    const nodeTypes = { zone: ZoneNode, collapsed: CollapsedNode, card: CardNode };
+
+    const initialNodes = [
+      // Expanded zone: Ideas
+      {
+        id: 'zone-ideas',
+        type: 'zone',
+        position: { x: 40, y: 80 },
+        data: { label: 'Campaign Ideas', zoneType: 'ideas', cardCount: 4 },
+        style: { width: 500, height: 380 },
+      },
+      ...['Experiential pop-ups tied to local cultural moments',
+          'Community-sourced creative brief for next collection',
+          'Maker documentary series following product journey',
+          'Zero-waste packaging as a design feature not afterthought'
+      ].map((text, i) => ({
+        id: `card-i-${i}`,
+        type: 'card',
+        position: { x: 15 + (i % 2) * 230, y: 25 + Math.floor(i / 2) * 140 },
+        parentId: 'zone-ideas',
+        extent: 'parent',
+        data: { text, cardType: 'ideas' },
+      })),
+
+      // Expanded zone: Signals
+      {
+        id: 'zone-signals',
+        type: 'zone',
+        position: { x: 600, y: 80 },
+        data: { label: 'Market Signals', zoneType: 'signals', cardCount: 3 },
+        style: { width: 460, height: 380 },
+      },
+      ...['Secondhand luxury outpacing new sales in key demographics',
+          'Brand transparency now table stakes not differentiator',
+          'Community commerce models driving 5x retention vs traditional'
+      ].map((text, i) => ({
+        id: `card-s-${i}`,
+        type: 'card',
+        position: { x: 15 + (i % 2) * 220, y: 25 + Math.floor(i / 2) * 140 },
+        parentId: 'zone-signals',
+        extent: 'parent',
+        data: { text, cardType: 'signals' },
+      })),
+
+      // Collapsed zone: Tensions
+      {
+        id: 'collapsed-tensions',
+        type: 'collapsed',
+        position: { x: 40, y: 510 },
+        data: {
+          label: 'Tensions',
+          zoneType: 'tensions',
+          cardCount: 5,
+          summaryPreview: 'Core friction between growth ambitions and authenticity claims; pricing vs accessibility creates strongest audience division',
+        },
+        style: { width: 500, height: 52 },
+      },
+
+      // Collapsed zone: Strategy
+      {
+        id: 'collapsed-strategy',
+        type: 'collapsed',
+        position: { x: 600, y: 510 },
+        data: {
+          label: 'Strategy',
+          zoneType: 'strategy',
+          cardCount: 4,
+          summaryPreview: 'Position at intersection of craft and community; premiumise heroes, democratise entry; physical spaces as cultural anchors',
+        },
+        style: { width: 460, height: 52 },
+      },
+    ];
+
+    function App() {
+      const [nodes, , onNodesChange] = useNodesState(initialNodes);
+      const [edges, , onEdgesChange] = useEdgesState([]);
+
+      return h('div', { style: { width: '100vw', height: '100vh' } },
+        h('div', { className: 'top-bar-warm' },
+          h('span', { style: { fontFamily: 'Fraunces, serif', fontWeight: 600, fontSize: '14px', color: '#2a2520' } }, 'Sustainable Brand Strategy'),
+          h('span', { style: { fontSize: '12px', color: '#999', marginLeft: '12px' } }, '4 zones · 16 cards'),
+        ),
+        h('div', { className: 'toolbar-warm' },
+          h('button', { className: 'toolbar-btn' }, 'Expand all'),
+          h('button', { className: 'toolbar-btn' }, 'Collapse all'),
+          h('button', { className: 'toolbar-btn' }, 'Read as outline'),
+        ),
+        h(ReactFlow, {
+          nodes, edges, onNodesChange, onEdgesChange,
+          nodeTypes,
+          fitView: true,
+          fitViewOptions: { padding: 0.25 },
+          style: { background: '#f0ede8' },
+          proOptions: { hideAttribution: true },
+        },
+          h(Background, { gap: 20, size: 1, color: 'rgba(0,0,0,0.03)' }),
+          h(Controls, { showInteractive: false }),
+          h(MiniMap, {
+            nodeColor: (n) => {
+              if (n.data?.zoneType) return COLORS[n.data.zoneType] || '#ddd';
+              return '#ddd';
+            },
+          }),
+        ),
+      );
+    }
+
+    createRoot(document.getElementById('root')).render(h(App));
+  </script>
+</body>
+</html>

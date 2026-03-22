@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seeds — V12 Zone Typing & AI Context</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://esm.sh/@xyflow/react@12/dist/style.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            surface: '#1b1b20',
+            canvas: '#131316',
+            accent: '#eac1f5',
+          }
+        }
+      }
+    }
+  </script>
+  <script type="importmap">
+  {
+    "imports": {
+      "react": "https://esm.sh/react@18",
+      "react/": "https://esm.sh/react@18/",
+      "react-dom": "https://esm.sh/react-dom@18",
+      "react-dom/": "https://esm.sh/react-dom@18/",
+      "@xyflow/react": "https://esm.sh/@xyflow/react@12?external=react,react-dom",
+      "@xyflow/react/": "https://esm.sh/@xyflow/react@12&external=react,react-dom/"
+    }
+  }
+  </script>
+  <style>
+    body { margin: 0; font-family: 'DM Sans', sans-serif; background: #131316; color: #e5e5e5; }
+    .mono { font-family: 'IBM Plex Mono', monospace; }
+
+    .zone-node-dark {
+      border-radius: 14px;
+      min-width: 100%;
+      min-height: 100%;
+      position: relative;
+      transition: border-color 0.3s;
+    }
+
+    .zone-glow {
+      position: absolute;
+      inset: 0;
+      border-radius: 14px;
+      pointer-events: none;
+      opacity: 0.06;
+    }
+
+    .card-node-dark {
+      background: #1b1b20;
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px;
+      padding: 12px 14px;
+      width: 200px;
+      font-size: 13px;
+      line-height: 1.45;
+      color: #d4d4d4;
+      transition: all 0.2s;
+    }
+    .card-node-dark:hover {
+      border-color: rgba(255,255,255,0.12);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+    }
+    .card-node-dark .type-bar {
+      width: 3px;
+      border-radius: 2px;
+      position: absolute;
+      left: 0;
+      top: 8px;
+      bottom: 8px;
+      transition: background 0.4s;
+    }
+
+    .zone-label-dark {
+      position: absolute;
+      top: -14px;
+      left: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 2;
+    }
+    .zone-label-dark .name {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 3px 10px;
+      border-radius: 6px;
+      background: #131316;
+    }
+
+    .context-tooltip {
+      position: absolute;
+      top: -50px;
+      left: 16px;
+      background: #222228;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 11px;
+      color: #aaa;
+      max-width: 300px;
+      line-height: 1.4;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+      z-index: 20;
+      pointer-events: none;
+    }
+
+    .generate-btn {
+      position: absolute;
+      bottom: 14px;
+      right: 14px;
+      background: rgba(234,193,245,0.12);
+      border: 1px solid rgba(234,193,245,0.2);
+      border-radius: 8px;
+      padding: 5px 12px;
+      font-size: 11px;
+      font-weight: 500;
+      color: #eac1f5;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: all 0.15s;
+    }
+    .generate-btn:hover {
+      background: rgba(234,193,245,0.2);
+    }
+
+    .link-arrow {
+      position: absolute;
+      z-index: 5;
+    }
+
+    .top-bar-dark {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 48px;
+      background: rgba(19,19,22,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      z-index: 100;
+    }
+
+    .skeleton-card {
+      background: #1b1b20;
+      border: 1px solid rgba(255,255,255,0.04);
+      border-radius: 10px;
+      padding: 12px 14px;
+      width: 200px;
+    }
+    .skeleton-line {
+      height: 10px;
+      border-radius: 4px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+    }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    .react-flow__background { opacity: 0.3; }
+    .react-flow__controls button { background: #222 !important; color: #aaa !important; border-color: #333 !important; }
+    .react-flow__controls button:hover { background: #333 !important; }
+    .react-flow__minimap { background: #1a1a1e !important; border-radius: 8px; overflow: hidden; }
+  </style>
+</head>
+<body>
+  <div id="root" style="width:100vw;height:100vh;"></div>
+
+  <script type="module">
+    import React, { useState, useCallback } from 'react';
+    import { createRoot } from 'react-dom/client';
+    import {
+      ReactFlow,
+      Background,
+      Controls,
+      MiniMap,
+      useNodesState,
+      useEdgesState,
+      Handle,
+      Position,
+    } from '@xyflow/react';
+
+    const h = React.createElement;
+
+    const ZONE_TYPES = {
+      ideas: { color: '#34d399', label: 'Ideas', context: 'Cards here are treated as generative possibilities — the AI will explore and expand them.' },
+      tensions: { color: '#f472b6', label: 'Tensions', context: 'Cards here are friction points — the AI steers toward problem-awareness and contradiction.' },
+      signals: { color: '#38bdf8', label: 'Signals', context: 'Cards here are cultural/market observations — the AI treats them as evidence to build from.' },
+      strategy: { color: '#a78bfa', label: 'Strategy', context: 'Cards here are directional choices — the AI synthesizes toward clarity and focus.' },
+      frameworks: { color: '#fb923c', label: 'Frameworks', context: 'Cards here are structural models — the AI maps relationships and implications.' },
+    };
+
+    function ZoneNode({ data, id }) {
+      const [hovered, setHovered] = useState(false);
+      const typeConfig = ZONE_TYPES[data.zoneType] || {};
+      const color = typeConfig.color || '#555';
+
+      return h('div', {
+        className: 'zone-node-dark',
+        style: {
+          width: '100%',
+          height: '100%',
+          border: `1.5px solid ${color}44`,
+          background: `${color}06`,
+        },
+        onMouseEnter: () => setHovered(true),
+        onMouseLeave: () => setHovered(false),
+      },
+        // Ambient glow
+        h('div', {
+          className: 'zone-glow',
+          style: {
+            background: `radial-gradient(ellipse at center, ${color}12 0%, transparent 70%)`,
+          }
+        }),
+
+        // Zone label
+        h('div', { className: 'zone-label-dark' },
+          h('span', { className: 'name', style: { color } }, data.label),
+          data.cardCount !== undefined && h('span', {
+            style: {
+              fontSize: '10px',
+              color: '#666',
+              fontFamily: 'IBM Plex Mono, monospace',
+            }
+          }, `${data.cardCount} cards`),
+        ),
+
+        // Context tooltip on hover
+        hovered && typeConfig.context && h('div', { className: 'context-tooltip' },
+          h('span', { style: { color: '#eac1f5', fontSize: '9px', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', marginBottom: '4px' } }, 'AI CONTEXT'),
+          typeConfig.context,
+        ),
+
+        // Generate button
+        h('div', { className: 'generate-btn' }, 'Generate in zone →'),
+      );
+    }
+
+    function CardNode({ data }) {
+      const [hovered, setHovered] = useState(false);
+      const typeConfig = ZONE_TYPES[data.cardType] || {};
+      const color = typeConfig.color || '#555';
+
+      return h('div', {
+        className: 'card-node-dark',
+        style: { position: 'relative', paddingLeft: '18px' },
+        onMouseEnter: () => setHovered(true),
+        onMouseLeave: () => setHovered(false),
+      },
+        h('div', { className: 'type-bar', style: { background: color } }),
+        h('div', { style: { fontSize: '13px', lineHeight: '1.45' } }, data.text),
+        // Actions on hover
+        hovered && h('div', {
+          style: {
+            display: 'flex',
+            gap: '4px',
+            marginTop: '8px',
+            paddingTop: '8px',
+            borderTop: '1px solid rgba(255,255,255,0.04)',
+          }
+        },
+          ['Select', 'Riff', 'Lock', 'Reject'].map(action =>
+            h('button', {
+              key: action,
+              style: {
+                padding: '2px 7px',
+                borderRadius: '5px',
+                border: '1px solid rgba(255,255,255,0.06)',
+                background: 'rgba(255,255,255,0.03)',
+                fontSize: '10px',
+                color: '#888',
+                cursor: 'pointer',
+                fontFamily: 'DM Sans, sans-serif',
+              }
+            }, action)
+          )
+        ),
+        h(Handle, { type: 'source', position: Position.Right, style: { opacity: 0, width: 6, height: 6 } }),
+        h(Handle, { type: 'target', position: Position.Left, style: { opacity: 0, width: 6, height: 6 } }),
+      );
+    }
+
+    function SkeletonCard() {
+      return h('div', { className: 'skeleton-card' },
+        h('div', { className: 'skeleton-line', style: { width: '80%', marginBottom: '8px' } }),
+        h('div', { className: 'skeleton-line', style: { width: '60%', marginBottom: '6px' } }),
+        h('div', { className: 'skeleton-line', style: { width: '70%' } }),
+      );
+    }
+
+    const nodeTypes = { zone: ZoneNode, card: CardNode };
+
+    const initialNodes = [
+      // Ideas zone
+      {
+        id: 'zone-ideas',
+        type: 'zone',
+        position: { x: 60, y: 80 },
+        data: { label: 'Ideas', zoneType: 'ideas', cardCount: 4 },
+        style: { width: 500, height: 400 },
+      },
+      ...['Brand story rooted in maker culture rather than mass production',
+          'Limited edition drops tied to cultural moments not seasons',
+          'Product as canvas — customisation as brand ritual',
+          'Physical spaces as community hubs not retail stores'
+      ].map((text, i) => ({
+        id: `card-ideas-${i}`,
+        type: 'card',
+        position: { x: 20 + (i % 2) * 230, y: 30 + Math.floor(i / 2) * 150 },
+        parentId: 'zone-ideas',
+        extent: 'parent',
+        data: { text, cardType: 'ideas' },
+      })),
+
+      // Tensions zone
+      {
+        id: 'zone-tensions',
+        type: 'zone',
+        position: { x: 620, y: 80 },
+        data: { label: 'Tensions', zoneType: 'tensions', cardCount: 3 },
+        style: { width: 500, height: 400 },
+      },
+      ...['Audience wants authenticity but brand needs scale to survive',
+          'Premium pricing conflicts with accessibility mission',
+          'Digital-first audience craves physical, tactile experiences'
+      ].map((text, i) => ({
+        id: `card-tensions-${i}`,
+        type: 'card',
+        position: { x: 20 + (i % 2) * 230, y: 30 + Math.floor(i / 2) * 150 },
+        parentId: 'zone-tensions',
+        extent: 'parent',
+        data: { text, cardType: 'tensions' },
+      })),
+
+      // Signals zone
+      {
+        id: 'zone-signals',
+        type: 'zone',
+        position: { x: 60, y: 540 },
+        data: { label: 'Signals', zoneType: 'signals', cardCount: 3 },
+        style: { width: 500, height: 350 },
+      },
+      ...['73% of Gen Z prefer brands with verifiable sustainability claims',
+          'Rise of repair culture — Patagonia Worn Wear revenue up 40%',
+          'TikTok maker content driving 3x engagement vs polished brand content'
+      ].map((text, i) => ({
+        id: `card-signals-${i}`,
+        type: 'card',
+        position: { x: 20 + (i % 2) * 230, y: 30 + Math.floor(i / 2) * 150 },
+        parentId: 'zone-signals',
+        extent: 'parent',
+        data: { text, cardType: 'signals' },
+      })),
+
+      // Strategy parent zone with children
+      {
+        id: 'zone-strategy',
+        type: 'zone',
+        position: { x: 620, y: 540 },
+        data: { label: 'Strategy', zoneType: 'strategy', cardCount: 3 },
+        style: { width: 500, height: 350 },
+      },
+      ...['Position as the anti-fast-fashion brand without being preachy',
+          'Build distribution through community not retail partnerships',
+          'Content strategy: show the process, never the pitch'
+      ].map((text, i) => ({
+        id: `card-strategy-${i}`,
+        type: 'card',
+        position: { x: 20 + (i % 2) * 230, y: 30 + Math.floor(i / 2) * 150 },
+        parentId: 'zone-strategy',
+        extent: 'parent',
+        data: { text, cardType: 'strategy' },
+      })),
+
+      // Empty frameworks zone
+      {
+        id: 'zone-frameworks',
+        type: 'zone',
+        position: { x: 1180, y: 80 },
+        data: { label: 'Frameworks', zoneType: 'frameworks', cardCount: 0 },
+        style: { width: 400, height: 400 },
+      },
+    ];
+
+    const initialEdges = [
+      // Zone-to-zone context links
+      {
+        id: 'link-1',
+        source: 'zone-signals',
+        target: 'zone-tensions',
+        style: { stroke: 'rgba(255,255,255,0.06)', strokeWidth: 1 },
+        type: 'straight',
+      },
+      {
+        id: 'link-2',
+        source: 'zone-tensions',
+        target: 'zone-strategy',
+        style: { stroke: 'rgba(255,255,255,0.06)', strokeWidth: 1 },
+        type: 'straight',
+      },
+    ];
+
+    function App() {
+      const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+      const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+
+      return h('div', { style: { width: '100vw', height: '100vh' } },
+        h('div', { className: 'top-bar-dark' },
+          h('span', { style: { fontWeight: 600, fontSize: '14px', color: '#e5e5e5' } }, 'Sustainable Fashion Brand'),
+          h('span', { style: { fontSize: '12px', color: '#666', marginLeft: '12px', fontFamily: 'IBM Plex Mono, monospace' } }, '5 zones · 13 cards'),
+        ),
+        h(ReactFlow, {
+          nodes,
+          edges,
+          onNodesChange,
+          onEdgesChange,
+          nodeTypes,
+          fitView: true,
+          fitViewOptions: { padding: 0.2 },
+          style: { background: '#131316' },
+          proOptions: { hideAttribution: true },
+        },
+          h(Background, { gap: 24, size: 1, color: 'rgba(255,255,255,0.03)' }),
+          h(Controls, { showInteractive: false }),
+          h(MiniMap, {
+            nodeColor: (n) => {
+              if (n.type === 'zone') return ZONE_TYPES[n.data?.zoneType]?.color || '#333';
+              return '#444';
+            },
+          }),
+        ),
+      );
+    }
+
+    createRoot(document.getElementById('root')).render(h(App));
+  </script>
+</body>
+</html>

@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Seeds — V31g Light Minimal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #fafaf8;
+      --text-1: #1a1a1a;
+      --text-2: #666;
+      --text-muted: #aaa;
+      --border: rgba(0,0,0,0.06);
+      --border-hover: rgba(0,0,0,0.1);
+
+      --idea-bg: #C6F6D5;
+      --idea-accent: #48bb78;
+      --tension-bg: #FED7D7;
+      --tension-accent: #fc8181;
+      --signal-bg: #BEE3F8;
+      --signal-accent: #63b3ed;
+      --direction-bg: #E9D8FD;
+      --direction-accent: #b794f4;
+      --floating-bg: #FEFCBF;
+
+      --font: 'Instrument Sans', system-ui, -apple-system, sans-serif;
+    }
+
+    html, body {
+      width: 100%; height: 100%; overflow: hidden;
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text-1);
+      user-select: none;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── TOP BAR ─────────────────────────────────────────────── */
+    #topbar {
+      position: fixed; top: 0; left: 0; right: 0; height: 44px;
+      background: var(--bg);
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      display: flex; align-items: center;
+      padding: 0 18px;
+      z-index: 1000;
+      gap: 12px;
+    }
+
+    #topbar .logo { display: flex; align-items: center; flex-shrink: 0; }
+
+    #topbar .separator {
+      width: 1px; height: 16px;
+      background: rgba(0,0,0,0.08);
+      flex-shrink: 0;
+    }
+
+    #topbar .project-name {
+      font-size: 13px; font-weight: 500;
+      color: var(--text-1);
+      letter-spacing: -0.01em;
+    }
+
+    #topbar .spacer { flex: 1; }
+
+    #topbar .top-actions {
+      display: flex; align-items: center; gap: 12px;
+    }
+
+    .share-link {
+      font-size: 13px; font-weight: 400;
+      color: var(--text-2);
+      cursor: pointer;
+      background: none; border: none;
+      font-family: var(--font);
+      transition: color .15s;
+    }
+    .share-link:hover { color: var(--text-1); }
+
+    /* ── CANVAS ──────────────────────────────────────────────── */
+    #canvas-wrap {
+      position: fixed; top: 44px; left: 0; right: 0; bottom: 0;
+      overflow: hidden; cursor: default;
+      background: var(--bg);
+    }
+    #canvas-wrap.panning { cursor: grab; }
+    #canvas-wrap.panning:active { cursor: grabbing; }
+
+    #canvas {
+      position: absolute; top: 0; left: 0;
+      transform-origin: 0 0;
+      width: 4000px; height: 3000px;
+    }
+
+    /* ── ZONES ───────────────────────────────────────────────── */
+    .zone {
+      position: absolute;
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 12px;
+      padding: 54px 24px 24px;
+      background: transparent;
+      min-width: 200px;
+      min-height: 150px;
+    }
+    .zone:hover { border-color: rgba(0,0,0,0.1); }
+    .zone:hover .resize-handle { opacity: 1; }
+
+    .zone-header {
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 40px;
+      display: flex; align-items: center;
+      padding: 0 18px;
+      border-radius: 12px 12px 0 0;
+    }
+
+    .zone-label {
+      font-size: 10px; font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      white-space: nowrap;
+    }
+
+    .zone-count {
+      font-size: 10px; font-weight: 600;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-left: 4px;
+    }
+
+    /* Zone accent borders */
+    .zone.ideas { border-top: 2px solid var(--idea-accent); }
+    .zone.ideas .zone-label { color: var(--idea-accent); }
+    .zone.tensions { border-top: 2px solid var(--tension-accent); }
+    .zone.tensions .zone-label { color: var(--tension-accent); }
+    .zone.signals { border-top: 2px solid var(--signal-accent); }
+    .zone.signals .zone-label { color: var(--signal-accent); }
+    .zone.directions { border-top: 2px solid var(--direction-accent); }
+    .zone.directions .zone-label { color: var(--direction-accent); }
+
+    .zone-cards { display: flex; flex-wrap: wrap; gap: 14px; }
+
+    /* Resize handles */
+    .resize-handle {
+      position: absolute;
+      opacity: 0;
+      transition: opacity .15s;
+      z-index: 10;
+    }
+    .resize-handle.right {
+      top: 0; right: -3px; width: 6px; height: 100%;
+      cursor: ew-resize;
+    }
+    .resize-handle.bottom {
+      bottom: -3px; left: 0; width: 100%; height: 6px;
+      cursor: ns-resize;
+    }
+    .resize-handle.corner {
+      bottom: -4px; right: -4px; width: 14px; height: 14px;
+      cursor: nwse-resize;
+    }
+    .resize-handle.corner::after {
+      content: '';
+      position: absolute;
+      bottom: 3px; right: 3px;
+      width: 8px; height: 8px;
+      border-right: 1.5px solid rgba(0,0,0,0.15);
+      border-bottom: 1.5px solid rgba(0,0,0,0.15);
+      border-radius: 1px;
+    }
+
+    /* ── STICKY CARDS ────────────────────────────────────────── */
+    .card {
+      position: relative;
+      width: 180px; height: 130px;
+      border-radius: 6px;
+      padding: 12px;
+      border: none;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.02);
+      cursor: grab;
+      flex-shrink: 0;
+      transition: transform .15s, box-shadow .15s;
+      overflow: visible;
+    }
+    .card:active { cursor: grabbing; }
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+      z-index: 50;
+    }
+
+    /* Post-it color variants — dark text on colored backgrounds */
+    .card.idea { background: var(--idea-bg); color: #1a4731; }
+    .card.tension { background: var(--tension-bg); color: #63171b; }
+    .card.signal { background: var(--signal-bg); color: #1a365d; }
+    .card.direction { background: var(--direction-bg); color: #322659; }
+    .card.floating { background: var(--floating-bg); color: #5a4b1a; }
+
+    .card-type {
+      font-size: 9px; font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 6px;
+      color: rgba(0,0,0,0.3);
+    }
+    .card-text {
+      font-size: 12.5px; font-weight: 400;
+      line-height: 1.5;
+      color: inherit;
+    }
+
+    /* ── LARGE card action buttons ─────────────────────────── */
+    .card-actions {
+      position: absolute;
+      top: -10px; right: -6px;
+      display: none;
+      gap: 5px;
+    }
+    .card:hover .card-actions { display: flex; }
+
+    .card-action-btn {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      border: 1px solid rgba(0,0,0,0.08);
+      cursor: pointer;
+      background: #fff;
+      font-size: 13px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-2);
+      font-family: var(--font);
+      transition: all 120ms ease;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+
+    /* Hover fills matching card type */
+    .card.idea .card-action-btn.reject:hover { background: #fed7d7; color: #e53e3e; border-color: rgba(229,62,62,0.2); }
+    .card.idea .card-action-btn.star:hover { background: #fefcbf; color: #d69e2e; border-color: rgba(214,158,46,0.2); }
+    .card.idea .card-action-btn.riff:hover { background: #c6f6d5; color: #38a169; border-color: rgba(56,161,105,0.2); }
+
+    .card.tension .card-action-btn.reject:hover { background: #fed7d7; color: #e53e3e; border-color: rgba(229,62,62,0.2); }
+    .card.tension .card-action-btn.star:hover { background: #fefcbf; color: #d69e2e; border-color: rgba(214,158,46,0.2); }
+    .card.tension .card-action-btn.riff:hover { background: #fed7d7; color: #e53e3e; border-color: rgba(229,62,62,0.2); }
+
+    .card.signal .card-action-btn.reject:hover { background: #fed7d7; color: #e53e3e; border-color: rgba(229,62,62,0.2); }
+    .card.signal .card-action-btn.star:hover { background: #fefcbf; color: #d69e2e; border-color: rgba(214,158,46,0.2); }
+    .card.signal .card-action-btn.riff:hover { background: #bee3f8; color: #3182ce; border-color: rgba(49,130,206,0.2); }
+
+    .card.direction .card-action-btn.reject:hover { background: #fed7d7; color: #e53e3e; border-color: rgba(229,62,62,0.2); }
+    .card.direction .card-action-btn.star:hover { background: #fefcbf; color: #d69e2e; border-color: rgba(214,158,46,0.2); }
+    .card.direction .card-action-btn.riff:hover { background: #e9d8fd; color: #805ad5; border-color: rgba(128,90,213,0.2); }
+
+    .card.floating .card-action-btn.reject:hover { background: #fed7d7; color: #e53e3e; border-color: rgba(229,62,62,0.2); }
+    .card.floating .card-action-btn.star:hover { background: #fefcbf; color: #d69e2e; border-color: rgba(214,158,46,0.2); }
+    .card.floating .card-action-btn.riff:hover { background: #fefcbf; color: #b7791f; border-color: rgba(183,121,31,0.2); }
+
+    /* ── AI INLINE NOTES ──────────────────────────────────── */
+    .ai-note {
+      position: absolute;
+      max-width: 280px;
+    }
+    .ai-note-text {
+      font-size: 11.5px; font-weight: 400;
+      font-style: italic;
+      line-height: 1.5;
+      color: #888;
+    }
+    .ai-note-icon {
+      color: var(--text-muted);
+      font-style: normal;
+      margin-right: 4px;
+    }
+
+    /* ── FLOATING TOOLBAR ───────────────────────────────────── */
+    #toolbar {
+      position: fixed;
+      bottom: 20px;
+      left: 50%; transform: translateX(-50%);
+      height: 48px;
+      background: #fff;
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 12px;
+      display: flex; align-items: center;
+      padding: 0 8px;
+      gap: 2px;
+      z-index: 1000;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+
+    .tool-btn {
+      width: 32px; height: 32px;
+      border-radius: 6px;
+      border: none;
+      background: transparent; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+      color: var(--text-2);
+      transition: all .12s;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .tool-btn:hover { color: var(--text-1); background: rgba(0,0,0,0.03); }
+    .tool-btn.active { background: rgba(0,0,0,0.04); color: var(--text-1); }
+
+    .toolbar-divider {
+      width: 1px; height: 20px;
+      background: rgba(0,0,0,0.06);
+      margin: 0 4px;
+      flex-shrink: 0;
+    }
+
+    /* Sticky note dropdown trigger */
+    .sticky-tool-wrap { position: relative; }
+    .sticky-dropdown-btn {
+      position: absolute; bottom: 0; right: 0;
+      width: 10px; height: 10px; border-radius: 2px;
+      background: transparent;
+      border: none; cursor: pointer;
+      font-size: 6px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-2);
+    }
+
+    /* Sticky palette popup */
+    #sticky-palette {
+      position: absolute;
+      bottom: calc(100% + 12px); left: 50%; transform: translateX(-50%);
+      background: #fff;
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 10px;
+      padding: 6px;
+      display: none; flex-direction: column; gap: 2px;
+      width: 160px;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    #sticky-palette.open { display: flex; }
+    .palette-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 6px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px; font-weight: 400;
+      color: var(--text-1);
+      transition: background .1s;
+      font-family: var(--font);
+    }
+    .palette-item:hover { background: rgba(0,0,0,0.03); }
+    .palette-dot {
+      width: 14px; height: 14px;
+      border-radius: 4px; flex-shrink: 0;
+    }
+
+    /* Zoom display */
+    #zoom-display {
+      font-size: 11px; font-weight: 500;
+      color: var(--text-2); padding: 0 8px;
+      cursor: pointer; white-space: nowrap;
+      letter-spacing: 0.02em;
+    }
+    #zoom-display:hover { color: var(--text-1); }
+
+    /* New button */
+    #new-btn {
+      height: 28px; padding: 0 14px;
+      border-radius: 8px;
+      background: rgba(0,0,0,0.04);
+      color: var(--text-1);
+      border: none; cursor: pointer;
+      font-family: var(--font);
+      font-size: 12px; font-weight: 500;
+      display: flex; align-items: center; gap: 5px;
+      transition: all .15s;
+      white-space: nowrap;
+      margin-left: 2px;
+    }
+    #new-btn:hover { background: rgba(0,0,0,0.07); }
+
+    /* tooltip */
+    .tool-tooltip {
+      position: absolute;
+      bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+      background: var(--text-1);
+      color: #fff;
+      font-size: 11px; font-weight: 500;
+      font-family: var(--font);
+      padding: 4px 10px; border-radius: 6px;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0; transition: opacity .15s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    }
+    .tool-btn:hover .tool-tooltip { opacity: 1; }
+
+    /* dragging */
+    .card.dragging {
+      opacity: .88;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1) !important;
+      z-index: 999 !important;
+      cursor: grabbing !important;
+    }
+
+    /* Floating note (standalone) */
+    .floating-card { position: absolute; }
+    .floating-card .card { width: 180px; height: 130px; }
+
+    /* editable card */
+    .card.editing .card-text {
+      outline: none;
+      cursor: text;
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div id="topbar">
+  <div class="logo">
+    <svg viewBox="0 0 732 172" fill="none" xmlns="http://www.w3.org/2000/svg" style="height:17px;width:auto;">
+      <path d="M120.68 0C123.275 0 124.573 1.29829 124.573 3.89355V26.9912C124.573 29.8459 123.275 31.1436 120.68 31.1436H38.6689C33.7382 31.1437 31.1436 33.7393 31.1436 38.9297V62.2871C31.1437 67.4773 33.7383 70.0721 38.6689 70.0723H97.3223C99.9174 70.0723 101.216 71.3701 101.216 74.2246V85.6445C101.216 90.8348 103.811 93.4296 109.001 93.4297H120.68C123.275 93.4297 124.573 94.7275 124.573 97.582V143.778C124.573 146.633 123.275 147.931 120.68 147.931H109.001C103.811 147.931 101.216 150.526 101.216 155.457V167.396C101.216 169.991 99.9174 171.288 97.3223 171.288H3.89258C1.29753 171.288 0.000108743 169.991 0 167.396V144.297C0.0001236 141.442 1.29755 140.145 3.89258 140.145H85.9033C90.8342 140.145 93.4296 137.55 93.4297 132.359V109.002C93.4297 103.811 90.8343 101.216 85.9033 101.216H27.25C24.6549 101.216 23.3575 99.9181 23.3574 97.0635V85.6445C23.3574 80.454 20.7618 77.8584 15.5713 77.8584H3.89258C1.29746 77.8583 3.18864e-05 76.5607 0 73.7061V27.5098C0.000117108 24.6553 1.29754 23.3575 3.89258 23.3574H15.5713C20.7618 23.3574 23.3574 20.7621 23.3574 15.8311V3.89355C23.3574 1.29835 24.6548 6.00221e-05 27.25 0H120.68ZM272.584 0C275.179 0 276.478 1.29829 276.478 3.89355V27.251C276.477 29.846 275.179 31.1436 272.584 31.1436H190.833C185.643 31.1436 183.048 33.739 183.048 38.6699V62.5459C183.048 67.4768 185.643 70.0722 190.833 70.0723H249.227C251.822 70.0723 253.12 71.3706 253.12 73.9658V97.3232C253.12 99.9183 251.822 101.216 249.227 101.216H190.833C185.643 101.216 183.048 103.811 183.048 108.742V132.618C183.048 137.549 185.643 140.144 190.833 140.145H272.584C275.179 140.145 276.478 141.443 276.478 144.038V167.396C276.477 169.991 275.179 171.288 272.584 171.288H155.797C153.202 171.288 151.904 169.99 151.904 167.396V3.89355C151.904 1.29837 153.202 8.08707e-05 155.797 0H272.584ZM424.397 0C426.993 2.76769e-05 428.29 1.29832 428.29 3.89355V27.251C428.29 29.846 426.993 31.1435 424.397 31.1436H342.646C337.456 31.1436 334.86 33.7389 334.86 38.6699V62.5459C334.86 67.4769 337.456 70.0723 342.646 70.0723H401.04C403.635 70.0723 404.933 71.3706 404.933 73.9658V97.3232C404.933 99.9183 403.635 101.216 401.04 101.216H342.646C337.456 101.216 334.86 103.811 334.86 108.742V132.618C334.86 137.549 337.456 140.145 342.646 140.145H424.397C426.993 140.145 428.29 141.443 428.29 144.038V167.396C428.29 169.991 426.993 171.288 424.397 171.288H307.61C305.015 171.288 303.718 169.991 303.718 167.396V3.89355C303.718 1.29829 305.015 0 307.61 0H424.397ZM552.854 0C555.448 0.000151161 556.746 1.29798 556.746 4.15234V15.5723C556.746 20.7626 559.342 23.3574 564.272 23.3574H576.211C578.806 23.3576 580.103 24.6554 580.104 27.5098V144.038C580.103 146.633 578.806 147.931 576.211 147.931H564.272C559.341 147.931 556.746 150.526 556.746 155.717V167.396C556.746 169.99 555.448 171.288 552.854 171.288H459.424C456.829 171.288 455.53 169.991 455.53 167.396V3.89355C455.53 1.29829 456.829 0 459.424 0H552.854ZM727.933 0C730.528 8.42668e-05 731.825 1.29837 731.825 3.89355V26.9912C731.825 29.8458 730.528 31.1435 727.933 31.1436H645.922C640.991 31.1436 638.396 33.7392 638.396 38.9297V62.2871C638.396 67.4774 640.991 70.0723 645.922 70.0723H704.575C707.17 70.0724 708.468 71.3702 708.468 74.2246V85.6445C708.468 90.8348 711.063 93.4297 716.254 93.4297H727.933C730.528 93.4298 731.825 94.7276 731.825 97.582V143.778C731.825 146.633 730.528 147.931 727.933 147.931H716.254C711.063 147.931 708.468 150.526 708.468 155.457V167.396C708.468 169.99 707.17 171.288 704.575 171.288H611.146C608.55 171.288 607.252 169.991 607.252 167.396V144.297C607.252 141.442 608.55 140.145 611.146 140.145H693.155C698.086 140.145 700.682 137.55 700.682 132.359V109.002C700.682 103.811 698.086 101.216 693.155 101.216H634.503C631.908 101.216 630.609 99.9182 630.609 97.0635V85.6445C630.609 80.4541 628.015 77.8585 622.824 77.8584H611.146C608.55 77.8584 607.252 76.5608 607.252 73.7061V27.5098C607.252 24.6552 608.55 23.3574 611.146 23.3574H622.824C628.015 23.3573 630.609 20.762 630.609 15.8311V3.89355C630.609 1.29829 631.908 0 634.503 0H727.933ZM494.46 31.1436C489.269 31.1436 486.674 33.7389 486.674 38.6699V132.618C486.674 137.549 489.269 140.145 494.46 140.145H541.175C546.365 140.144 548.96 137.549 548.96 132.618V38.6699C548.96 33.7391 546.365 31.1437 541.175 31.1436H494.46Z" fill="#1a1a1a"/>
+    </svg>
+  </div>
+  <div class="separator"></div>
+  <div class="project-name">DTC Brand Launch</div>
+  <div class="spacer"></div>
+  <div class="top-actions">
+    <button class="share-link">Share</button>
+  </div>
+</div>
+
+<!-- CANVAS WRAP -->
+<div id="canvas-wrap">
+  <div id="canvas">
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- ZONE 1: CAMPAIGN IDEAS -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div class="zone ideas" id="zone-ideas" style="left:100px; top:80px; width:820px;">
+      <div class="zone-header">
+        <span class="zone-label">CAMPAIGN IDEAS</span>
+        <span class="zone-count">(6)</span>
+      </div>
+      <div class="zone-cards">
+
+        <div class="card idea">
+          <div class="card-type">IDEA</div>
+          <div class="card-text">"Roots to Results" — hero stories of founders who built with Seeds</div>
+          <div class="card-actions">
+            <button class="card-action-btn reject" title="Reject">&#10005;</button>
+            <button class="card-action-btn star" title="Star">&#9733;</button>
+            <button class="card-action-btn riff" title="Riff">&#8635;</button>
+          </div>
+        </div>
+
+        <div class="card idea">
+          <div class="card-type">IDEA</div>
+          <div class="card-text">TikTok "Day 1" series — raw, unfiltered brand origin moments</div>
+          <div class="card-actions">
+            <button class="card-action-btn reject">&#10005;</button>
+            <button class="card-action-btn star">&#9733;</button>
+            <button class="card-action-btn riff">&#8635;</button>
+          </div>
+        </div>
+
+        <div class="card idea">
+          <div class="card-type">IDEA</div>
+          <div class="card-text">Community drop events — local pop-ups as acquisition + PR moments</div>
+          <div class="card-actions">
+            <button class="card-action-btn reject">&#10005;</button>
+            <button class="card-action-btn star">&#9733;</button>
+            <button class="card-action-btn riff">&#8635;</button>
+          </div>
+        </div>
+
+        <div class="card idea">
+          <div class="card-type">IDEA</div>
+          <div class="card-text">Micro-influencer seeding kit — tactile unboxing designed for shares</div>
+          <div class="card-actions">
+            <button class="card-action-btn reject">&#10005;</button>
+            <button class="card-action-btn star">&#9733;</button>
+            <button class="card-action-btn riff">&#8635;</button>
+          </div>
+        </div>
+
+        <div class="card idea">
+          <div class="card-type">IDEA</div>
+          <div class="card-text">Email sequence tied to product lifecycle — educational + story-driven</div>
+          <div class="card-actions">
+            <button class="card-action-btn reject">&#10005;</button>
+            <button class="card-action-btn star">&#9733;</button>
+            <button class="card-action-btn riff">&#8635;</button>
+          </div>
+        </div>
+
+        <div class="card idea">
+          <div class="card-type">IDEA</div>
+          <div class="card-text">Loyalty waitlist for V2 — reward earliest buyers with co-design access</div>
+          <div class="card-actions">
+            <button class="card-action-btn reject">&#10005;</button>
+            <button class="card-action-btn star">&#9733;</button>
+            <button class="card-action-btn riff">&#8635;</button>
+          </div>
+        </div>
+
+      </div>
+      <div class="resize-handle right"></div>
+      <div class="resize-handle bottom"></div>
+      <div class="resize-handle corner"></div>
+    </div>
+
+    <!-- AI Note for Campaign Ideas -->
+    <div class="ai-note" style="left:940px; top:130px;">
+      <div class="ai-note-text"><span class="ai-note-icon">&#10022;</span> 6 ideas span owned, earned & community channels. TikTok + micro-influencer combo has strongest reach/cost ratio for DTC launch.</div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- ZONE 2: AUDIENCE TENSIONS -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div class="zone tensions" id="zone-tensions" style="left:100px; top:460px; width:620px;">
+      <div class="zone-header">
+        <span class="zone-label">AUDIENCE TENSIONS</span>
+        <span class="zone-count">(4)</span>
+      </div>
+      <div class="zone-cards">
+
+        <div class="card tension">
+          <div class="card-type">TENSION</div>
+          <div class="card-text">Skepticism — "another DTC brand" fatigue among digitally-native 25-35s</div>
+          <div class="card-actions">
+            <button class="card-action-btn reject">&#10005;</button>
+            <button class="card-action-btn star">&#9733;</button>
+            <button class="card-action-btn riff">&#8635;</button>
+          </div>
+        </div>
+
+        <div class="card tension">
+          <div class="card-type">TENSION</div>
+          <div class="card-text">Price sensitivity post-2024 inflation — premium positioning needs strong proof</div>
+          <div class="card-actions">
+            <button class="card-action-btn reject">&#10005;</button>
+            <button class="card-action-btn star">&#9733;</button>
+            <button class="card-action-btn riff">&#8635;</button>
+          </div>
+        </div>
+
+        <div class="card tension">
+          <div class="card-type">TENSION</div>
+          <div class="card-text">Discovery distrust — paid ads feel inauthentic, organic trust is thin</div>
+          <div class="card-actions">
+            <button class="card-action-btn reject">&#10005;</button>
+            <button class="card-action-btn star">&#9733;</button>
+            <button class="card-action-btn riff">&#8635;</button>
+          </div>
+        </div>
+
+        <div class="card tension">
+          <div class="card-type">TENSION</div>
+          <div class="card-text">Loyalty cliff — first-time buyers rarely return without a reason to</div>
+          <div class="card-actions">
+            <button class="card-action-btn reject">&#10005;</button>
+            <button class="card-action-btn star">&#9733;</button>
+            <button class="card-action-btn riff">&#8635;</button>
+          </div>
+        </div>
+
+      </div>
+      <div class="resize-handle right"></div>
+      <div class="resize-handle bottom"></div>
+      <div class="resize-handle corner"></div>
+    </div>
+
+    <!-- AI Note for Tensions -->
+    <div class="ai-note" style="left:740px; top:540px;">
+      <div class="ai-note-text"><span class="ai-note-icon">&#10022;</span> Trust deficit is the core tension. Campaigns should lead with proof, not promise — real voices over brand voice.</div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- ZONE 3: MARKET SIGNALS -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div class="zone signals" id="zone-signals" style="left:940px; top:460px; width:560px;">
+      <div class="zone-header">
+        <span class="zone-label">MARKET SIGNALS</span>
+        <span class="zone-count">(3)</span>
+      </div>
+      <div class="zone-cards">
+
+        <div class="card signal">
+          <div class="card-type">SIGNAL</div>
+          <div class="card-text">Resale & community commerce up 34% YoY — ownership narrative shifting</div>
+          <div class="card-actions">
+            <button class="card-action-btn reject">&#10005;</button>
+            <button class="card-action-btn star">&#9733;</button>
+            <button class="card-action-btn riff">&#8635;</button>
+          </div>
+        </div>
+
+        <div class="card signal">
+          <div class="card-type">SIGNAL</div>
+          <div class="card-text">TikTok Shop driving 2x purchase intent vs Instagram for sub-$80 items</div>
+          <div class="card-actions">
+            <button class="card-action-btn reject">&#10005;</button>
+            <button class="card-action-btn star">&#9733;</button>
+            <button class="card-action-btn riff">&#8635;</button>
+          </div>
+        </div>
+
+        <div class="card signal">
+          <div class="card-type">SIGNAL</div>
+          <div class="card-text">Competitor Doe Beauty hit $40M via zero paid — pure UGC flywheel strategy</div>
+          <div class="card-actions">
+            <button class="card-action-btn reject">&#10005;</button>
+            <button class="card-action-btn star">&#9733;</button>
+            <button class="card-action-btn riff">&#8635;</button>
+          </div>
+        </div>
+
+      </div>
+      <div class="resize-handle right"></div>
+      <div class="resize-handle bottom"></div>
+      <div class="resize-handle corner"></div>
+    </div>
+
+    <!-- AI Note for Signals -->
+    <div class="ai-note" style="left:1080px; top:720px;">
+      <div class="ai-note-text"><span class="ai-note-icon">&#10022;</span> UGC flywheel is validated. TikTok Shop + community commerce = highest leverage entry point for launch.</div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- ZONE 4: STRATEGIC DIRECTION -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div class="zone directions" id="zone-direction" style="left:100px; top:840px; width:960px;">
+      <div class="zone-header">
+        <span class="zone-label">STRATEGIC DIRECTION</span>
+        <span class="zone-count">(4)</span>
+      </div>
+      <div class="zone-cards">
+
+        <div class="card direction">
+          <div class="card-type">DIRECTION</div>
+          <div class="card-text">Lead with UGC flywheel — seed 50 creators before any paid spend</div>
+          <div class="card-actions">
+            <button class="card-action-btn reject">&#10005;</button>
+            <button class="card-action-btn star">&#9733;</button>
+            <button class="card-action-btn riff">&#8635;</button>
+          </div>
+        </div>
+
+        <div class="card direction">
+          <div class="card-type">DIRECTION</div>
+          <div class="card-text">Price anchoring through story — founder COGS transparency builds premium trust</div>
+          <div class="card-actions">
+            <button class="card-action-btn reject">&#10005;</button>
+            <button class="card-action-btn star">&#9733;</button>
+            <button class="card-action-btn riff">&#8635;</button>
+          </div>
+        </div>
+
+        <div class="card direction">
+          <div class="card-type">DIRECTION</div>
+          <div class="card-text">TikTok Shop as primary launch channel — optimize for sub-$60 AOV entry</div>
+          <div class="card-actions">
+            <button class="card-action-btn reject">&#10005;</button>
+            <button class="card-action-btn star">&#9733;</button>
+            <button class="card-action-btn riff">&#8635;</button>
+          </div>
+        </div>
+
+        <div class="card direction">
+          <div class="card-type">DIRECTION</div>
+          <div class="card-text">Q3 pop-up activation in 3 cities — NYC, LA, Chicago for earned media burst</div>
+          <div class="card-actions">
+            <button class="card-action-btn reject">&#10005;</button>
+            <button class="card-action-btn star">&#9733;</button>
+            <button class="card-action-btn riff">&#8635;</button>
+          </div>
+        </div>
+
+      </div>
+      <div class="resize-handle right"></div>
+      <div class="resize-handle bottom"></div>
+      <div class="resize-handle corner"></div>
+    </div>
+
+    <!-- Floating Note -->
+    <div class="floating-card" style="left:1200px; top:180px;">
+      <div class="card floating">
+        <div class="card-type">NOTE</div>
+        <div class="card-text">Next step: align on $150k launch budget split across TikTok, seeding kits & pop-ups</div>
+        <div class="card-actions">
+          <button class="card-action-btn reject">&#10005;</button>
+          <button class="card-action-btn star">&#9733;</button>
+          <button class="card-action-btn riff">&#8635;</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- #canvas -->
+</div><!-- #canvas-wrap -->
+
+<!-- FLOATING TOOLBAR -->
+<div id="toolbar">
+
+  <!-- Cursor -->
+  <button class="tool-btn active" id="tool-cursor">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+      <path d="M3 2L13 8.5L8.5 9.5L6.5 14L3 2Z" fill="currentColor"/>
+    </svg>
+    <span class="tool-tooltip">Cursor (V)</span>
+  </button>
+
+  <!-- Hand -->
+  <button class="tool-btn" id="tool-hand">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+      <path d="M8 1.5C8 1.5 8 1 8.5 1C9 1 9 1.5 9 1.5V7H9.5C9.5 7 9.5 6 10.5 6C11.5 6 11.5 7 11.5 7V7.5C11.5 7.5 11.5 6.5 12.5 6.5C13.5 6.5 13.5 7.5 13.5 7.5V9C13.5 12 11.5 14.5 8.5 14.5C5.5 14.5 3 12 3 9V5.5C3 5.5 3 5 3.5 5C4 5 4 5.5 4 5.5V8H4.5V2.5C4.5 2.5 4.5 2 5 2C5.5 2 5.5 2.5 5.5 2.5V7H6V1.5C6 1.5 6 1 6.5 1C7 1 7 1.5 7 1.5V7H7.5V1.5H8V1.5Z" fill="currentColor" stroke="currentColor" stroke-width="0.3"/>
+    </svg>
+    <span class="tool-tooltip">Hand (H)</span>
+  </button>
+
+  <div class="toolbar-divider"></div>
+
+  <!-- Sticky Note (with palette) -->
+  <div class="sticky-tool-wrap" style="position:relative;">
+    <button class="tool-btn" id="tool-sticky">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+        <rect x="2" y="2" width="12" height="11" rx="1.5" fill="currentColor"/>
+        <path d="M10 13L14 9H10V13Z" fill="currentColor" opacity=".5"/>
+      </svg>
+      <span class="tool-tooltip">Sticky Note</span>
+    </button>
+    <button class="sticky-dropdown-btn" id="sticky-palette-toggle">&#9662;</button>
+
+    <div id="sticky-palette">
+      <div class="palette-item" data-type="idea">
+        <div class="palette-dot" style="background:var(--idea-bg);"></div>
+        <span>Idea</span>
+      </div>
+      <div class="palette-item" data-type="tension">
+        <div class="palette-dot" style="background:var(--tension-bg);"></div>
+        <span>Tension</span>
+      </div>
+      <div class="palette-item" data-type="signal">
+        <div class="palette-dot" style="background:var(--signal-bg);"></div>
+        <span>Signal</span>
+      </div>
+      <div class="palette-item" data-type="direction">
+        <div class="palette-dot" style="background:var(--direction-bg);"></div>
+        <span>Direction</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="toolbar-divider"></div>
+
+  <!-- Zoom -->
+  <span id="zoom-display">100%</span>
+
+  <!-- New button -->
+  <button id="new-btn">
+    <svg width="11" height="11" viewBox="0 0 13 13" fill="none" style="flex-shrink:0;">
+      <path d="M6.5 1V12M1 6.5H12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    New
+  </button>
+
+</div>
+
+<script>
+(function(){
+  const wrap = document.getElementById('canvas-wrap');
+  const canvas = document.getElementById('canvas');
+  const zoomDisplay = document.getElementById('zoom-display');
+
+  let scale = 1, panX = 0, panY = 0;
+  let isPanning = false, startX, startY, startPanX, startPanY;
+  let currentTool = 'cursor';
+  let spaceHeld = false, altHeld = false;
+  let selectedStickyType = 'idea';
+
+  function applyTransform() {
+    canvas.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+    zoomDisplay.textContent = Math.round(scale * 100) + '%';
+  }
+
+  // -- PAN --
+  function shouldPan() { return currentTool === 'hand' || spaceHeld || altHeld; }
+
+  wrap.addEventListener('mousedown', e => {
+    if (e.target.closest('.card') || e.target.closest('.tool-btn') || e.target.closest('#toolbar') || e.target.closest('.resize-handle')) return;
+    if (shouldPan() || e.button === 1) {
+      isPanning = true;
+      startX = e.clientX; startY = e.clientY;
+      startPanX = panX; startPanY = panY;
+      wrap.classList.add('panning');
+      e.preventDefault();
+    }
+  });
+
+  window.addEventListener('mousemove', e => {
+    if (isPanning) {
+      panX = startPanX + (e.clientX - startX);
+      panY = startPanY + (e.clientY - startY);
+      applyTransform();
+    }
+  });
+
+  window.addEventListener('mouseup', () => {
+    isPanning = false;
+    wrap.classList.remove('panning');
+  });
+
+  // -- ZOOM --
+  wrap.addEventListener('wheel', e => {
+    e.preventDefault();
+    const rect = wrap.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+
+    const delta = e.deltaY > 0 ? 0.92 : 1.08;
+    const newScale = Math.min(3, Math.max(0.2, scale * delta));
+
+    panX = mx - (mx - panX) * (newScale / scale);
+    panY = my - (my - panY) * (newScale / scale);
+    scale = newScale;
+    applyTransform();
+  }, { passive: false });
+
+  // -- KEYBOARD --
+  window.addEventListener('keydown', e => {
+    if (e.code === 'Space') { spaceHeld = true; wrap.style.cursor = 'grab'; e.preventDefault(); }
+    if (e.altKey) { altHeld = true; }
+    if (e.key === 'v' || e.key === 'V') selectTool('cursor');
+    if (e.key === 'h' || e.key === 'H') selectTool('hand');
+    if (e.key === '=' || e.key === '+') { scale = Math.min(3, scale * 1.15); applyTransform(); }
+    if (e.key === '-') { scale = Math.max(0.2, scale * 0.85); applyTransform(); }
+    if (e.key === '0') { scale = 1; panX = 0; panY = 0; applyTransform(); }
+  });
+  window.addEventListener('keyup', e => {
+    if (e.code === 'Space') { spaceHeld = false; wrap.style.cursor = ''; }
+    if (!e.altKey) altHeld = false;
+  });
+
+  // -- TOOL SELECTION --
+  function selectTool(name) {
+    currentTool = name;
+    document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+    const btn = document.getElementById('tool-' + name);
+    if (btn) btn.classList.add('active');
+    wrap.style.cursor = name === 'hand' ? 'grab' : 'default';
+  }
+
+  document.querySelectorAll('.tool-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.id.replace('tool-', '');
+      if (id && id !== 'sticky') selectTool(id);
+    });
+  });
+
+  // -- CARD DRAG --
+  let dragCard = null, dragOffX, dragOffY, dragOrigParent, dragWasFlex;
+
+  document.addEventListener('mousedown', e => {
+    const card = e.target.closest('.card');
+    if (!card || e.target.closest('.card-action-btn') || currentTool !== 'cursor') return;
+    if (card.classList.contains('editing')) return;
+
+    dragCard = card;
+    const rect = card.getBoundingClientRect();
+    const canvasRect = canvas.getBoundingClientRect();
+
+    if (card.parentElement.classList.contains('zone-cards')) {
+      dragOrigParent = card.parentElement;
+      const absLeft = (rect.left - canvasRect.left) / scale;
+      const absTop = (rect.top - canvasRect.top) / scale;
+      card.style.position = 'absolute';
+      card.style.left = absLeft + 'px';
+      card.style.top = absTop + 'px';
+      canvas.appendChild(card);
+      dragWasFlex = true;
+    }
+
+    dragOffX = (e.clientX - rect.left) / scale;
+    dragOffY = (e.clientY - rect.top) / scale;
+    card.classList.add('dragging');
+    e.preventDefault();
+  });
+
+  window.addEventListener('mousemove', e => {
+    if (!dragCard) return;
+    const canvasRect = canvas.getBoundingClientRect();
+    const x = (e.clientX - canvasRect.left) / scale - dragOffX;
+    const y = (e.clientY - canvasRect.top) / scale - dragOffY;
+    dragCard.style.left = x + 'px';
+    dragCard.style.top = y + 'px';
+  });
+
+  window.addEventListener('mouseup', () => {
+    if (dragCard) {
+      dragCard.classList.remove('dragging');
+      dragCard = null;
+      dragOrigParent = null;
+      dragWasFlex = false;
+    }
+  });
+
+  // -- ZONE RESIZE --
+  let resizeZone = null, resizeType, resizeStartX, resizeStartY, resizeStartW, resizeStartH;
+
+  document.addEventListener('mousedown', e => {
+    const handle = e.target.closest('.resize-handle');
+    if (!handle) return;
+    resizeZone = handle.closest('.zone');
+    resizeType = handle.classList.contains('right') ? 'right' :
+                 handle.classList.contains('bottom') ? 'bottom' : 'corner';
+    resizeStartX = e.clientX;
+    resizeStartY = e.clientY;
+    resizeStartW = resizeZone.offsetWidth;
+    resizeStartH = resizeZone.offsetHeight;
+    e.preventDefault();
+    e.stopPropagation();
+  });
+
+  window.addEventListener('mousemove', e => {
+    if (!resizeZone) return;
+    const dx = (e.clientX - resizeStartX) / scale;
+    const dy = (e.clientY - resizeStartY) / scale;
+    if (resizeType === 'right' || resizeType === 'corner') {
+      resizeZone.style.width = Math.max(250, resizeStartW + dx) + 'px';
+    }
+    if (resizeType === 'bottom' || resizeType === 'corner') {
+      resizeZone.style.height = Math.max(180, resizeStartH + dy) + 'px';
+    }
+  });
+
+  window.addEventListener('mouseup', () => { resizeZone = null; });
+
+  // -- STICKY PALETTE --
+  const paletteToggle = document.getElementById('sticky-palette-toggle');
+  const stickyBtn = document.getElementById('tool-sticky');
+  const palette = document.getElementById('sticky-palette');
+
+  paletteToggle.addEventListener('click', e => {
+    e.stopPropagation();
+    palette.classList.toggle('open');
+  });
+  stickyBtn.addEventListener('click', e => {
+    e.stopPropagation();
+    palette.classList.toggle('open');
+  });
+
+  document.querySelectorAll('.palette-item').forEach(item => {
+    item.addEventListener('click', () => {
+      selectedStickyType = item.dataset.type;
+      palette.classList.remove('open');
+      selectTool('cursor');
+      spawnCard(selectedStickyType, panX, panY);
+    });
+  });
+
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.sticky-tool-wrap')) palette.classList.remove('open');
+  });
+
+  // -- DOUBLE-CLICK TO CREATE --
+  wrap.addEventListener('dblclick', e => {
+    if (e.target.closest('.card') || e.target.closest('#toolbar')) return;
+    const canvasRect = canvas.getBoundingClientRect();
+    const x = (e.clientX - canvasRect.left) / scale;
+    const y = (e.clientY - canvasRect.top) / scale;
+    spawnCard(selectedStickyType, x, y, true);
+  });
+
+  function spawnCard(type, x, y, editable) {
+    if (x === panX && y === panY) {
+      const wrapRect = wrap.getBoundingClientRect();
+      x = (wrapRect.width / 2 - panX) / scale - 90;
+      y = (wrapRect.height / 2 - panY) / scale - 65;
+    }
+
+    const colorMap = {
+      idea: { bg: 'idea', label: 'IDEA' },
+      tension: { bg: 'tension', label: 'TENSION' },
+      signal: { bg: 'signal', label: 'SIGNAL' },
+      direction: { bg: 'direction', label: 'DIRECTION' }
+    };
+    const info = colorMap[type] || colorMap.idea;
+
+    const card = document.createElement('div');
+    card.className = `card ${info.bg}`;
+    card.style.position = 'absolute';
+    card.style.left = x + 'px';
+    card.style.top = y + 'px';
+    card.innerHTML = `
+      <div class="card-type">${info.label}</div>
+      <div class="card-text" ${editable ? 'contenteditable="true"' : ''}>${editable ? '' : 'New ' + info.label.toLowerCase() + ' card'}</div>
+      <div class="card-actions">
+        <button class="card-action-btn reject">&#10005;</button>
+        <button class="card-action-btn star">&#9733;</button>
+        <button class="card-action-btn riff">&#8635;</button>
+      </div>
+    `;
+    canvas.appendChild(card);
+
+    if (editable) {
+      card.classList.add('editing');
+      const textEl = card.querySelector('.card-text');
+      setTimeout(() => textEl.focus(), 50);
+      textEl.addEventListener('blur', () => {
+        card.classList.remove('editing');
+        textEl.contentEditable = 'false';
+        if (!textEl.textContent.trim()) {
+          card.remove();
+        }
+      });
+      textEl.addEventListener('keydown', e => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          textEl.blur();
+        }
+      });
+    }
+  }
+
+  // -- CARD ACTION BUTTONS --
+  document.addEventListener('click', e => {
+    const btn = e.target.closest('.card-action-btn');
+    if (!btn) return;
+    const card = btn.closest('.card');
+    if (btn.classList.contains('reject')) {
+      card.style.transition = 'opacity .2s, transform .2s';
+      card.style.opacity = '0';
+      card.style.transform = 'scale(0.9)';
+      setTimeout(() => card.remove(), 200);
+    } else if (btn.classList.contains('star')) {
+      btn.style.color = '#d69e2e';
+      btn.style.background = '#fefcbf';
+    } else if (btn.classList.contains('riff')) {
+      const rect = card.getBoundingClientRect();
+      const canvasRect = canvas.getBoundingClientRect();
+      const type = card.classList.contains('idea') ? 'idea' :
+                   card.classList.contains('tension') ? 'tension' :
+                   card.classList.contains('signal') ? 'signal' :
+                   card.classList.contains('direction') ? 'direction' : 'idea';
+      const x = (rect.left - canvasRect.left) / scale + 20;
+      const y = (rect.top - canvasRect.top) / scale + 20;
+      spawnCard(type, x, y, true);
+    }
+  });
+
+  // -- NEW BUTTON --
+  document.getElementById('new-btn').addEventListener('click', () => {
+    spawnCard(selectedStickyType, panX, panY);
+  });
+
+  // -- ZOOM DISPLAY CLICK (reset) --
+  zoomDisplay.addEventListener('click', () => {
+    scale = 1; panX = 0; panY = 0;
+    applyTransform();
+  });
+
+  // Initial
+  applyTransform();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seeds — V11 Zone Creation & Empty State</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://esm.sh/@xyflow/react@12/dist/style.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            surface: '#ffffff',
+            canvas: '#f4f4f2',
+            accent: '#eac1f5',
+            ideas: '#34d399',
+            tensions: '#f472b6',
+            signals: '#38bdf8',
+            strategy: '#a78bfa',
+            frameworks: '#fb923c',
+            guardrail: '#ef4444',
+          }
+        }
+      }
+    }
+  </script>
+  <script type="importmap">
+  {
+    "imports": {
+      "react": "https://esm.sh/react@18",
+      "react/": "https://esm.sh/react@18/",
+      "react-dom": "https://esm.sh/react-dom@18",
+      "react-dom/": "https://esm.sh/react-dom@18/",
+      "@xyflow/react": "https://esm.sh/@xyflow/react@12?external=react,react-dom",
+      "@xyflow/react/": "https://esm.sh/@xyflow/react@12&external=react,react-dom/"
+    }
+  }
+  </script>
+  <style>
+    body { margin: 0; font-family: 'Inter', sans-serif; background: #f4f4f2; }
+    .react-flow__node { font-family: 'Inter', sans-serif; }
+    .playfair { font-family: 'Playfair Display', serif; }
+
+    .zone-node {
+      background: rgba(255,255,255,0.5);
+      border: 1.5px dashed rgba(0,0,0,0.12);
+      border-radius: 12px;
+      min-width: 100%;
+      min-height: 100%;
+    }
+    .zone-node.typed-ideas { border-color: rgba(52,211,153,0.4); background: rgba(52,211,153,0.03); }
+    .zone-node.typed-tensions { border-color: rgba(244,114,182,0.4); background: rgba(244,114,182,0.03); }
+    .zone-node.typed-signals { border-color: rgba(56,189,248,0.4); background: rgba(56,189,248,0.03); }
+    .zone-node.typed-strategy { border-color: rgba(167,139,250,0.4); background: rgba(167,139,250,0.03); }
+    .zone-node.typed-frameworks { border-color: rgba(251,146,60,0.4); background: rgba(251,146,60,0.03); }
+
+    .card-node {
+      background: #ffffff;
+      border: 1px solid rgba(0,0,0,0.08);
+      border-radius: 10px;
+      padding: 12px 14px;
+      width: 200px;
+      font-size: 13px;
+      line-height: 1.45;
+      color: #1a1a1a;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      transition: box-shadow 0.2s, border-color 0.2s;
+    }
+    .card-node:hover {
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      border-color: rgba(0,0,0,0.14);
+    }
+    .card-node .type-dot {
+      width: 6px; height: 6px; border-radius: 50%; display: inline-block; margin-right: 6px; flex-shrink: 0;
+    }
+
+    .zone-label {
+      position: absolute;
+      top: -12px;
+      left: 16px;
+      background: #f4f4f2;
+      padding: 2px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      color: #444;
+    }
+
+    .zone-type-badge {
+      display: inline-block;
+      padding: 1px 8px;
+      border-radius: 10px;
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .empty-zone-text {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      color: rgba(0,0,0,0.2);
+      font-size: 15px;
+      text-align: center;
+      padding: 40px 20px;
+      pointer-events: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 80%;
+    }
+
+    .add-card-btn {
+      position: absolute;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.04);
+      border: 1px dashed rgba(0,0,0,0.12);
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-size: 12px;
+      color: #888;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .add-card-btn:hover {
+      background: rgba(0,0,0,0.06);
+      color: #555;
+      border-color: rgba(0,0,0,0.2);
+    }
+
+    .toolbar {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #ffffff;
+      border: 1px solid rgba(0,0,0,0.1);
+      border-radius: 14px;
+      padding: 8px 12px;
+      display: flex;
+      gap: 6px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      z-index: 100;
+    }
+    .toolbar button {
+      padding: 8px 16px;
+      border-radius: 10px;
+      border: none;
+      background: transparent;
+      font-size: 13px;
+      font-weight: 500;
+      color: #555;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: 'Inter', sans-serif;
+    }
+    .toolbar button:hover {
+      background: rgba(0,0,0,0.05);
+      color: #111;
+    }
+    .toolbar button.primary {
+      background: #eac1f5;
+      color: #2a1a30;
+    }
+    .toolbar button.primary:hover {
+      background: #dda8ed;
+    }
+
+    .zone-type-picker {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+    .zone-type-chip {
+      padding: 3px 10px;
+      border-radius: 10px;
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.15s;
+    }
+    .zone-type-chip:hover { opacity: 0.8; }
+    .zone-type-chip.selected { border-color: currentColor; }
+
+    .react-flow__node-zone { z-index: 0 !important; }
+    .react-flow__node-card { z-index: 1 !important; }
+
+    .top-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 48px;
+      background: rgba(244,244,242,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      z-index: 100;
+    }
+    .top-bar .title {
+      font-weight: 600;
+      font-size: 14px;
+      color: #1a1a1a;
+    }
+    .top-bar .subtitle {
+      font-size: 12px;
+      color: #888;
+      margin-left: 12px;
+    }
+
+    /* React Flow overrides */
+    .react-flow__background { opacity: 0.4; }
+    .react-flow__controls { bottom: 80px !important; }
+    .react-flow__minimap { bottom: 80px !important; }
+  </style>
+</head>
+<body>
+  <div id="root" style="width:100vw;height:100vh;"></div>
+
+  <script type="importmap">
+  { "imports": {} }
+  </script>
+
+  <script type="module">
+    import React, { useState, useCallback, useRef, useEffect } from 'react';
+    import { createRoot } from 'react-dom/client';
+    import {
+      ReactFlow,
+      Background,
+      Controls,
+      MiniMap,
+      useNodesState,
+      useEdgesState,
+      Handle,
+      Position,
+      useReactFlow,
+    } from '@xyflow/react';
+
+    const h = React.createElement;
+
+    const ZONE_TYPES = {
+      ideas: { color: '#34d399', bg: 'rgba(52,211,153,0.03)', label: 'Ideas' },
+      tensions: { color: '#f472b6', bg: 'rgba(244,114,182,0.03)', label: 'Tensions' },
+      signals: { color: '#38bdf8', bg: 'rgba(56,189,248,0.03)', label: 'Signals' },
+      strategy: { color: '#a78bfa', bg: 'rgba(167,139,250,0.03)', label: 'Strategy' },
+      frameworks: { color: '#fb923c', bg: 'rgba(251,146,60,0.03)', label: 'Frameworks' },
+      custom: { color: '#888888', bg: 'rgba(0,0,0,0.02)', label: 'Custom' },
+    };
+
+    // Zone Node Component
+    function ZoneNode({ data, id }) {
+      const [isNaming, setIsNaming] = useState(data.isNaming || false);
+      const [name, setName] = useState(data.label || '');
+      const [showTypePicker, setShowTypePicker] = useState(false);
+      const inputRef = useRef(null);
+
+      useEffect(() => {
+        if (isNaming && inputRef.current) inputRef.current.focus();
+      }, [isNaming]);
+
+      const zoneType = data.zoneType || 'custom';
+      const typeConfig = ZONE_TYPES[zoneType];
+      const isEmpty = data.cardCount === 0;
+
+      return h('div', {
+        className: `zone-node ${data.zoneType ? 'typed-' + data.zoneType : ''}`,
+        style: {
+          width: '100%',
+          height: '100%',
+          position: 'relative',
+          borderColor: typeConfig?.color ? `${typeConfig.color}66` : undefined,
+          background: typeConfig?.bg || undefined,
+        }
+      },
+        // Zone label
+        h('div', { className: 'zone-label', style: { display: 'flex', alignItems: 'center', gap: '8px' } },
+          isNaming
+            ? h('input', {
+                ref: inputRef,
+                value: name,
+                onChange: (e) => setName(e.target.value),
+                onKeyDown: (e) => {
+                  if (e.key === 'Enter') {
+                    setIsNaming(false);
+                    setShowTypePicker(true);
+                  }
+                },
+                onBlur: () => { setIsNaming(false); if (name) setShowTypePicker(true); },
+                style: {
+                  border: 'none',
+                  background: 'transparent',
+                  outline: 'none',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  fontFamily: 'Inter, sans-serif',
+                  color: '#333',
+                  width: '120px',
+                },
+                placeholder: 'Name this zone...'
+              })
+            : h('span', {
+                onDoubleClick: () => setIsNaming(true),
+                style: { cursor: 'pointer' }
+              }, name || 'Untitled Zone'),
+          data.zoneType && h('span', {
+            className: 'zone-type-badge',
+            style: {
+              background: `${typeConfig.color}18`,
+              color: typeConfig.color,
+            }
+          }, typeConfig.label),
+        ),
+
+        // Type picker
+        showTypePicker && h('div', {
+          style: {
+            position: 'absolute',
+            top: '12px',
+            left: '16px',
+            background: '#fff',
+            border: '1px solid rgba(0,0,0,0.1)',
+            borderRadius: '10px',
+            padding: '10px 12px',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
+            zIndex: 10,
+          }
+        },
+          h('div', { style: { fontSize: '10px', color: '#888', marginBottom: '6px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.05em' } }, 'Zone type'),
+          h('div', { className: 'zone-type-picker' },
+            Object.entries(ZONE_TYPES).map(([key, cfg]) =>
+              h('span', {
+                key,
+                className: `zone-type-chip ${data.zoneType === key ? 'selected' : ''}`,
+                style: { background: `${cfg.color}18`, color: cfg.color },
+                onClick: () => setShowTypePicker(false),
+              }, cfg.label)
+            )
+          )
+        ),
+
+        // Empty state
+        isEmpty && h('div', { className: 'empty-zone-text' },
+          data.placeholderText || 'Drop ideas here...'
+        ),
+
+        // Add card button
+        isEmpty && h('div', { className: 'add-card-btn' }, '+ Add card'),
+      );
+    }
+
+    // Card Node Component
+    function CardNode({ data }) {
+      const [hovered, setHovered] = useState(false);
+      const typeConfig = ZONE_TYPES[data.cardType] || ZONE_TYPES.ideas;
+
+      return h('div', {
+        className: 'card-node',
+        onMouseEnter: () => setHovered(true),
+        onMouseLeave: () => setHovered(false),
+      },
+        h('div', { style: { display: 'flex', alignItems: 'flex-start', gap: '2px' } },
+          h('span', { className: 'type-dot', style: { background: typeConfig.color, marginTop: '5px' } }),
+          h('span', null, data.text),
+        ),
+        // Hover actions
+        hovered && h('div', {
+          style: {
+            display: 'flex',
+            gap: '4px',
+            marginTop: '8px',
+            paddingTop: '8px',
+            borderTop: '1px solid rgba(0,0,0,0.06)',
+          }
+        },
+          ['Select', 'Riff', 'Lock'].map(action =>
+            h('button', {
+              key: action,
+              style: {
+                padding: '2px 8px',
+                borderRadius: '6px',
+                border: '1px solid rgba(0,0,0,0.08)',
+                background: 'rgba(0,0,0,0.02)',
+                fontSize: '10px',
+                color: '#666',
+                cursor: 'pointer',
+                fontFamily: 'Inter, sans-serif',
+              }
+            }, action)
+          )
+        ),
+        // Handles for edges
+        h(Handle, { type: 'source', position: Position.Right, style: { opacity: 0, width: 8, height: 8 } }),
+        h(Handle, { type: 'target', position: Position.Left, style: { opacity: 0, width: 8, height: 8 } }),
+      );
+    }
+
+    const nodeTypes = { zone: ZoneNode, card: CardNode };
+
+    // Initial nodes
+    const initialNodes = [
+      // Zone 1: Ideas (populated)
+      {
+        id: 'zone-1',
+        type: 'zone',
+        position: { x: 80, y: 100 },
+        data: {
+          label: 'Initial Ideas',
+          zoneType: 'ideas',
+          cardCount: 3,
+        },
+        style: { width: 520, height: 360 },
+      },
+      {
+        id: 'card-1',
+        type: 'card',
+        position: { x: 20, y: 30 },
+        parentId: 'zone-1',
+        extent: 'parent',
+        data: {
+          text: 'Sustainability as core brand value, not just messaging layer',
+          cardType: 'ideas',
+        },
+      },
+      {
+        id: 'card-2',
+        type: 'card',
+        position: { x: 240, y: 30 },
+        parentId: 'zone-1',
+        extent: 'parent',
+        data: {
+          text: 'Community co-creation model for product development',
+          cardType: 'ideas',
+        },
+      },
+      {
+        id: 'card-3',
+        type: 'card',
+        position: { x: 130, y: 180 },
+        parentId: 'zone-1',
+        extent: 'parent',
+        data: {
+          text: 'Radical transparency in supply chain as competitive moat',
+          cardType: 'ideas',
+        },
+      },
+
+      // Zone 2: Empty with placeholder
+      {
+        id: 'zone-2',
+        type: 'zone',
+        position: { x: 660, y: 100 },
+        data: {
+          label: 'Audience Tensions',
+          zoneType: 'tensions',
+          cardCount: 0,
+          placeholderText: 'What frictions does the audience feel?',
+        },
+        style: { width: 420, height: 360 },
+      },
+
+      // Zone 3: Being named (new)
+      {
+        id: 'zone-3',
+        type: 'zone',
+        position: { x: 350, y: 520 },
+        data: {
+          label: '',
+          zoneType: null,
+          cardCount: 0,
+          isNaming: true,
+          placeholderText: 'Start typing to name this zone...',
+        },
+        style: { width: 400, height: 300 },
+      },
+    ];
+
+    const initialEdges = [];
+
+    function App() {
+      const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+      const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+
+      const onAddZone = useCallback(() => {
+        const id = `zone-${Date.now()}`;
+        const newZone = {
+          id,
+          type: 'zone',
+          position: { x: 300 + Math.random() * 200, y: 300 + Math.random() * 200 },
+          data: {
+            label: '',
+            zoneType: null,
+            cardCount: 0,
+            isNaming: true,
+            placeholderText: 'What belongs here?',
+          },
+          style: { width: 400, height: 300 },
+        };
+        setNodes(nds => [...nds, newZone]);
+      }, [setNodes]);
+
+      return h('div', { style: { width: '100vw', height: '100vh' } },
+        // Top bar
+        h('div', { className: 'top-bar' },
+          h('span', { className: 'title' }, 'Brand Strategy Sprint'),
+          h('span', { className: 'subtitle' }, '3 zones · 3 cards'),
+        ),
+
+        // React Flow canvas
+        h(ReactFlow, {
+          nodes,
+          edges,
+          onNodesChange,
+          onEdgesChange,
+          nodeTypes,
+          fitView: true,
+          fitViewOptions: { padding: 0.3 },
+          style: { background: '#f4f4f2' },
+          proOptions: { hideAttribution: true },
+        },
+          h(Background, { gap: 20, size: 1, color: 'rgba(0,0,0,0.06)' }),
+          h(Controls, { showInteractive: false }),
+          h(MiniMap, {
+            nodeColor: (n) => {
+              if (n.type === 'zone') {
+                const zt = n.data?.zoneType;
+                return ZONE_TYPES[zt]?.color || '#ddd';
+              }
+              return '#ccc';
+            },
+            style: { borderRadius: '8px', overflow: 'hidden' },
+          }),
+        ),
+
+        // Bottom toolbar
+        h('div', { className: 'toolbar' },
+          h('button', { onClick: onAddZone, className: 'primary' }, '+ New Zone'),
+          h('button', null, 'Select'),
+          h('button', null, 'Connect'),
+          h('button', null, 'Generate'),
+        ),
+      );
+    }
+
+    createRoot(document.getElementById('root')).render(h(App));
+  </script>
+</body>
+</html>
