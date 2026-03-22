@@ -1,0 +1,84 @@
+/* ── Navigation ── */
+
+.sidebar-nav {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 0 8px;
+}
+
+.sidebar-bottom {
+  border-top: 1px solid var(--border);
+  padding: 12px 8px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fg-2);
+  text-decoration: none;
+  border-radius: 0;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+}
+
+.nav-item:hover {
+  background: var(--bg-1);
+  color: var(--fg);
+}
+
+.nav-item.active {
+  background: var(--fg);
+  color: var(--bg);
+}
+
+.nav-item svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+/* Logo (inline variant) */
+.logo {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--fg);
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.logo:hover { color: var(--accent); }
+
+/* Logo (fixed variant, for canvas view) */
+.logo-fixed {
+  position: fixed;
+  top: 20px;
+  left: 24px;
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--fg);
+  z-index: 50;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.logo-fixed:hover { color: var(--accent); }

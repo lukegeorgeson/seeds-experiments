@@ -1,0 +1,59 @@
+/* ── Forms ── */
+
+.search-wrapper {
+  position: relative;
+}
+
+.search-wrapper svg {
+  position: absolute;
+  left: 9px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 13px;
+  height: 13px;
+  color: var(--fg-3);
+  pointer-events: none;
+}
+
+.search-input {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  background: var(--surface);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  padding: 7px 10px 7px 30px;
+  width: 220px;
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.search-input::placeholder {
+  color: var(--fg-3);
+  text-transform: uppercase;
+}
+
+.search-input:focus {
+  border-color: var(--border-strong);
+}
+
+.sort-select {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: var(--surface);
+  color: var(--fg-2);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  padding: 7px 10px;
+  cursor: pointer;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.sort-select:hover {
+  border-color: var(--border-strong);
+}

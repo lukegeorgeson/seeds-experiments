@@ -1,0 +1,120 @@
+/* ── Canvas (React Flow overrides) ── */
+
+.react-flow__background { background: var(--bg) !important; }
+.react-flow__minimap { display: none; }
+.react-flow__attribution { display: none !important; }
+.react-flow__controls { display: none; }
+
+/* Edge styles */
+.react-flow__edge-path {
+  stroke: var(--connection);
+  stroke-width: 1.5;
+  stroke-dasharray: 6 3;
+}
+
+.react-flow__edge-path:hover {
+  stroke: var(--connection-hover);
+  stroke-width: 2;
+  stroke-dasharray: none;
+}
+
+/* Edge labels */
+.react-flow__edge-text {
+  font-family: var(--mono);
+  font-size: 9px;
+  fill: var(--fg-3);
+}
+
+/* Handle styles */
+.react-flow__handle {
+  width: 8px;
+  height: 8px;
+  background: transparent;
+  border: 1.5px solid transparent;
+  border-radius: 0;
+  opacity: 0;
+  transition: opacity var(--transition-slow), background var(--transition-slow);
+}
+
+.react-flow__node:hover .react-flow__handle {
+  opacity: 1;
+  background: var(--handle-color);
+  border-color: var(--bg);
+}
+
+.react-flow__node.connecting .react-flow__handle,
+.react-flow.connecting .react-flow__handle {
+  opacity: 1;
+  background: var(--handle-color);
+  border-color: var(--bg);
+}
+
+/* ── Generate node ── */
+.generate-node {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  padding: 16px;
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.generate-title {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--fg);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.generate-title svg { width: 12px; height: 12px; }
+
+.generate-btn {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--fg-2);
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 0;
+  padding: 7px 10px;
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--transition-normal), border-color var(--transition-normal);
+}
+
+.generate-btn:hover {
+  background: var(--fg);
+  color: var(--bg);
+  border-color: var(--fg);
+}
+
+/* ── Toast notification ── */
+.toast {
+  position: fixed;
+  bottom: 76px;
+  left: 50%;
+  transform: translateX(-50%) translateY(16px);
+  background: var(--fg);
+  color: var(--bg);
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 6px 14px;
+  border-radius: 0;
+  opacity: 0;
+  transition: opacity var(--transition-toast), transform var(--transition-toast);
+  z-index: 100;
+  pointer-events: none;
+  letter-spacing: 0.02em;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}

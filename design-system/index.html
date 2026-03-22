@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seeds Design System — Component Showcase</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="index.css">
+<style>
+  /* Showcase-specific styles */
+  html, body { overflow: auto; }
+  .showcase { padding: 40px; max-width: 1200px; margin: 0 auto; }
+  .showcase-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 48px; padding-bottom: 16px; border-bottom: 1px solid var(--border);
+  }
+  .showcase-title {
+    font-family: var(--mono); font-size: 13px; font-weight: 600;
+    letter-spacing: 0.14em; text-transform: uppercase; color: var(--fg);
+  }
+  .showcase-controls { display: flex; align-items: center; gap: 0; }
+  .section { margin-bottom: 56px; }
+  .section-title {
+    font-family: var(--mono); font-size: 10px; font-weight: 600;
+    letter-spacing: 0.14em; text-transform: uppercase; color: var(--fg-3);
+    margin-bottom: 20px; padding-bottom: 8px; border-bottom: 1px solid var(--border);
+  }
+  .subsection { margin-bottom: 24px; }
+  .subsection-title {
+    font-family: var(--mono); font-size: 9px; font-weight: 500;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--fg-3);
+    margin-bottom: 12px;
+  }
+  .demo-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-start; margin-bottom: 16px; }
+  .demo-col { display: flex; flex-direction: column; gap: 8px; }
+
+  /* Color swatches */
+  .swatch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; }
+  .swatch {
+    display: flex; flex-direction: column; border: 1px solid var(--border);
+  }
+  .swatch-color { height: 40px; }
+  .swatch-label {
+    font-family: var(--mono); font-size: 9px; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--fg-3); padding: 6px 8px;
+    background: var(--surface);
+  }
+  .swatch-value {
+    font-family: var(--mono); font-size: 9px; color: var(--fg-3);
+    padding: 0 8px 6px; background: var(--surface);
+  }
+
+  /* Typography scale */
+  .type-row { display: flex; align-items: baseline; gap: 16px; margin-bottom: 8px; }
+  .type-label {
+    font-family: var(--mono); font-size: 9px; color: var(--fg-3);
+    min-width: 80px; text-transform: uppercase; letter-spacing: 0.06em;
+  }
+
+  /* Inline demo containers */
+  .demo-surface { background: var(--surface); border: 1px solid var(--border); padding: 20px; }
+  .demo-bg { background: var(--bg); border: 1px solid var(--border); padding: 20px; }
+  .demo-inline { display: inline-flex; gap: 8px; align-items: center; }
+
+  /* Zone demo container */
+  .zone-demo { position: relative; width: 300px; height: 200px; }
+  .zone-demo .zone-node { width: 300px; height: 200px; }
+
+  /* Question demo sizing */
+  .question-demo { width: 360px; }
+
+  /* Menu demo positioning */
+  .menu-demo { position: relative; display: inline-block; }
+  .menu-demo .context-menu { position: relative; }
+  .menu-demo .dropdown-menu { position: relative; bottom: auto; left: auto; transform: none; }
+  .menu-demo .theme-picker-dropdown { position: relative; top: auto; right: auto; }
+
+  /* Toolbar demo positioning */
+  .toolbar-demo .floating-toolbar { position: relative; bottom: auto; left: auto; transform: none; display: inline-flex; }
+  .toolbar-demo .zoom-controls { position: relative; bottom: auto; right: auto; display: inline-flex; }
+
+  /* Toast demo */
+  .toast-demo .toast { position: relative; bottom: auto; left: auto; transform: none; opacity: 1; display: inline-block; }
+</style>
+</head>
+<body>
+
+<div class="showcase">
+  <!-- Header -->
+  <div class="showcase-header">
+    <div class="showcase-title">Seeds Design System</div>
+    <div class="showcase-controls">
+      <button class="btn-icon" id="themeToggle" title="Toggle dark mode">
+        <svg id="sunIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square">
+          <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <svg id="moonIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" style="display:none;">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+      <div class="theme-picker-wrapper">
+        <button class="btn-icon" id="colorwayToggle" title="Change colorway" style="margin-left:-1px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r="0.5" fill="currentColor" stroke="none"/><circle cx="17.5" cy="10.5" r="0.5" fill="currentColor" stroke="none"/><circle cx="8.5" cy="7.5" r="0.5" fill="currentColor" stroke="none"/><circle cx="6.5" cy="12" r="0.5" fill="currentColor" stroke="none"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.93 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.04-.23-.29-.38-.63-.38-1.02 0-.83.67-1.5 1.5-1.5H16c3.31 0 6-2.69 6-6 0-5.17-4.49-9-10-9z"/></svg>
+        </button>
+        <div class="theme-picker-dropdown" id="colorwayDropdown" style="display:none;">
+          <div class="dropdown-section-label">Color</div>
+          <button class="theme-picker-item active" data-colorway="gruvbox"><span class="theme-picker-swatch" style="background:#fabd2f;"></span>Gruvbox</button>
+          <button class="theme-picker-item" data-colorway="andromeda"><span class="theme-picker-swatch" style="background:#8aadf4;"></span>Andromeda</button>
+          <button class="theme-picker-item" data-colorway="rosepine"><span class="theme-picker-swatch" style="background:#ebbcba;"></span>Rose Pine</button>
+          <button class="theme-picker-item" data-colorway="nord"><span class="theme-picker-swatch" style="background:#88c0d0;"></span>Nord</button>
+          <button class="theme-picker-item" data-colorway="solarized"><span class="theme-picker-swatch" style="background:#268bd2;"></span>Solarized</button>
+          <button class="theme-picker-item" data-colorway="flexoki"><span class="theme-picker-swatch" style="background:#d0a215;"></span>Flexoki</button>
+          <div class="theme-picker-divider"></div>
+          <div class="dropdown-section-label">Mono</div>
+          <button class="theme-picker-item" data-colorway="ink"><span class="theme-picker-swatch" style="background:#b0b0b0;"></span>Ink</button>
+          <button class="theme-picker-item" data-colorway="ash"><span class="theme-picker-swatch" style="background:#8e8e94;"></span>Ash</button>
+          <button class="theme-picker-item" data-colorway="bone"><span class="theme-picker-swatch" style="background:#d8d3cb;"></span>Bone</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- TYPOGRAPHY -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-title">Typography</div>
+
+    <div class="subsection">
+      <div class="subsection-title">Font Families</div>
+      <div class="type-row">
+        <span class="type-label">Body</span>
+        <span style="font-family:var(--font); font-size:14px;">Inter — The quick brown fox jumps over the lazy dog</span>
+      </div>
+      <div class="type-row">
+        <span class="type-label">Mono</span>
+        <span style="font-family:var(--mono); font-size:14px;">IBM Plex Mono — The quick brown fox jumps</span>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Scale</div>
+      <div class="type-row">
+        <span class="type-label">XS / 9px</span>
+        <span style="font-family:var(--mono); font-size:9px; text-transform:uppercase; letter-spacing:0.12em; font-weight:500;">Label — Uppercase Mono</span>
+      </div>
+      <div class="type-row">
+        <span class="type-label">SM / 10px</span>
+        <span style="font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:0.04em;">Meta text — Card metadata</span>
+      </div>
+      <div class="type-row">
+        <span class="type-label">Base / 11px</span>
+        <span style="font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:0.08em; font-weight:600;">Button Text — Navigation</span>
+      </div>
+      <div class="type-row">
+        <span class="type-label">MD / 12px</span>
+        <span style="font-family:var(--font); font-size:12px; line-height:1.55;">Body text for cards and descriptions. This is the standard reading size.</span>
+      </div>
+      <div class="type-row">
+        <span class="type-label">LG / 13px</span>
+        <span style="font-family:var(--font); font-size:13px; line-height:1.65;">Brief content and longer form text. Slightly larger for readability.</span>
+      </div>
+      <div class="type-row">
+        <span class="type-label">XL / 14px</span>
+        <span style="font-family:var(--font); font-size:14px; font-weight:500; line-height:1.5;">Question text — Prominent content</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- COLORS -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-title">Color Tokens</div>
+
+    <div class="subsection">
+      <div class="subsection-title">Base Palette</div>
+      <div class="swatch-grid">
+        <div class="swatch"><div class="swatch-color" style="background:var(--bg);"></div><div class="swatch-label">--bg</div><div class="swatch-value">Background</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:var(--bg-1);"></div><div class="swatch-label">--bg-1</div><div class="swatch-value">Background alt</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:var(--surface);"></div><div class="swatch-label">--surface</div><div class="swatch-value">Surface</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:var(--fg);"></div><div class="swatch-label">--fg</div><div class="swatch-value">Foreground</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:var(--fg-2);"></div><div class="swatch-label">--fg-2</div><div class="swatch-value">Secondary</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:var(--fg-3);"></div><div class="swatch-label">--fg-3</div><div class="swatch-value">Muted</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:var(--border);"></div><div class="swatch-label">--border</div><div class="swatch-value">Border</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:var(--border-strong);"></div><div class="swatch-label">--border-strong</div><div class="swatch-value">Border hover</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:var(--accent);"></div><div class="swatch-label">--accent</div><div class="swatch-value">Accent</div></div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Post-it Colors</div>
+      <div class="swatch-grid">
+        <div class="swatch"><div class="swatch-color" style="background:var(--postit-yellow);"></div><div class="swatch-label">--postit-yellow</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:var(--postit-pink);"></div><div class="swatch-label">--postit-pink</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:var(--postit-green);"></div><div class="swatch-label">--postit-green</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:var(--postit-blue);"></div><div class="swatch-label">--postit-blue</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:var(--postit-orange);"></div><div class="swatch-label">--postit-orange</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:var(--postit-purple);"></div><div class="swatch-label">--postit-purple</div></div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Zone Strokes</div>
+      <div class="swatch-grid">
+        <div class="swatch"><div class="swatch-color" style="background:var(--zone-stroke-yellow);"></div><div class="swatch-label">--zone-stroke-yellow</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:var(--zone-stroke-pink);"></div><div class="swatch-label">--zone-stroke-pink</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:var(--zone-stroke-green);"></div><div class="swatch-label">--zone-stroke-green</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:var(--zone-stroke-blue);"></div><div class="swatch-label">--zone-stroke-blue</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- BUTTONS -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-title">Buttons</div>
+
+    <div class="subsection">
+      <div class="subsection-title">Primary</div>
+      <div class="demo-row">
+        <button class="btn-primary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New Project
+        </button>
+        <button class="btn-primary">Submit</button>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Icon Buttons</div>
+      <div class="demo-row">
+        <button class="btn-icon" title="Theme toggle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        </button>
+        <button class="btn-icon" title="User">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Icon Button Group</div>
+      <div class="demo-row">
+        <div class="btn-icon-group">
+          <button class="btn-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          </button>
+          <button class="btn-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r="0.5" fill="currentColor" stroke="none"/><circle cx="17.5" cy="10.5" r="0.5" fill="currentColor" stroke="none"/><circle cx="8.5" cy="7.5" r="0.5" fill="currentColor" stroke="none"/><circle cx="6.5" cy="12" r="0.5" fill="currentColor" stroke="none"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.93 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.04-.23-.29-.38-.63-.38-1.02 0-.83.67-1.5 1.5-1.5H16c3.31 0 6-2.69 6-6 0-5.17-4.49-9-10-9z"/></svg>
+          </button>
+          <button class="btn-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Ghost Button</div>
+      <div class="demo-row">
+        <button class="btn-ghost">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" width="14" height="14"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Settings
+        </button>
+        <button class="btn-ghost">Help</button>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">View Toggle</div>
+      <div class="demo-row">
+        <div class="view-toggle">
+          <button class="view-btn active" title="Grid view">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          </button>
+          <button class="view-btn" title="List view">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Action Buttons (24px)</div>
+      <div class="demo-row">
+        <div style="display:flex; gap:0;">
+          <button class="btn-action" title="Add">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+          <button class="btn-action" title="Generate">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.45 4.35L18 9l-4.55 1.65L12 15l-1.45-4.35L6 9l4.55-1.65L12 3z"/></svg>
+          </button>
+          <button class="btn-action" title="Delete">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- PROJECT CARDS -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-title">Project Cards</div>
+
+    <div class="subsection">
+      <div class="subsection-title">Grid View</div>
+      <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:16px;">
+        <a href="#" class="project-card" onclick="event.preventDefault();">
+          <div class="card-thumb">
+            <div class="thumb-dots" id="dots1"></div>
+            <button class="card-more" onclick="event.preventDefault();event.stopPropagation();">&#8943;</button>
+          </div>
+          <div class="card-info">
+            <div class="card-name">Skincare Launch</div>
+            <div class="card-meta">Edited 2h ago</div>
+          </div>
+        </a>
+        <a href="#" class="project-card" onclick="event.preventDefault();">
+          <div class="card-thumb">
+            <div class="thumb-dots" id="dots2"></div>
+            <button class="card-more" onclick="event.preventDefault();event.stopPropagation();">&#8943;</button>
+          </div>
+          <div class="card-info">
+            <div class="card-name">Brand Strategy Q2</div>
+            <div class="card-meta">Edited 4h ago</div>
+          </div>
+        </a>
+        <a href="#" class="project-card" onclick="event.preventDefault();">
+          <div class="card-thumb">
+            <div class="thumb-dots" id="dots3"></div>
+            <button class="card-more" onclick="event.preventDefault();event.stopPropagation();">&#8943;</button>
+          </div>
+          <div class="card-info">
+            <div class="card-name">Campaign Concepts</div>
+            <div class="card-meta">Edited 1d ago</div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">List View</div>
+      <div class="project-grid list-view" style="flex:none; overflow:visible; padding:0;">
+        <a href="#" class="project-card" onclick="event.preventDefault();">
+          <div class="card-thumb">
+            <div class="thumb-dots" id="dots4"></div>
+          </div>
+          <div class="card-info">
+            <div class="card-name">Product Naming</div>
+            <div class="card-meta">Edited 2d ago</div>
+          </div>
+          <button class="card-more" onclick="event.preventDefault();event.stopPropagation();" style="opacity:1; position:relative; top:auto; right:auto; margin-right:10px;">&#8943;</button>
+        </a>
+        <a href="#" class="project-card" onclick="event.preventDefault();">
+          <div class="card-thumb">
+            <div class="thumb-dots" id="dots5"></div>
+          </div>
+          <div class="card-info">
+            <div class="card-name">Social Content Plan</div>
+            <div class="card-meta">Edited 3d ago</div>
+          </div>
+          <button class="card-more" onclick="event.preventDefault();event.stopPropagation();" style="opacity:1; position:relative; top:auto; right:auto; margin-right:10px;">&#8943;</button>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- POST-IT CARDS -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-title">Post-it Cards</div>
+    <div class="demo-row" style="gap:16px;">
+      <div class="postit-node" data-color="yellow">
+        <div class="postit-star-badge">&#9733;</div>
+        <div class="postit-type">Tension</div>
+        <div class="postit-text">Gen Z craves authenticity but engages most with highly produced content.</div>
+        <div class="postit-actions" style="opacity:1;">
+          <button class="postit-action">&#10005;</button>
+          <button class="postit-action">&#9734;</button>
+          <button class="postit-action">&#8635;</button>
+        </div>
+      </div>
+      <div class="postit-node" data-color="pink">
+        <div class="postit-type">Signal</div>
+        <div class="postit-text">De-influencing isn't anti-consumption -- it's a demand for specificity.</div>
+      </div>
+      <div class="postit-node" data-color="green">
+        <div class="postit-type">Direction</div>
+        <div class="postit-text">Position as "ingredient-literate" beauty -- not clean, not clinical, just honest.</div>
+      </div>
+      <div class="postit-node" data-color="blue">
+        <div class="postit-type">Idea</div>
+        <div class="postit-text">A "formula card" shipped with every product -- ingredient breakdown designed to be shared.</div>
+      </div>
+      <div class="postit-node" data-color="orange">
+        <div class="postit-type">Provocation</div>
+        <div class="postit-text">What if we never claimed "clean" or "natural"?</div>
+      </div>
+      <div class="postit-node" data-color="purple">
+        <div class="postit-type">Guard Rail</div>
+        <div class="postit-text">Never use aspirational lifestyle imagery. Show the product, the texture.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- NAVIGATION -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-title">Navigation</div>
+    <div class="demo-row">
+      <div style="width:220px; border:1px solid var(--border); background:var(--surface); padding:16px 0;">
+        <nav class="sidebar-nav">
+          <a href="#" class="nav-item active" onclick="event.preventDefault();">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+            All Projects
+          </a>
+          <a href="#" class="nav-item" onclick="event.preventDefault();">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Recents
+          </a>
+          <a href="#" class="nav-item" onclick="event.preventDefault();">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            Starred
+          </a>
+          <a href="#" class="nav-item" onclick="event.preventDefault();">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Shared with me
+          </a>
+          <a href="#" class="nav-item" onclick="event.preventDefault();">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><rect x="3" y="3" width="18" height="18" rx="0"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+            Templates
+          </a>
+          <a href="#" class="nav-item" onclick="event.preventDefault();">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            Trash
+          </a>
+        </nav>
+        <div class="sidebar-bottom">
+          <a href="#" class="nav-item" onclick="event.preventDefault();">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            Settings
+          </a>
+          <a href="#" class="nav-item" onclick="event.preventDefault();">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            Help
+          </a>
+        </div>
+      </div>
+      <div>
+        <div class="subsection-title">Logo</div>
+        <a href="#" class="logo" onclick="event.preventDefault();">Seeds</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- FORMS -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-title">Form Elements</div>
+    <div class="demo-row">
+      <div class="search-wrapper">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" class="search-input" placeholder="Search projects...">
+      </div>
+      <select class="sort-select">
+        <option value="recent">Recent</option>
+        <option value="name">Name</option>
+        <option value="created">Created</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- ZONES -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-title">Zones</div>
+
+    <div class="subsection">
+      <div class="subsection-title">Zone Variants</div>
+      <div class="demo-row" style="gap:24px;">
+        <div class="zone-demo">
+          <div class="zone-node" data-zone-color="yellow" style="width:280px; height:180px;">
+            <div class="zone-header">
+              <span class="zone-label">Cultural Landscape</span>
+              <div class="zone-actions" style="opacity:1;">
+                <button class="zone-action-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+                <button class="zone-action-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.45 4.35L18 9l-4.55 1.65L12 15l-1.45-4.35L6 9l4.55-1.65L12 3z"/></svg></button>
+              </div>
+            </div>
+            <div class="zone-resize-handle-corner zone-resize-corner-tl" style="opacity:1;"></div>
+            <div class="zone-resize-handle-corner zone-resize-corner-tr" style="opacity:1;"></div>
+            <div class="zone-resize-handle-corner zone-resize-corner-bl" style="opacity:1;"></div>
+            <div class="zone-resize-handle-corner zone-resize-corner-br" style="opacity:1;"></div>
+          </div>
+        </div>
+        <div class="zone-demo">
+          <div class="zone-node" data-zone-color="pink" style="width:280px; height:180px;">
+            <div class="zone-header"><span class="zone-label">Strategic Direction</span></div>
+          </div>
+        </div>
+        <div class="zone-demo">
+          <div class="zone-node" data-zone-color="green" style="width:280px; height:180px;">
+            <div class="zone-header"><span class="zone-label">Creative Ideas</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="demo-row" style="gap:24px; margin-top:24px;">
+        <div class="zone-demo">
+          <div class="zone-node" data-zone-color="blue" style="width:280px; height:180px;">
+            <div class="zone-header"><span class="zone-label">Guard Rails</span></div>
+          </div>
+        </div>
+        <div class="zone-demo">
+          <div class="zone-node" data-zone-color="distilled" style="width:280px; height:180px;">
+            <div class="zone-header"><span class="zone-label">Distilled</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Zone Summary</div>
+      <div style="width:320px;">
+        <div class="zone-summary-node">
+          <div class="zone-summary-header">
+            <span class="zone-summary-label">Summary</span>
+            <span class="zone-summary-zone-name" data-color="yellow">Cultural Landscape</span>
+          </div>
+          <div class="zone-summary-text">Gen Z demands authenticity while consuming polished content. The tension between transparency and aspiration defines the opportunity space.</div>
+          <div class="zone-summary-meta">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            3 cards
+          </div>
+          <div class="zone-summary-actions" style="opacity:1;">
+            <button class="zone-summary-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+            <button class="zone-summary-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Brief Node</div>
+      <div style="width:260px;">
+        <div class="brief-node">
+          <div class="brief-node-label">Brief</div>
+          <div class="brief-node-text">Develop brand positioning for a new skincare line targeting Gen Z. Focus on transparency, ingredient literacy, and standing out in a crowded clean beauty market.</div>
+          <div class="brief-node-meta">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            2 min ago
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Modifier Node</div>
+      <div style="width:220px;">
+        <div class="modifier-node">
+          <div class="modifier-node-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px; height:11px;"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+            Brand Reference
+          </div>
+          <div class="modifier-node-text">The Ordinary's radical ingredient transparency model. Scientific naming as brand language.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- MENUS -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-title">Menus &amp; Dropdowns</div>
+    <div class="demo-row" style="gap:24px; align-items:flex-start;">
+      <div class="menu-demo">
+        <div class="subsection-title">Context Menu</div>
+        <div class="context-menu">
+          <button class="context-menu-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="10 15 15 20 20 15"/><path d="M4 4h7a4 4 0 0 1 4 4v12"/></svg>
+            Riff on this
+          </button>
+          <button class="context-menu-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            Star
+          </button>
+          <button class="context-menu-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Duplicate
+          </button>
+          <div class="context-menu-divider"></div>
+          <button class="context-menu-item danger">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+            Reject
+          </button>
+        </div>
+      </div>
+
+      <div class="menu-demo">
+        <div class="subsection-title">Dropdown Menu</div>
+        <div class="dropdown-menu">
+          <div class="dropdown-section-label">Zones</div>
+          <button class="dropdown-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>
+            Ideas
+          </button>
+          <button class="dropdown-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+            Strategy
+          </button>
+          <button class="dropdown-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            Insights
+          </button>
+        </div>
+      </div>
+
+      <div class="menu-demo">
+        <div class="subsection-title">Theme Picker</div>
+        <div class="theme-picker-dropdown" style="display:block; position:relative; top:auto; right:auto;">
+          <div class="dropdown-section-label">Color</div>
+          <button class="theme-picker-item active"><span class="theme-picker-swatch" style="background:#fabd2f;"></span>Gruvbox</button>
+          <button class="theme-picker-item"><span class="theme-picker-swatch" style="background:#8aadf4;"></span>Andromeda</button>
+          <button class="theme-picker-item"><span class="theme-picker-swatch" style="background:#ebbcba;"></span>Rose Pine</button>
+          <div class="theme-picker-divider"></div>
+          <div class="dropdown-section-label">Mono</div>
+          <button class="theme-picker-item"><span class="theme-picker-swatch" style="background:#b0b0b0;"></span>Ink</button>
+          <button class="theme-picker-item"><span class="theme-picker-swatch" style="background:#8e8e94;"></span>Ash</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- TOOLBAR -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-title">Toolbar</div>
+
+    <div class="subsection">
+      <div class="subsection-title">Floating Toolbar</div>
+      <div class="toolbar-demo">
+        <div class="floating-toolbar">
+          <button class="toolbar-btn" title="Select">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 9 2 12 5 15"/><polyline points="9 5 12 2 15 5"/><polyline points="15 19 12 22 9 19"/><polyline points="19 9 22 12 19 15"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/></svg>
+          </button>
+          <div class="toolbar-divider"></div>
+          <button class="toolbar-btn active" title="Post-it">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="0"/></svg>
+          </button>
+          <button class="toolbar-btn" title="Zone">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          </button>
+          <div class="toolbar-divider"></div>
+          <button class="new-block-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            New Block
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Zoom Controls</div>
+      <div class="toolbar-demo">
+        <div class="zoom-controls">
+          <button class="zoom-btn">+</button>
+          <div class="zoom-level">100%</div>
+          <button class="zoom-btn">-</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- QUESTION NODE -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-title">Question Node</div>
+    <div class="demo-row" style="gap:24px; align-items:flex-start;">
+      <div class="question-demo">
+        <div class="subsection-title">Active Question</div>
+        <div class="question-node">
+          <div class="question-node-header">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <span>Questions</span>
+            <span class="question-progress">1/4</span>
+          </div>
+          <div class="question-text">1. What should this launch feel like most?</div>
+          <div class="question-options">
+            <button class="question-option"><span class="question-option-key">A</span><span class="question-option-text">Discovered in the wild</span></button>
+            <button class="question-option selected"><span class="question-option-key">B</span><span class="question-option-text">Decoded by insiders</span></button>
+            <button class="question-option"><span class="question-option-key">C</span><span class="question-option-text">Witnessed by everyone</span></button>
+            <button class="question-option"><span class="question-option-key">D</span><span class="question-option-text">Announced with force</span></button>
+            <div class="question-option-custom">
+              <span class="question-option-key" style="padding:10px 0 10px 14px;">E</span>
+              <input class="question-custom-input" placeholder="Type your own answer...">
+            </div>
+          </div>
+          <button class="question-skip">Skip</button>
+        </div>
+      </div>
+
+      <div class="question-demo">
+        <div class="subsection-title">With Answered History</div>
+        <div class="question-node">
+          <div class="question-node-header">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <span>Questions</span>
+            <span class="question-progress">3/4</span>
+          </div>
+          <div class="question-answered">
+            <span class="question-answered-q">Q1. What should this launch feel like?</span>
+            <span class="question-answered-a">Decoded by insiders</span>
+          </div>
+          <div class="question-answered">
+            <span class="question-answered-q">Q2. How should the brand talk about ingredients?</span>
+            <span class="question-answered-a skipped">Skipped</span>
+          </div>
+          <div class="question-text">3. What's the first thing people should share?</div>
+          <div class="question-options">
+            <button class="question-option"><span class="question-option-key">A</span><span class="question-option-text">An ingredient breakdown card</span></button>
+            <button class="question-option"><span class="question-option-key">B</span><span class="question-option-text">A "what's really in yours?" comparison</span></button>
+            <button class="question-option"><span class="question-option-key">C</span><span class="question-option-text">A formula quiz result</span></button>
+            <button class="question-option"><span class="question-option-key">D</span><span class="question-option-text">A behind-the-lab video</span></button>
+          </div>
+        </div>
+      </div>
+
+      <div style="width:260px;">
+        <div class="subsection-title">Complete State</div>
+        <div class="question-node">
+          <div class="question-node-header">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <span>Questions</span>
+            <span class="question-progress">4/4</span>
+          </div>
+          <div class="question-complete">
+            <div class="question-complete-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="24" height="24"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="question-complete-text">All questions answered</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- CANVAS ELEMENTS -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-title">Canvas Elements</div>
+
+    <div class="demo-row" style="gap:24px; align-items:flex-start;">
+      <div>
+        <div class="subsection-title">Generate Node</div>
+        <div class="generate-node">
+          <div class="generate-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.45 4.35L18 9l-4.55 1.65L12 15l-1.45-4.35L6 9l4.55-1.65L12 3z"/></svg>
+            Generate
+          </div>
+          <button class="generate-btn">Tensions &amp; signals</button>
+          <button class="generate-btn">Strategic directions</button>
+          <button class="generate-btn">Creative ideas</button>
+        </div>
+      </div>
+
+      <div class="toast-demo">
+        <div class="subsection-title">Toast Notification</div>
+        <div class="toast" style="opacity:1; transform:none; position:relative; bottom:auto; left:auto;">starred</div>
+        <div class="toast" style="opacity:1; transform:none; position:relative; bottom:auto; left:auto; margin-top:8px;">rejected</div>
+        <div class="toast" style="opacity:1; transform:none; position:relative; bottom:auto; left:auto; margin-top:8px;">generating...</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// Theme toggle
+const themeToggle = document.getElementById('themeToggle');
+const sunIcon = document.getElementById('sunIcon');
+const moonIcon = document.getElementById('moonIcon');
+let darkMode = false;
+
+function applyTheme() {
+  document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
+  sunIcon.style.display = darkMode ? 'none' : 'block';
+  moonIcon.style.display = darkMode ? 'block' : 'none';
+}
+
+themeToggle.addEventListener('click', () => {
+  darkMode = !darkMode;
+  applyTheme();
+});
+
+applyTheme();
+
+// Colorway picker
+const colorwayToggle = document.getElementById('colorwayToggle');
+const colorwayDropdown = document.getElementById('colorwayDropdown');
+let colorwayOpen = false;
+
+colorwayToggle.addEventListener('click', (e) => {
+  e.stopPropagation();
+  colorwayOpen = !colorwayOpen;
+  colorwayDropdown.style.display = colorwayOpen ? 'block' : 'none';
+});
+
+document.addEventListener('click', () => {
+  colorwayOpen = false;
+  colorwayDropdown.style.display = 'none';
+});
+
+colorwayDropdown.addEventListener('click', (e) => { e.stopPropagation(); });
+
+document.querySelectorAll('#colorwayDropdown .theme-picker-item').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const cw = btn.dataset.colorway;
+    document.querySelectorAll('#colorwayDropdown .theme-picker-item').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    if (cw === 'gruvbox') {
+      document.documentElement.removeAttribute('data-colorway');
+    } else {
+      document.documentElement.setAttribute('data-colorway', cw);
+    }
+  });
+});
+
+// Generate dot thumbnails
+const colors = ['#fabd2f', '#d3869b', '#b8bb26', '#83a598', '#fe8019', '#d3869b'];
+const dotPatterns = [
+  [[0,0,1,1,0,0,0,0],[0,1,1,1,1,0,0,0],[0,0,0,0,0,2,2,0],[0,0,3,3,0,2,2,0],[0,0,3,3,0,0,0,0],[4,0,0,0,0,0,5,5],[4,4,0,0,0,0,5,0],[0,0,0,1,1,0,0,0]],
+  [[2,2,2,0,0,0,0,0],[2,2,0,0,3,3,0,0],[0,0,0,0,3,3,0,0],[0,0,0,0,0,0,0,0],[0,1,1,0,0,4,4,0],[0,1,1,0,0,4,4,0],[0,0,0,5,5,0,0,0],[0,0,0,5,5,0,0,0]],
+  [[0,0,0,0,0,0,0,0],[0,3,0,0,1,1,0,0],[0,3,0,0,1,1,0,0],[0,0,0,0,0,0,0,0],[0,0,2,2,0,0,5,0],[0,0,2,2,0,0,5,0],[4,4,0,0,0,0,0,0],[4,4,0,0,3,3,0,0]],
+  [[1,1,1,0,0,2,2,2],[1,1,0,0,0,0,2,2],[0,0,0,0,0,0,0,0],[0,0,3,3,3,0,0,0],[0,0,3,3,3,0,0,0],[0,0,0,0,0,0,0,0],[5,5,0,0,0,4,4,0],[5,5,0,0,0,4,4,0]],
+  [[0,4,4,0,0,0,0,0],[0,4,4,0,1,0,0,0],[0,0,0,0,1,0,0,0],[0,0,0,0,0,0,2,2],[3,3,0,0,0,0,2,2],[3,3,0,5,5,0,0,0],[0,0,0,5,5,0,0,0],[0,0,0,0,0,0,0,0]],
+];
+
+function renderDots(elId, patternIdx) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  const pattern = dotPatterns[patternIdx % dotPatterns.length];
+  let html = '';
+  pattern.forEach(row => {
+    row.forEach(val => {
+      if (val === 0) {
+        html += '<span class="thumb-dot" style="background:transparent;"></span>';
+      } else {
+        html += '<span class="thumb-dot" style="background:' + colors[val - 1] + ';"></span>';
+      }
+    });
+  });
+  el.innerHTML = html;
+}
+
+renderDots('dots1', 0);
+renderDots('dots2', 1);
+renderDots('dots3', 2);
+renderDots('dots4', 3);
+renderDots('dots5', 4);
+
+// Nav item clicks
+document.querySelectorAll('.sidebar-nav .nav-item, .sidebar-bottom .nav-item').forEach(item => {
+  item.addEventListener('click', function(e) {
+    e.preventDefault();
+    const parent = this.closest('.sidebar-nav') || this.closest('.sidebar-bottom');
+    if (!parent) return;
+    parent.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+</script>
+
+</body>
+</html>

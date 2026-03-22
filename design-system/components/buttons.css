@@ -1,0 +1,161 @@
+/* ── Buttons ── */
+
+/* Primary button (new project, CTA) */
+.btn-primary {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: var(--fg);
+  color: var(--bg);
+  border: 1px solid var(--fg);
+  border-radius: 0;
+  padding: 7px 14px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background var(--transition-fast);
+}
+
+.btn-primary:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.btn-primary svg { width: 12px; height: 12px; }
+
+/* Icon button (32px square) */
+.btn-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--fg-2);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.btn-icon:hover {
+  background: var(--fg);
+  color: var(--bg);
+}
+
+.btn-icon svg { width: 14px; height: 14px; }
+
+/* Icon button group (shared borders) */
+.btn-icon-group {
+  display: flex;
+  gap: 0;
+}
+
+.btn-icon-group .btn-icon + .btn-icon {
+  margin-left: -1px;
+}
+
+/* Toolbar button */
+.toolbar-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 0;
+  background: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--fg-3);
+  transition: background var(--transition-fast), color var(--transition-fast);
+  position: relative;
+  font-family: var(--mono);
+}
+
+.toolbar-btn:hover {
+  background: var(--fg);
+  color: var(--bg);
+}
+
+.toolbar-btn.active {
+  background: var(--fg);
+  color: var(--bg);
+}
+
+.toolbar-btn svg { width: 16px; height: 16px; }
+
+/* Ghost button (no border, hover fill) */
+.btn-ghost {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: none;
+  color: var(--fg-2);
+  border: none;
+  border-radius: 0;
+  padding: 7px 10px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.btn-ghost:hover {
+  background: var(--fg);
+  color: var(--bg);
+}
+
+.btn-ghost svg { width: 14px; height: 14px; }
+
+/* View toggle buttons */
+.view-toggle {
+  display: flex;
+  gap: 0;
+}
+
+.view-btn {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border);
+  border-radius: 0;
+  background: var(--surface);
+  color: var(--fg-3);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.view-btn + .view-btn { border-left: none; }
+.view-btn:hover { color: var(--fg); }
+.view-btn.active { background: var(--fg); color: var(--bg); }
+.view-btn svg { width: 14px; height: 14px; }
+
+/* Small action button (24px, used in zones/cards) */
+.btn-action {
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--border);
+  border-radius: 0;
+  background: var(--bg);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--fg-3);
+  transition: background var(--transition-normal), color var(--transition-normal);
+  margin-left: -1px;
+}
+
+.btn-action:first-child { margin-left: 0; }
+.btn-action:hover { background: var(--fg); color: var(--bg); }
+.btn-action svg { width: 12px; height: 12px; }
