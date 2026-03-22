@@ -22,6 +22,7 @@
     letter-spacing: 0.14em; text-transform: uppercase; color: var(--fg);
   }
   .showcase-controls { display: flex; align-items: center; gap: 0; }
+  .showcase-links { display: flex; align-items: center; gap: 8px; margin-right: 12px; }
   .section { margin-bottom: 56px; }
   .section-title {
     font-family: var(--mono); font-size: 10px; font-weight: 600;
@@ -92,6 +93,7 @@
   .demo-surface { background: var(--surface); border: 1px solid var(--border); padding: 20px; }
   .demo-bg { background: var(--bg); border: 1px solid var(--border); padding: 20px; }
   .demo-inline { display: inline-flex; gap: 8px; align-items: center; }
+  .doc-link { text-decoration: none; }
 
   /* Zone demo container */
   .zone-demo { position: relative; width: 300px; height: 200px; }
@@ -122,6 +124,9 @@
   <div class="showcase-header">
     <div class="showcase-title">Seeds Design System</div>
     <div class="showcase-controls">
+      <div class="showcase-links">
+        <a class="btn-ghost doc-link" href="references/seeds-canvas-reference.html">Canvas Reference</a>
+      </div>
       <div class="btn-icon-group">
         <button class="btn-icon" id="themeToggle" title="Toggle dark mode">
           <svg id="sunIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square">
@@ -237,6 +242,20 @@
     <div class="subsection">
       <div class="subsection-title">Canvas Geometry Tokens</div>
       <div class="token-grid" id="canvasTokenGrid"></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Reference Artifacts</div>
+
+    <div class="subsection">
+      <div class="subsection-title">Implementation Reference</div>
+      <div class="demo-bg">
+        <p style="font-size:12px; line-height:1.55; color:var(--fg-2); margin-bottom:12px;">
+          Use the canvas reference as the canonical full-board composition artifact when implementing the real app. It shows how the design-system primitives combine on a live React Flow board.
+        </p>
+        <a class="btn-secondary doc-link" href="references/seeds-canvas-reference.html">Open Seeds Canvas Reference</a>
+      </div>
     </div>
   </div>
 
